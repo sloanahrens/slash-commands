@@ -35,8 +35,9 @@ Continue whatever you were doing, but remember these rules:
 
 ## YAML Gotchas
 
-- **Quote strings with colons** - `echo "Service URL:"` not `echo Service URL:` (YAML interprets unquoted colons as key-value separators)
+- **Avoid colons in list items** - even inside quotes, `- echo "Service URL: foo"` becomes `{'echo "Service URL': 'foo"'}`. Use dashes instead: `- echo "Service URL - foo"`
 - **Use `|` for multiline scripts** - avoids escaping issues
+- **Validate with Python** - `python3 -c "import yaml; print(yaml.safe_load(open('file.yml')))"` reveals parsing surprises
 
 ---
 
