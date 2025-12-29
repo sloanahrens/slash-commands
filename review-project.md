@@ -4,7 +4,7 @@ description: Review Project (for specified repo, or prompts for selection)
 
 # Review Project
 
-Conduct a technical review of a repository and provide actionable recommendations.
+Conduct a technical review of a repository and update its documentation.
 
 **Arguments**: `$ARGUMENTS` - Optional repo name (supports fuzzy match). If empty, shows selection menu.
 
@@ -48,33 +48,55 @@ npm test            # If available
 - Environment configuration
 - Documentation quality
 
-### Step 4: Generate Report
+### Step 4: Update Documentation
 
-Write to `<repo-path>/docs/tech-review.md`:
+**Primary: Update `<repo>/CLAUDE.md`**
+
+Incorporate key findings directly into the repo's CLAUDE.md:
+- Update commands if they've changed
+- Add warnings or gotchas discovered
+- Refine architecture descriptions
+- Keep it concise (100-200 lines max)
+
+**If detailed analysis needed: `<repo>/docs/tech-review.md`**
+
+Only create this file if findings are too detailed for CLAUDE.md:
 
 ```markdown
 # Technical Review: <repo-name>
-*Generated: <date>*
+*Last updated: <date>*
 
-## Executive Summary
+## Summary
 [3-5 key findings]
 
 ## Strengths
-[What the project does well - specific examples]
+[What the project does well]
 
-## Critical Issues
-[High-priority problems]
+## Issues & Recommendations
 - **Issue**: Description
 - **Impact**: Why this matters
-- **Recommendation**: Action items
-- **Effort**: Low/Medium/High
-
-## Improvement Opportunities
-[Medium-priority improvements]
+- **Fix**: Action items
 
 ## Future Considerations
-[Long-term architectural improvements]
+[Long-term improvements]
 ```
+
+**If registry info changed: Update root CLAUDE.md**
+
+Only update `<base_path>/CLAUDE.md` if:
+- Repo name or alias changed
+- New gotchas that affect the registry table
+- Stack or description is outdated
+
+---
+
+## Documentation Rules
+
+| DO | DON'T |
+|----|-------|
+| Update `<repo>/CLAUDE.md` | Create docs at workspace root |
+| Write details to `<repo>/docs/` | Duplicate info across files |
+| Update root CLAUDE.md registry | Create standalone review files at root |
 
 ---
 
