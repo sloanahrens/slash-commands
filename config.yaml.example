@@ -1,0 +1,41 @@
+# Portable Commands Configuration
+# Copy this file to config.yaml and customize for your environment
+# config.yaml is gitignored and will not be committed
+
+# Base path for all repositories (use absolute path or ~)
+base_path: ~/code/my-workspace
+
+# Repository definitions
+# Each repo needs:
+#   - name: directory name (required)
+#   - group: 'devops' or 'apps' (required)
+#   - aliases: list of fuzzy match shortcuts (optional)
+#   - work_dir: subdirectory to run commands from (optional)
+#   - test_cmd: custom test command (optional)
+
+repos:
+  # DevOps/Infrastructure examples
+  - name: my-infra-pulumi
+    group: devops
+    aliases: [pulumi, infra]
+
+  - name: my-terraform
+    group: devops
+    aliases: [tf, terraform]
+
+  # Application examples
+  - name: my-nextjs-app
+    group: apps
+    aliases: [app, next]
+
+  - name: my-api
+    group: apps
+    aliases: [api]
+    work_dir: backend        # Run commands from this subdirectory
+    test_cmd: go test ./...  # Custom test command
+
+  # Monorepo with subdirectories
+  - name: my-monorepo
+    group: apps
+    aliases: [mono]
+    work_dir: packages/app   # Subdirectory for npm commands
