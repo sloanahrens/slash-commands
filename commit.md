@@ -2,7 +2,7 @@
 description: Commit changes for a repository
 ---
 
-# Commit Progress
+# Commit
 
 Help commit git changes for a repository.
 
@@ -136,7 +136,7 @@ Would you like to proceed? (yes/no/edit)
 ## Examples
 
 ```bash
-/commit-progress                       # Interactive selection
-/commit-progress pulumi                # Fuzzy match → devops-pulumi-ts
-/commit-progress atap --conventional   # Use conventional commits format
+/commit                       # Interactive selection
+/commit pulumi                # Fuzzy match → devops-pulumi-ts
+/commit hanscom --conventional   # Use conventional commits format
 ```
