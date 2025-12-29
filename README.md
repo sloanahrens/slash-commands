@@ -28,7 +28,10 @@ repos:
 | `/update-docs <repo>` | Update CLAUDE.md, README, docs |
 | `/review-project <repo>` | Technical review to docs/tech-review.md |
 | `/add-repo <url>` | Clone repo and add to config |
-| `/dev-rules` | Remind Claude of workspace rules (includes pwd check) |
+| `/status [repo]` | Show status overview of all or one repo |
+| `/sync [repo]` | Pull latest changes for all or one repo |
+| `/switch <repo>` | Quick context switch to a repo |
+| `/dev-rules` | Remind Claude of workspace rules |
 
 All repo commands support fuzzy matching via aliases (e.g., `/run-tests app`).
 
