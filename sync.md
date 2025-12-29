@@ -53,7 +53,7 @@ Sync Results
 
 | Repo              | Result      | Details              |
 |-------------------|-------------|----------------------|
-| devops-gcp-pulumi | ✓ updated   | 3 commits pulled     |
+| devops-pulumi-ts | ✓ updated   | 3 commits pulled     |
 | fractals-nextjs   | ✓ current   | Already up to date   |
 | mango             | ⚠ skipped   | Uncommitted changes  |
 | git-monitor       | ✗ failed    | Merge conflict       |
@@ -91,6 +91,6 @@ Conflict in <repo-name>. Resolve manually:
 
 ```bash
 /sync                # Sync all repos
-/sync pulumi         # Sync devops-gcp-pulumi only
+/sync pulumi         # Sync devops-pulumi-ts only
 /sync --force        # Sync all, auto-stash dirty repos
 ```

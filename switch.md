@@ -63,6 +63,6 @@ Show key info from repo's CLAUDE.md:
 
 ```bash
 /switch fractals     # Switch to fractals-nextjs
-/switch pulumi       # Switch to devops-gcp-pulumi
+/switch pulumi       # Switch to devops-pulumi-ts
 /switch              # Show selection menu
 ```

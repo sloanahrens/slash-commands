@@ -84,6 +84,6 @@ Report:
 
 ```bash
 /update-docs              # Interactive selection
-/update-docs pulumi       # Fuzzy match → devops-gcp-pulumi
+/update-docs pulumi       # Fuzzy match → devops-pulumi-ts
 /update-docs atap         # Fuzzy match → atap-automation2
 ```

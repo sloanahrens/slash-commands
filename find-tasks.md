@@ -49,7 +49,28 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Finding tasks
    ls <repo-path>/docs/plans/*.md 2>/dev/null
    ```
 
-6. **(If `--issues` flag)** Check remote issues/PRs:
+6. **(If `--linear` flag OR repo has `linear_project` in config)** Check Linear issues:
+
+   Use Linear MCP tools to fetch open issues:
+   ```
+   # Search for issues related to the project
+   mcp__linear__search_issues(query: "<project-keywords>", status: "In Progress")
+   mcp__linear__search_issues(query: "<project-keywords>", status: "Backlog")
+   mcp__linear__search_issues(query: "<project-keywords>", status: "Todo")
+   ```
+
+   Display Linear issues in output:
+   ```
+   Linear Issues (<project-name>):
+   ├── In Progress
+   │   └── MESH-905: Poc Design (High)
+   ├── Backlog
+   │   └── DMB-6: Scope Hanscom Plaid integration (High)
+   └── Todo
+       └── (none)
+   ```
+
+7. **(If `--issues` flag)** Check GitHub/Bitbucket issues/PRs:
    ```bash
    # Detect remote type from git remote
    git remote get-url origin
@@ -103,6 +124,7 @@ For each task:
 
 | Flag | Effect |
 |------|--------|
+| `--linear` | Include Linear issues (auto-enabled if repo has `linear_project` in config) |
 | `--issues` | Include GitHub/Bitbucket issues and PRs in analysis |
 | `--deep` | More thorough analysis (test coverage, dependency audit) |
 
@@ -112,7 +134,9 @@ For each task:
 
 ```bash
 /find-tasks                    # Interactive selection
-/find-tasks pulumi             # Fuzzy match → devops-gcp-pulumi
+/find-tasks pulumi             # Fuzzy match → devops-pulumi-ts
+/find-tasks hanscom            # Auto-includes Linear (has linear_project in config)
+/find-tasks hanscom --linear   # Explicit Linear flag
 /find-tasks fractals --issues  # Include GitHub issues
-/find-tasks atap --deep        # Deep analysis
+/find-tasks mango --deep       # Deep analysis
 ```

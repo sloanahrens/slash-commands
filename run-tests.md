@@ -115,7 +115,7 @@ Examples:
 
 ```bash
 /run-tests                          # Interactive selection
-/run-tests pulumi                   # Fuzzy match → devops-gcp-pulumi
+/run-tests pulumi                   # Fuzzy match → devops-pulumi-ts
 /run-tests atap --only=test         # Just run tests
 /run-tests fractals --fix           # Auto-fix lint issues
 ```

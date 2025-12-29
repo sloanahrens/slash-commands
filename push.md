@@ -71,6 +71,6 @@ Or if new branch:
 
 ```bash
 /push                    # Interactive selection
-/push pulumi             # Fuzzy match → devops-gcp-pulumi
+/push pulumi             # Fuzzy match → devops-pulumi-ts
 /push commands           # Push .claude/commands repo
 ```
