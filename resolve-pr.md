@@ -1,5 +1,5 @@
 ---
-description: Resolve GitHub PR review feedback using brainstorming workflow
+description: Resolve GitHub PR review feedback with technical rigor
 argument-hint: <github-pr-url>
 allowed-tools: [Bash, Read, Glob, Grep, Task, Skill, WebFetch, AskUserQuestion]
 ---
@@ -164,25 +164,25 @@ Briefly list resolved items for context.
 Summary list of all files that need modifications.
 ```
 
-## Step 7: Invoke Brainstorming
+## Step 7: Invoke Code Review Reception
 
-Now invoke the brainstorming skill to create a resolution plan:
+Now invoke the receiving-code-review skill to evaluate and resolve feedback:
 
 ```
-/superpowers:brainstorm
+/superpowers:receiving-code-review
 ```
 
-Provide context for the brainstorm:
+Provide context:
 - The organized feedback summary from Step 6
-- The goal: "Create a plan to resolve all issues raised in this PR feedback"
 - The local repository path where changes will be made
 - Current state of relevant files
 
-The brainstorming skill will:
-1. Ask clarifying questions about ambiguous feedback
-2. Propose approaches for addressing each issue
-3. Create a structured plan to resolve all feedback
-4. Optionally proceed to implementation
+The skill will guide you to:
+1. **Clarify first** - Ask about any unclear items before implementing anything
+2. **Verify** - Check suggestions against codebase reality before acting
+3. **Evaluate** - Push back on technically incorrect suggestions with reasoning
+4. **Implement in order** - Blocking issues → simple fixes → complex fixes
+5. **Test each** - Verify no regressions after each change
 
 ## Error Handling
 

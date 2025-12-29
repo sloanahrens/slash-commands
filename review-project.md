@@ -34,6 +34,8 @@ npm test            # If available
 
 ### Step 4: Review Key Areas
 
+Use the `pr-review-toolkit:code-reviewer` agent to analyze the codebase systematically. The agent will check:
+
 **App Repos (Next.js, React):**
 - Architecture & component organization
 - State management patterns
@@ -51,6 +53,8 @@ npm test            # If available
 - Dependency management
 - Environment configuration
 - Documentation quality
+
+Invoke the agent with the repo path and focus areas relevant to the stack.
 
 ### Step 5: Update Documentation
 

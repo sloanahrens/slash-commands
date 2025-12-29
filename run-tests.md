@@ -102,9 +102,12 @@ Examples:
 
 - If a check fails, analyze the error output
 - If `--fix` was passed, attempt auto-fix and re-run
-- Apply manual fixes to source files if needed
-- Verify fixes with a re-run
-- If unable to fix automatically, report the issue
+- **If tests fail and cause is unclear**, invoke `superpowers:systematic-debugging` to investigate:
+  - Gather evidence before hypothesizing
+  - Form testable hypotheses
+  - Verify fix actually resolves the issue
+- Verify all fixes with a re-run
+- If unable to fix automatically, report the issue with diagnosis
 
 ---
 

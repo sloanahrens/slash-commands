@@ -46,6 +46,8 @@ cd <repo-path> && git log --oneline -5          # Recent changes
 
 ### Step 4: Update Files
 
+Follow `elements-of-style` principles when writing: omit needless words, use active voice, be specific.
+
 **CLAUDE.md**: Verify commands are current, patterns accurate, links work.
 
 **README.md**: Keep brief, include quick start, link to detailed docs.

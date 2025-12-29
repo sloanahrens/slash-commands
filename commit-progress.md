@@ -87,6 +87,15 @@ cd <repo-path> && git add -A && git commit -m "<message>"
 
 If user wants edits, ask what to modify and regenerate.
 
+### Step 8: Verify Success
+
+Confirm commit succeeded:
+```bash
+cd <repo-path> && git log -1 --oneline
+```
+
+If pre-commit hooks modified files, include them in an amended commit.
+
 ---
 
 ## Commit Guidelines
