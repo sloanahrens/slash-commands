@@ -32,6 +32,7 @@ repos:
 | `/sync [repo]` | Pull latest changes for all or one repo |
 | `/switch <repo>` | Quick context switch to a repo |
 | `/dev-rules` | Remind Claude of workspace rules |
+| `/setup-plugins` | Install all recommended plugins |
 
 All repo commands support fuzzy matching via aliases (e.g., `/run-tests app`).
 
@@ -81,22 +82,53 @@ If `language` is not specified, it's auto-detected from files:
 - Git
 - Repos should have a `CLAUDE.md` for best results
 
-## Optional: Superpowers Skills
+## Recommended Plugins
 
-The `/super` command uses skills from the Superpowers marketplace plugin. To install:
+Run `/setup-plugins` to install all recommended plugins, or install manually:
+
+### Add Marketplaces
 
 ```bash
-claude mcp add superpowers-marketplace -- npx -y @anthropic-ai/superpowers-marketplace@latest
+claude plugin marketplace add obra/superpowers-marketplace
+claude plugin marketplace add anthropics/claude-plugins-official
 ```
 
-This adds skills like:
-- `superpowers:brainstorming` - Structured creative exploration
-- `superpowers:writing-plans` - Implementation planning
-- `superpowers:systematic-debugging` - Bug investigation
-- `superpowers:test-driven-development` - TDD workflow
-- `superpowers:verification-before-completion` - Pre-commit checks
+### Core Plugins (Superpowers Marketplace)
 
-These are optional but recommended. Without them, `/super` will still work but won't invoke the brainstorming skill.
+```bash
+claude plugin install superpowers@superpowers-marketplace          # TDD, debugging, brainstorming
+claude plugin install elements-of-style@superpowers-marketplace    # Writing guidance
+claude plugin install episodic-memory@superpowers-marketplace      # Memory across sessions
+claude plugin install double-shot-latte@superpowers-marketplace    # Auto-continue
+claude plugin install superpowers-developing-for-claude-code@superpowers-marketplace  # Plugin dev
+claude plugin install superpowers-lab@superpowers-marketplace      # Experimental (vim, tmux)
+claude plugin install superpowers-chrome@superpowers-marketplace   # Chrome DevTools (BETA)
+```
+
+### Official Plugins
+
+```bash
+claude plugin install frontend-design@claude-plugins-official      # React/Tailwind guidance
+claude plugin install feature-dev@claude-plugins-official          # Code architect agents
+claude plugin install code-review@claude-plugins-official          # Code review workflow
+claude plugin install commit-commands@claude-plugins-official      # Git helpers
+claude plugin install pr-review-toolkit@claude-plugins-official    # PR review
+claude plugin install hookify@claude-plugins-official              # Custom hooks
+claude plugin install typescript-lsp@claude-plugins-official       # TypeScript LSP
+claude plugin install gopls-lsp@claude-plugins-official            # Go LSP
+```
+
+### Key Skills
+
+The `/super` command uses the `superpowers:brainstorming` skill. Other useful skills:
+
+| Skill | When to Use |
+|-------|-------------|
+| `superpowers:brainstorming` | Before creative work, designing features |
+| `superpowers:writing-plans` | Creating implementation plans |
+| `superpowers:systematic-debugging` | Bug investigation (find root cause first) |
+| `superpowers:test-driven-development` | Writing new code (test first) |
+| `superpowers:verification-before-completion` | Before claiming work is done |
 
 ## Commit Rules
 
