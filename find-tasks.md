@@ -49,6 +49,19 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Finding tasks
    ls <repo-path>/docs/plans/*.md 2>/dev/null
    ```
 
+6. **(If `--issues` flag)** Check remote issues/PRs:
+   ```bash
+   # Detect remote type from git remote
+   git remote get-url origin
+
+   # GitHub
+   gh issue list --limit 10
+   gh pr list --limit 5
+
+   # Bitbucket (if bb CLI available)
+   # Or use API directly
+   ```
+
 ### Step 3: Identify High-Impact Work
 
 Focus on tasks that:
@@ -86,10 +99,20 @@ For each task:
 
 ---
 
+## Options
+
+| Flag | Effect |
+|------|--------|
+| `--issues` | Include GitHub/Bitbucket issues and PRs in analysis |
+| `--deep` | More thorough analysis (test coverage, dependency audit) |
+
+---
+
 ## Examples
 
 ```bash
-/find-tasks              # Interactive selection
-/find-tasks pulumi       # Fuzzy match → devops-gcp-pulumi
-/find-tasks atap         # Fuzzy match → atap-automation2
+/find-tasks                    # Interactive selection
+/find-tasks pulumi             # Fuzzy match → devops-gcp-pulumi
+/find-tasks fractals --issues  # Include GitHub issues
+/find-tasks atap --deep        # Deep analysis
 ```

@@ -26,14 +26,31 @@ cd <repo-path> && git status
 
 If no changes, report "No changes to commit" and exit.
 
-### Step 3: Review Changes
+### Step 3: Detect Pre-commit Hooks
+
+Check for hooks that will run on commit:
+
+```bash
+ls <repo-path>/.husky/pre-commit 2>/dev/null
+ls <repo-path>/.git/hooks/pre-commit 2>/dev/null
+cat <repo-path>/package.json | grep -q "husky\|lint-staged"
+```
+
+If hooks exist, warn:
+```
+⚠️  Pre-commit hooks detected (husky/lint-staged)
+    Hooks will run: lint, format, tests
+    This may modify files or reject the commit.
+```
+
+### Step 4: Review Changes
 
 ```bash
 cd <repo-path> && git diff --stat
 cd <repo-path> && git diff
 ```
 
-### Step 4: Generate Commit Message
+### Step 5: Generate Commit Message
 
 Analyze changes and draft a message that:
 - Has short summary (50-72 characters)
@@ -41,7 +58,16 @@ Analyze changes and draft a message that:
 - Focuses on WHAT and WHY, not HOW
 - Follows commit rules in `_shared-repo-logic.md`
 
-### Step 5: Present for Approval
+**If `--conventional` flag passed**, use Conventional Commits format:
+```
+<type>(<scope>): <description>
+
+[optional body]
+```
+
+Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `build`, `ci`
+
+### Step 6: Present for Approval
 
 ```
 Proposed commit message for <repo-name>:
@@ -52,7 +78,7 @@ Proposed commit message for <repo-name>:
 Would you like to proceed? (yes/no/edit)
 ```
 
-### Step 6: Execute Commit
+### Step 7: Execute Commit
 
 If approved:
 ```bash
@@ -89,10 +115,19 @@ Would you like to proceed? (yes/no/edit)
 
 ---
 
+## Options
+
+| Flag | Effect |
+|------|--------|
+| `--conventional` | Use Conventional Commits format |
+| `--amend` | Amend previous commit (use with caution) |
+
+---
+
 ## Examples
 
 ```bash
-/commit-progress              # Interactive selection
-/commit-progress pulumi       # Fuzzy match → devops-gcp-pulumi
-/commit-progress atap         # Fuzzy match → atap-automation2
+/commit-progress                       # Interactive selection
+/commit-progress pulumi                # Fuzzy match → devops-gcp-pulumi
+/commit-progress atap --conventional   # Use conventional commits format
 ```

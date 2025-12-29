@@ -77,10 +77,32 @@ If `commands` block exists in config, use those instead.
 
 ---
 
+## Options
+
+Parse flags from `$ARGUMENTS`:
+
+| Flag | Effect |
+|------|--------|
+| `--only=<checks>` | Run only specified checks (comma-separated) |
+| `--fix` | Auto-fix issues where possible (lint, format) |
+| `--watch` | Run tests in watch mode (if supported) |
+
+**Check names:** `lint`, `typecheck`, `build`, `test`
+
+Examples:
+```bash
+/run-tests pulumi --only=lint,typecheck   # Skip build and test
+/run-tests fractals --only=test           # Just run tests
+/run-tests atap --fix                     # Auto-fix lint issues
+```
+
+---
+
 ## Error Handling
 
 - If a check fails, analyze the error output
-- Apply fixes directly to source files
+- If `--fix` was passed, attempt auto-fix and re-run
+- Apply manual fixes to source files if needed
 - Verify fixes with a re-run
 - If unable to fix automatically, report the issue
 
@@ -89,7 +111,8 @@ If `commands` block exists in config, use those instead.
 ## Examples
 
 ```bash
-/run-tests              # Interactive selection
-/run-tests pulumi       # Fuzzy match → devops-gcp-pulumi
-/run-tests atap         # Fuzzy match → atap-automation2
+/run-tests                          # Interactive selection
+/run-tests pulumi                   # Fuzzy match → devops-gcp-pulumi
+/run-tests atap --only=test         # Just run tests
+/run-tests fractals --fix           # Auto-fix lint issues
 ```
