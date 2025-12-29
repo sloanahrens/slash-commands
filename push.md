@@ -18,21 +18,31 @@ Push local commits to remote origin for a repository.
 
 Follow repo selection from `_shared-repo-logic.md`, then confirm: "Pushing for: <repo-name>"
 
-### Step 2: Check Repository Status
+### Step 2: Check for Uncommitted Changes
+
+```bash
+cd <repo-path> && git status --porcelain
+```
+
+**If uncommitted changes exist:**
+
+Invoke `/yes-commit <repo-name>` to commit changes first, then continue with push.
+
+### Step 3: Check Commits Ahead
 
 ```bash
 cd <repo-path> && git status
 ```
 
-If no commits ahead, report "Nothing to push" and exit.
+If no commits ahead of remote, report "Nothing to push" and exit.
 
-### Step 3: Get Current Branch
+### Step 4: Get Current Branch
 
 ```bash
 cd <repo-path> && git branch --show-current
 ```
 
-### Step 4: Check If Branch Tracks Remote
+### Step 5: Check If Branch Tracks Remote
 
 ```bash
 cd <repo-path> && git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null
@@ -41,7 +51,7 @@ cd <repo-path> && git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/nu
 - If this succeeds → branch already tracks remote
 - If this fails → new branch, needs `-u` flag
 
-### Step 5: Execute Push
+### Step 6: Execute Push
 
 **If branch tracks remote:**
 ```bash
@@ -53,7 +63,7 @@ cd <repo-path> && git push origin <branch-name>
 cd <repo-path> && git push -u origin <branch-name>
 ```
 
-### Step 6: Confirm Result
+### Step 7: Confirm Result
 
 Report push result:
 ```

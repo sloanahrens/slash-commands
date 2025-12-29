@@ -24,7 +24,7 @@ repos:
 | `/super <repo>` | Start brainstorming session with full context |
 | `/find-tasks <repo>` | Suggest 3-5 high-priority tasks |
 | `/run-tests <repo>` | Run lint, type-check, build, and tests |
-| `/commit <repo>` | Draft and commit changes |
+| `/yes-commit <repo>` | Draft and commit changes |
 | `/push <repo>` | Push commits to origin |
 | `/update-docs <repo>` | Update CLAUDE.md, README, docs |
 | `/review-project <repo>` | Technical review to docs/tech-review.md |

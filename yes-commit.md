@@ -136,7 +136,7 @@ Would you like to proceed? (yes/no/edit)
 ## Examples
 
 ```bash
-/commit                       # Interactive selection
-/commit pulumi                # Fuzzy match → my-infra-pulumi
-/commit my-app --conventional # Use conventional commits format
+/yes-commit                       # Interactive selection
+/yes-commit pulumi                # Fuzzy match → my-infra-pulumi
+/yes-commit my-app --conventional # Use conventional commits format
 ```
