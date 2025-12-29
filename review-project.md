@@ -121,6 +121,6 @@ Only update `<base_path>/CLAUDE.md` if:
 
 ```bash
 /review-project              # Interactive selection
-/review-project pulumi       # Fuzzy match → devops-pulumi-ts
-/review-project atap         # Fuzzy match → atap-automation2
+/review-project pulumi       # Fuzzy match → my-infra-pulumi
+/review-project my-app       # Fuzzy match → my-nextjs-app
 ```

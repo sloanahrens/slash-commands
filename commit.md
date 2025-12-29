@@ -111,7 +111,7 @@ If pre-commit hooks modified files, include them in an amended commit.
 ## Example Output
 
 ```
-Proposed commit message for devops-pulumi-ts:
+Proposed commit message for my-infra-pulumi:
 ---
 Add custom IAM role for Cloud Run deployments
 
@@ -137,6 +137,6 @@ Would you like to proceed? (yes/no/edit)
 
 ```bash
 /commit                       # Interactive selection
-/commit pulumi                # Fuzzy match → devops-pulumi-ts
-/commit hanscom --conventional   # Use conventional commits format
+/commit pulumi                # Fuzzy match → my-infra-pulumi
+/commit my-app --conventional # Use conventional commits format
 ```

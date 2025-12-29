@@ -32,10 +32,10 @@ git log --oneline -3
 ### Step 3: Display Summary
 
 ```
-Switched to: fractals-nextjs
-=============================
+Switched to: my-nextjs-app
+==========================
 
-Path:   ~/code/mono-claude/fractals-nextjs
+Path:   ~/code/my-workspace/my-nextjs-app
 Branch: feature/new-canvas
 Status: 2 modified, 1 untracked
 
@@ -62,7 +62,7 @@ Show key info from repo's CLAUDE.md:
 ## Examples
 
 ```bash
-/switch fractals     # Switch to fractals-nextjs
-/switch pulumi       # Switch to devops-pulumi-ts
+/switch my-app       # Switch to my-nextjs-app
+/switch pulumi       # Switch to my-infra-pulumi
 /switch              # Show selection menu
 ```

@@ -63,9 +63,9 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Finding tasks
    ```
    Linear Issues (<project-name>):
    ├── In Progress
-   │   └── MESH-905: Poc Design (High)
+   │   └── PROJ-123: API redesign (High)
    ├── Backlog
-   │   └── DMB-6: Scope Hanscom Plaid integration (High)
+   │   └── PROJ-456: Add retry logic (High)
    └── Todo
        └── (none)
    ```
@@ -134,9 +134,9 @@ For each task:
 
 ```bash
 /find-tasks                    # Interactive selection
-/find-tasks pulumi             # Fuzzy match → devops-pulumi-ts
-/find-tasks hanscom            # Auto-includes Linear (has linear_project in config)
-/find-tasks hanscom --linear   # Explicit Linear flag
-/find-tasks fractals --issues  # Include GitHub issues
-/find-tasks mango --deep       # Deep analysis
+/find-tasks pulumi             # Fuzzy match → my-infra-pulumi
+/find-tasks my-app             # Auto-includes Linear (has linear_project in config)
+/find-tasks my-app --linear    # Explicit Linear flag
+/find-tasks frontend --issues  # Include GitHub issues
+/find-tasks api --deep         # Deep analysis
 ```

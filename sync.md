@@ -53,10 +53,10 @@ Sync Results
 
 | Repo              | Result      | Details              |
 |-------------------|-------------|----------------------|
-| devops-pulumi-ts | ✓ updated   | 3 commits pulled     |
-| fractals-nextjs   | ✓ current   | Already up to date   |
-| mango             | ⚠ skipped   | Uncommitted changes  |
-| git-monitor       | ✗ failed    | Merge conflict       |
+| my-infra-pulumi   | ✓ updated   | 3 commits pulled     |
+| my-nextjs-app     | ✓ current   | Already up to date   |
+| my-go-api         | ⚠ skipped   | Uncommitted changes  |
+| my-python-service | ✗ failed    | Merge conflict       |
 ```
 
 ---
@@ -91,6 +91,6 @@ Conflict in <repo-name>. Resolve manually:
 
 ```bash
 /sync                # Sync all repos
-/sync pulumi         # Sync devops-pulumi-ts only
+/sync pulumi         # Sync my-infra-pulumi only
 /sync --force        # Sync all, auto-stash dirty repos
 ```

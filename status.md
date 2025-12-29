@@ -46,10 +46,10 @@ Workspace Status
 
 | Repo              | Branch  | Status  | Last Commit    | Linear        |
 |-------------------|---------|---------|----------------|---------------|
-| devops-pulumi-ts  | master  | clean   | 2 hours ago    | -             |
-| fractals-nextjs   | feature | 3 dirty | 1 day ago      | -             |
-| hanscom-plaid-poc | main    | clean   | 3 hours ago    | 2 In Progress |
-| mango             | master  | clean   | 3 days ago     | -             |
+| my-infra-pulumi   | master  | clean   | 2 hours ago    | -             |
+| my-nextjs-app     | feature | 3 dirty | 1 day ago      | -             |
+| my-client-project | main    | clean   | 3 hours ago    | 2 In Progress |
+| my-go-api         | master  | clean   | 3 days ago     | -             |
 
 Legend: clean = no changes, N dirty = N modified/untracked files
 Linear: shows issue count if repo has linear_project in config
@@ -75,8 +75,8 @@ Add to output:
 If `$ARGUMENTS` specifies a repo, show expanded info:
 
 ```
-Status: fractals-nextjs
-=======================
+Status: my-nextjs-app
+=====================
 
 Branch: feature/new-canvas
 Remote: origin/feature/new-canvas (↑1)
@@ -97,19 +97,19 @@ Recent commits:
 For repos with `linear_project` configured, add Linear section:
 
 ```
-Status: hanscom-fcu-poc-plaid-token-manager
-===========================================
+Status: my-client-project
+=========================
 
 Branch: main
 Remote: origin/main (up to date)
 Status: clean
 
-Linear Project: hanscom-fcu-plaid-token-manager-api
+Linear Project: my-client-api
   In Progress (1):
-    └── MESH-905: Poc Design (High) - https://linear.app/trabian/issue/MESH-905
+    └── PROJ-123: API redesign (High) - https://linear.app/my-org/issue/PROJ-123
   Backlog (2):
-    ├── DMB-6: Scope Hanscom Plaid integration (High)
-    └── MESH-772: Create payment origination resource
+    ├── PROJ-456: Add retry logic (High)
+    └── PROJ-789: Create payment resource
 
 Recent commits:
   abc1234 Add token refresh endpoint (3 hours ago)
@@ -121,5 +121,5 @@ Recent commits:
 
 ```bash
 /status              # Overview of all repos
-/status fractals     # Detailed status for fractals-nextjs
+/status my-app       # Detailed status for my-nextjs-app
 ```

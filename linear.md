@@ -35,7 +35,7 @@ Uses `mcp__linear__search_issues` with filters.
 ### `project <repo>` - Show project issues
 
 ```bash
-/linear project hanscom           # Fuzzy match repo with linear_project
+/linear project my-app            # Fuzzy match repo with linear_project
 /linear project                   # Interactive selection
 ```
 
@@ -59,7 +59,7 @@ Uses `mcp__linear__create_issue`.
 ### `comment <issue-id> <message>` - Add comment
 
 ```bash
-/linear comment MESH-905 "Fixed in commit abc123"
+/linear comment PROJ-123 "Fixed in commit abc123"
 ```
 
 Uses `mcp__linear__add_comment`.
@@ -67,8 +67,8 @@ Uses `mcp__linear__add_comment`.
 ### `update <issue-id>` - Update issue
 
 ```bash
-/linear update MESH-905 --status "In Progress"
-/linear update MESH-905 --priority 2
+/linear update PROJ-123 --status "In Progress"
+/linear update PROJ-123 --priority 2
 ```
 
 Uses `mcp__linear__update_issue`.
@@ -104,8 +104,8 @@ Repos can specify their Linear project in `config.yaml`:
 
 ```yaml
 repos:
-  - name: hanscom-fcu-poc-plaid-token-manager
-    linear_project: hanscom-fcu-plaid-token-manager-api
+  - name: my-client-project
+    linear_project: my-client-api
 ```
 
 The workspace Linear config is in `external_sources.linear`:
@@ -113,9 +113,9 @@ The workspace Linear config is in `external_sources.linear`:
 ```yaml
 external_sources:
   linear:
-    workspace: trabian
+    workspace: my-org
     projects:
-      - hanscom-fcu-plaid-token-manager-api
+      - my-client-api
 ```
 
 ---
@@ -125,8 +125,8 @@ external_sources:
 ```bash
 /linear my                                    # My assigned issues
 /linear search "authentication" --status Todo # Search with filter
-/linear project hanscom                       # Hanscom project issues
+/linear project my-app                        # Project issues for my-app
 /linear create "Add error handling"           # Create issue (prompts for details)
-/linear comment MESH-905 "WIP - 50% done"     # Add comment
-/linear update MESH-905 --status "In Progress" # Update status
+/linear comment PROJ-123 "WIP - 50% done"     # Add comment
+/linear update PROJ-123 --status "In Progress" # Update status
 ```

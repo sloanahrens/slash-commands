@@ -92,8 +92,8 @@ Parse flags from `$ARGUMENTS`:
 Examples:
 ```bash
 /run-tests pulumi --only=lint,typecheck   # Skip build and test
-/run-tests fractals --only=test           # Just run tests
-/run-tests atap --fix                     # Auto-fix lint issues
+/run-tests my-app --only=test             # Just run tests
+/run-tests frontend --fix                 # Auto-fix lint issues
 ```
 
 ---
@@ -115,7 +115,7 @@ Examples:
 
 ```bash
 /run-tests                          # Interactive selection
-/run-tests pulumi                   # Fuzzy match → devops-pulumi-ts
-/run-tests atap --only=test         # Just run tests
-/run-tests fractals --fix           # Auto-fix lint issues
+/run-tests pulumi                   # Fuzzy match → my-infra-pulumi
+/run-tests my-app --only=test       # Just run tests
+/run-tests frontend --fix           # Auto-fix lint issues
 ```
