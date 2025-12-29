@@ -6,10 +6,10 @@ This file contains shared patterns used by all repo-targeting slash commands.
 
 ## Configuration
 
-Commands use `config.yaml` for repository definitions. Copy `config.yaml.example` to `config.yaml` and customize for your environment.
+Commands use `config.yaml` for repository definitions. Copy `config.yaml.example` to `config.yaml` and add your repos.
 
 ```yaml
-base_path: ~/code/my-workspace
+base_path: ~/code/mono-claude
 repos:
   - name: my-app
     group: apps
@@ -25,7 +25,7 @@ repos:
 
 ## Critical Rule
 
-**CRITICAL**: Always stay within your configured `base_path` - never navigate above this directory.
+**CRITICAL**: Always stay within `~/code/mono-claude/` - never navigate above this directory.
 
 ---
 

@@ -1,9 +1,9 @@
 # Portable Commands Configuration
-# Copy this file to config.yaml and customize for your environment
+# Copy this file to config.yaml and add your repos
 # config.yaml is gitignored and will not be committed
 
-# Base path for all repositories (use absolute path or ~)
-base_path: ~/code/my-workspace
+# Base path - always use ~/code/mono-claude
+base_path: ~/code/mono-claude
 
 # Repository definitions
 # Each repo needs:
