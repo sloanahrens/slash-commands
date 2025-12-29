@@ -1,5 +1,5 @@
 ---
-description: Update Documentation (for specified repo, or prompts for selection)
+description: Update documentation for a repository
 ---
 
 # Update Documentation
@@ -26,13 +26,17 @@ Documentation lives in each repo - not centralized in mono-claude root.
 
 ## Process
 
-### Step 1: Inventory Documentation
+### Step 1: Resolve Repository
+
+Follow repo selection from `_shared-repo-logic.md`, then confirm: "Updating docs for: <repo-name>"
+
+### Step 2: Inventory Documentation
 
 ```bash
 ls -la <repo-path>/README.md <repo-path>/CLAUDE.md <repo-path>/docs/overview.md 2>/dev/null
 ```
 
-### Step 2: Gather Current State
+### Step 3: Gather Current State
 
 ```bash
 cd <repo-path> && npm test 2>&1 | tail -10      # Test counts
@@ -40,7 +44,7 @@ wc -l <repo-path>/README.md <repo-path>/CLAUDE.md  # Line counts
 cd <repo-path> && git log --oneline -5          # Recent changes
 ```
 
-### Step 3: Update Files
+### Step 4: Update Files
 
 **CLAUDE.md**: Verify commands are current, patterns accurate, links work.
 
@@ -48,7 +52,7 @@ cd <repo-path> && git log --oneline -5          # Recent changes
 
 **docs/overview.md**: Update test counts, metrics, "Last Updated" date.
 
-### Step 4: Verify
+### Step 5: Verify
 
 - No metrics duplicated across files
 - Line counts are reasonable

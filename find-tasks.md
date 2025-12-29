@@ -1,5 +1,5 @@
 ---
-description: Find Next Tasks (for specified repo, or prompts for selection)
+description: Find high-priority tasks for a repository
 ---
 
 # Find Next Tasks
@@ -14,7 +14,11 @@ Analyze the project and suggest 3-5 high-priority tasks for a repository.
 
 ## Process
 
-### Step 1: Review Current State
+### Step 1: Resolve Repository
+
+Follow repo selection from `_shared-repo-logic.md`, then confirm: "Finding tasks for: <repo-name>"
+
+### Step 2: Review Current State
 
 1. Read repo documentation:
    - `<repo>/CLAUDE.md` - Primary reference
@@ -28,12 +32,24 @@ Analyze the project and suggest 3-5 high-priority tasks for a repository.
 
 3. Examine test coverage gaps (if test scripts exist)
 
-4. Look for TODO/FIXME comments:
+4. Look for TODO/FIXME comments (use language-appropriate patterns):
    ```bash
-   grep -r "TODO\|FIXME" <repo-path>/src --include="*.ts" --include="*.tsx" | head -20
+   # TypeScript/JavaScript
+   grep -r "TODO\|FIXME" <repo-path> --include="*.ts" --include="*.tsx" --include="*.js" | head -20
+
+   # Go
+   grep -r "TODO\|FIXME" <repo-path> --include="*.go" | head -20
+
+   # Python
+   grep -r "TODO\|FIXME" <repo-path> --include="*.py" | head -20
    ```
 
-### Step 2: Identify High-Impact Work
+5. Check for incomplete implementation plans:
+   ```bash
+   ls <repo-path>/docs/plans/*.md 2>/dev/null
+   ```
+
+### Step 3: Identify High-Impact Work
 
 Focus on tasks that:
 - Unblock other work
@@ -41,7 +57,7 @@ Focus on tasks that:
 - Are quick wins with high value
 - Balance testing, features, and infrastructure
 
-### Step 3: Generate Task Options
+### Step 4: Generate Task Options
 
 Provide 3-5 concrete, actionable tasks.
 

@@ -1,5 +1,5 @@
 ---
-description: Run quality checks and tests (for specified repo, or prompts for selection)
+description: Run quality checks and tests for a repository
 ---
 
 # Run Tests Command
@@ -18,31 +18,49 @@ Run quality checks and test suite for a repository.
 
 Follow repo selection from `_shared-repo-logic.md`, then confirm: "Running tests for: <repo-name>"
 
-### Step 2: Detect Capabilities
+### Step 2: Detect Language & Commands
 
-Read `<repo>/package.json` and check for scripts:
+Check `config.yaml` for repo-specific settings:
+- `work_dir` → subdirectory to run commands from
+- `language` → explicit language setting
+- `commands` → custom command overrides
 
-| Script | Capability |
-|--------|------------|
-| `test` | Run tests |
-| `lint` | Run linting |
-| `type-check` or `typecheck` | Type checking |
-| `build` | Production build |
-
-Check for overrides in `.env.local`:
-- `<PREFIX>_TEST_CMD` → custom test command
-- `<PREFIX>_WORK_DIR` → subdirectory to run from (e.g., `nextapp`)
+If `language` not specified, detect from files (see `_shared-repo-logic.md`).
 
 ### Step 3: Run Quality Checks
 
-Run in order (if available):
+Run commands in order based on language (skip if command not available):
 
+**TypeScript/JavaScript** (package.json):
 ```bash
-cd <repo-path> && npm run lint
-cd <repo-path> && npm run type-check
-cd <repo-path> && npm run build
-cd <repo-path> && npm test
+npm run lint
+npx tsc --noEmit      # or npm run type-check
+npm run build
+npm test
 ```
+
+**Go** (go.mod):
+```bash
+golangci-lint run     # if available
+go build ./...
+go test ./...
+```
+
+**Python** (pyproject.toml):
+```bash
+ruff check .          # or flake8
+mypy .                # if available
+pytest
+```
+
+**Rust** (Cargo.toml):
+```bash
+cargo clippy
+cargo build
+cargo test
+```
+
+If `commands` block exists in config, use those instead.
 
 ### Step 4: Report Results
 

@@ -44,8 +44,20 @@ repos:
     group: apps                # 'apps' or 'devops'
     aliases: [app, next]       # Fuzzy match shortcuts
     work_dir: src              # Optional: subdirectory for commands
-    test_cmd: pnpm test        # Optional: custom test command
+    language: typescript       # Optional: typescript | go | python | rust | shell
+    commands:                  # Optional: override default commands
+      test: pnpm test
+      lint: pnpm lint
+      build: pnpm build
 ```
+
+### Language Detection
+
+If `language` is not specified, it's auto-detected from files:
+- `package.json` → typescript
+- `go.mod` → go
+- `pyproject.toml` → python
+- `Cargo.toml` → rust
 
 ### Groups
 

@@ -1,5 +1,5 @@
 ---
-description: Start brainstorming session with full monorepo context
+description: Start brainstorming session with workspace context
 ---
 
 # Super Command
@@ -14,26 +14,15 @@ Start a structured brainstorming session with full context about the workspace a
 
 ## Process
 
-### Step 1: Verify Location
+### Step 1: Resolve Repository
 
-```bash
-pwd
-```
+Follow repo selection from `_shared-repo-logic.md`:
+1. Read `config.yaml` for base path and repo definitions
+2. Match `$ARGUMENTS` to repo name or alias
+3. If no repo recognized, ask which repo the task relates to
+4. Confirm: "Brainstorming for: <repo-name>"
 
-Confirm you are in the configured `base_path` or a subdirectory.
-
-### Step 2: Read Workspace Context
-
-- Read `config.yaml` from this commands directory for base path and repo definitions
-- Read the workspace-level `CLAUDE.md` if it exists
-
-### Step 3: Resolve Repository
-
-Follow `_shared-repo-logic.md` for repo selection.
-
-If no repo recognized in `$ARGUMENTS`, ask which repo the task relates to.
-
-### Step 4: Load Repo Context
+### Step 2: Load Repo Context
 
 ```bash
 pwd  # Verify again before repo commands
@@ -43,7 +32,7 @@ cd <base_path>/<repo> && git log --oneline -5
 
 Read: `<repo>/CLAUDE.md`, `README.md`, `docs/overview.md`
 
-### Step 5: Run Brainstorming
+### Step 3: Run Brainstorming
 
 Invoke `/superpowers:brainstorming` with:
 - Selected repo name and path

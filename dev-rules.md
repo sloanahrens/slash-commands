@@ -1,6 +1,6 @@
 # Dev Rules
 
-Continue whatever you were doing, but remember these development rules:
+Remind Claude of workspace development rules. Continue whatever you were doing, but remember:
 
 ---
 
@@ -26,6 +26,13 @@ Continue whatever you were doing, but remember these development rules:
 - **NO** "generated with" tags
 - Use imperative mood ("Add feature" not "Added feature")
 - Keep summary under 72 characters
+
+---
+
+## YAML Gotchas
+
+- **Quote strings with colons** - `echo "Service URL:"` not `echo Service URL:` (YAML interprets unquoted colons as key-value separators)
+- **Use `|` for multiline scripts** - avoids escaping issues
 
 ---
 

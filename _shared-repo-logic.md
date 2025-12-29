@@ -14,6 +14,11 @@ repos:
   - name: my-app
     group: apps
     aliases: [app]
+    language: typescript        # optional: typescript | go | python | rust | shell
+    work_dir: src               # optional: subdirectory for commands
+    commands:                   # optional: override default commands
+      test: npm test
+      lint: npm run lint
 ```
 
 ---
@@ -32,6 +37,22 @@ Parse `config.yaml` in this commands directory for repository definitions:
 |-------|-------------|
 | `devops` | DevOps/Infrastructure repos |
 | `apps` | Application repos |
+
+---
+
+## Language Detection
+
+If `language` is not specified in config, detect from files:
+
+| File Found | Language | Default Commands |
+|------------|----------|------------------|
+| `package.json` | typescript | `npm run lint`, `npx tsc --noEmit`, `npm run build`, `npm test` |
+| `go.mod` | go | `golangci-lint run`, `go build ./...`, `go test ./...` |
+| `pyproject.toml` or `requirements.txt` | python | `ruff check .`, `mypy .`, `pytest` |
+| `Cargo.toml` | rust | `cargo clippy`, `cargo build`, `cargo test` |
+| `Makefile` only | shell | `make lint`, `make build`, `make test` |
+
+Commands can be overridden per-repo in `config.yaml`.
 
 ---
 

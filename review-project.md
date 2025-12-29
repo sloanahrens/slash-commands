@@ -1,5 +1,5 @@
 ---
-description: Review Project (for specified repo, or prompts for selection)
+description: Conduct technical review for a repository
 ---
 
 # Review Project
@@ -14,13 +14,17 @@ Conduct a technical review of a repository and update its documentation.
 
 ## Process
 
-### Step 1: Understand the Repository
+### Step 1: Resolve Repository
+
+Follow repo selection from `_shared-repo-logic.md`, then confirm: "Reviewing: <repo-name>"
+
+### Step 2: Understand the Repository
 
 1. Read documentation: `<repo>/CLAUDE.md`, `README.md`, `docs/overview.md`
 2. Examine structure: `ls -la <repo-path>`
 3. Check `package.json` for dependencies and scripts
 
-### Step 2: Run Available Checks
+### Step 3: Run Available Checks
 
 ```bash
 npm run lint        # If available
@@ -28,7 +32,7 @@ npm run type-check  # If available
 npm test            # If available
 ```
 
-### Step 3: Review Key Areas
+### Step 4: Review Key Areas
 
 **App Repos (Next.js, React):**
 - Architecture & component organization
@@ -48,7 +52,7 @@ npm test            # If available
 - Environment configuration
 - Documentation quality
 
-### Step 4: Update Documentation
+### Step 5: Update Documentation
 
 **Primary: Update `<repo>/CLAUDE.md`**
 

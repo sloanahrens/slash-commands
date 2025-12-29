@@ -1,5 +1,5 @@
 ---
-description: Commit Progress (for specified repo, or prompts for selection)
+description: Commit changes for a repository
 ---
 
 # Commit Progress
@@ -14,7 +14,11 @@ Help commit git changes for a repository.
 
 ## Process
 
-### Step 1: Check Repository Status
+### Step 1: Resolve Repository
+
+Follow repo selection from `_shared-repo-logic.md`, then confirm: "Committing for: <repo-name>"
+
+### Step 2: Check Repository Status
 
 ```bash
 cd <repo-path> && git status
@@ -22,14 +26,14 @@ cd <repo-path> && git status
 
 If no changes, report "No changes to commit" and exit.
 
-### Step 2: Review Changes
+### Step 3: Review Changes
 
 ```bash
 cd <repo-path> && git diff --stat
 cd <repo-path> && git diff
 ```
 
-### Step 3: Generate Commit Message
+### Step 4: Generate Commit Message
 
 Analyze changes and draft a message that:
 - Has short summary (50-72 characters)
@@ -37,7 +41,7 @@ Analyze changes and draft a message that:
 - Focuses on WHAT and WHY, not HOW
 - Follows commit rules in `_shared-repo-logic.md`
 
-### Step 4: Present for Approval
+### Step 5: Present for Approval
 
 ```
 Proposed commit message for <repo-name>:
@@ -48,7 +52,7 @@ Proposed commit message for <repo-name>:
 Would you like to proceed? (yes/no/edit)
 ```
 
-### Step 5: Execute Commit
+### Step 6: Execute Commit
 
 If approved:
 ```bash
