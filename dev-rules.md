@@ -1,6 +1,10 @@
+---
+description: Remind Claude of workspace development rules
+---
+
 # Dev Rules
 
-Remind Claude of workspace development rules. Continue whatever you were doing, but remember:
+Continue whatever you were doing, but remember these rules:
 
 ---
 

@@ -104,3 +104,56 @@ These commands enforce:
 - No Claude/Anthropic attribution in commits
 - Imperative mood ("Add feature" not "Added feature")
 - Summary under 72 characters
+
+## Portability
+
+These commands are designed to be portable across different workspaces.
+
+### Using in a New Workspace
+
+1. Copy the entire `.claude/commands/` folder to your workspace
+2. Create `config.yaml` from the example template
+3. Update `base_path` and add your repos
+4. Commands work immediately - no code changes needed
+
+### Customizing for Your Stack
+
+**Different package managers:**
+```yaml
+commands:
+  test: pnpm test
+  lint: pnpm lint
+  build: pnpm build
+```
+
+**Monorepos with multiple languages:**
+```yaml
+- name: my-fullstack
+  commands:
+    test: "cd backend && go test ./... && cd ../frontend && npm test"
+    lint: "cd backend && golangci-lint run && cd ../frontend && npm run lint"
+```
+
+**Custom test patterns:**
+```yaml
+- name: my-django-app
+  language: python
+  commands:
+    test: python manage.py test
+    lint: ruff check . && black --check .
+```
+
+### What's Portable vs Local
+
+| Portable (commit these) | Local (gitignored) |
+|------------------------|-------------------|
+| `*.md` command files | `config.yaml` |
+| `config.yaml.example` | |
+| `_shared-repo-logic.md` | |
+
+### Forking for Your Organization
+
+1. Fork this commands folder
+2. Modify `_shared-repo-logic.md` for org-specific rules
+3. Update `config.yaml.example` with your standard repos
+4. Add org-specific commands as needed
