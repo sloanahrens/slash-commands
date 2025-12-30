@@ -45,9 +45,9 @@ Recent:
   ghi9012 Update dependencies
 
 Quick actions:
-  /run-tests fractals    Run quality checks
-  /find-tasks fractals   Find next tasks
-  /super fractals        Start brainstorming
+  /run-tests my-app      Run quality checks
+  /find-tasks my-app     Find next tasks
+  /super my-app          Start brainstorming
 ```
 
 ### Step 4: Read CLAUDE.md

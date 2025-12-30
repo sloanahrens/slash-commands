@@ -37,7 +37,7 @@ All repo commands support fuzzy matching via aliases (e.g., `/run-tests app`).
 ## Usage Tips
 
 - **No argument**: Most commands show an interactive selection menu
-- **Fuzzy match**: Use partial names or aliases (`pulumi` → `devops-pulumi-ts`)
+- **Fuzzy match**: Use partial names or aliases (`app` → `my-nextjs-app`)
 - **Flags**: Some commands accept flags (`/run-tests --fix`, `/make-test --dry-run`)
 
 ---

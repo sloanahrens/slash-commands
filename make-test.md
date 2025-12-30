@@ -155,9 +155,9 @@ Parse flags from `$ARGUMENTS`:
 
 Examples:
 ```bash
-/make-test hanscom --dry-run        # Just analyze Makefile
-/make-test pulumi --all             # Test everything
-/make-test my-app --quick           # Only lint/typecheck
+/make-test my-app --dry-run         # Just analyze Makefile
+/make-test infra --all              # Test everything
+/make-test frontend --quick         # Only lint/typecheck
 ```
 
 ---
@@ -194,7 +194,7 @@ Ask: "Would you like me to apply any of these improvements?"
 
 ```bash
 /make-test                          # Interactive selection
-/make-test hanscom                  # Fuzzy match → hanscom-fcu-poc-plaid-token-manager
-/make-test pulumi --dry-run         # Analyze without running
-/make-test my-app --quick           # Only quick targets
+/make-test my-app                   # Fuzzy match to my-nextjs-app
+/make-test infra --dry-run          # Analyze without running
+/make-test api --quick              # Only quick targets
 ```
