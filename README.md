@@ -24,16 +24,21 @@ repos:
 | `/super <repo>` | Start brainstorming session with full context |
 | `/find-tasks <repo>` | Suggest 3-5 high-priority tasks |
 | `/run-tests <repo>` | Run lint, type-check, build, and tests |
+| `/make-test <repo>` | Test Makefile targets interactively |
 | `/yes-commit <repo>` | Draft and commit changes |
 | `/push <repo>` | Push commits to origin |
 | `/update-docs <repo>` | Update CLAUDE.md, README, docs |
 | `/review-project <repo>` | Technical review to docs/tech-review.md |
+| `/resolve-pr <url>` | Resolve GitHub PR review feedback |
 | `/add-repo <url>` | Clone repo and add to config |
 | `/status [repo]` | Show status overview of all or one repo |
 | `/sync [repo]` | Pull latest changes for all or one repo |
 | `/switch <repo>` | Quick context switch to a repo |
+| `/linear <subcommand>` | Interact with Linear issues |
 | `/dev-rules` | Remind Claude of workspace rules |
 | `/setup-plugins` | Install all recommended plugins |
+| `/list-commands` | List all available commands |
+| `/list-skills` | List available skills from plugins |
 
 All repo commands support fuzzy matching via aliases (e.g., `/run-tests app`).
 
@@ -115,6 +120,9 @@ claude plugin install code-review@claude-plugins-official          # Code review
 claude plugin install commit-commands@claude-plugins-official      # Git helpers
 claude plugin install pr-review-toolkit@claude-plugins-official    # PR review
 claude plugin install hookify@claude-plugins-official              # Custom hooks
+claude plugin install plugin-dev@claude-plugins-official           # Plugin development
+claude plugin install agent-sdk-dev@claude-plugins-official        # Agent SDK helpers
+claude plugin install security-guidance@claude-plugins-official    # Security best practices
 claude plugin install typescript-lsp@claude-plugins-official       # TypeScript LSP
 claude plugin install gopls-lsp@claude-plugins-official            # Go LSP
 ```
