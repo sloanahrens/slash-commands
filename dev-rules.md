@@ -11,8 +11,8 @@ Continue whatever you were doing, but remember these trabian workspace rules:
 ## Path Safety
 
 - **Run `pwd` before bash commands** - verify current location before file/path operations
-- **Use absolute paths** - always use full paths from `~/trabian-ai/`
-- **Stay within workspace** - never navigate above `~/trabian-ai/`
+- **Use absolute paths** - always use full paths from `~/trabian/`
+- **Stay within workspace** - never navigate above `~/trabian/`
 - **Respect worktree isolation** - `.trees/` worktrees are separate git environments
 
 ---
@@ -98,7 +98,7 @@ When using trabian MCP tools:
 ## General
 
 - Read the repo's `CLAUDE.md` before making changes
-- Read `~/trabian-ai/CLAUDE.md` for workspace context
+- Read `~/trabian/CLAUDE.md` for workspace context
 - Run tests after making changes
 - Keep changes focused and minimal
 - Consider clone repos as read-only references

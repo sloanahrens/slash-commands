@@ -52,7 +52,7 @@ If not installed, continue without acceleration - install via `/setup-plugins` i
 **Always load trabian workspace context first:**
 
 ```bash
-cat ~/trabian-ai/CLAUDE.md
+cat ~/trabian/CLAUDE.md
 ```
 
 Key context to extract:
@@ -73,7 +73,7 @@ Follow repo selection from `_shared-repo-logic.md`:
 
 **For builtin packages:**
 ```bash
-cat ~/trabian-ai/packages/<name>/CLAUDE.md  # or mcp/<name>
+cat ~/trabian/packages/<name>/CLAUDE.md  # or mcp/<name>
 git -C <repo-path> status
 git -C <repo-path> log --oneline -5
 ```
@@ -86,7 +86,7 @@ git -C ~/.trees/<name> log --oneline main..HEAD
 
 **For clones (reference repos):**
 ```bash
-cat ~/trabian-ai/clones/<name>/README.md
+cat ~/trabian/clones/<name>/README.md
 # Note: These are read-only references
 ```
 
@@ -141,9 +141,9 @@ When creating documentation, follow trabian's structure:
 
 | Type | Location |
 |------|----------|
-| Design docs | `~/trabian-ai/docs/plans/YYYY-MM-DD-<topic>-design.md` |
-| Implementation plans | `~/trabian-ai/docs/plans/YYYY-MM-DD-<topic>-plan.md` |
-| Knowledge base | `~/trabian-ai/docs/<system>/` |
+| Design docs | `~/trabian/docs/plans/YYYY-MM-DD-<topic>-design.md` |
+| Implementation plans | `~/trabian/docs/plans/YYYY-MM-DD-<topic>-plan.md` |
+| Knowledge base | `~/trabian/docs/<system>/` |
 | Technical reviews | `<repo>/docs/tech-review.md` |
 
 **Pattern for design doc filenames:**

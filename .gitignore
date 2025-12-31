@@ -1,2 +1,7 @@
 # Local configuration (contains user-specific paths)
 config.yaml
+
+# Symlinked command directories (trabian-specific)
+dev/
+kb/
+pm/

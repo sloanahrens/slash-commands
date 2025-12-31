@@ -17,7 +17,7 @@ Display a quick overview of all configured repositories, worktrees, and clones.
 Execute the status check as a single command block. **Do NOT use multi-line for loops** - they fail in Claude Code's bash tool.
 
 Read `config.yaml` for:
-- `base_path` (~/trabian-ai)
+- `base_path` (~/trabian)
 - `builtin[]` components
 - `worktrees_dir` (.trees)
 - `clones_config` (clones/clone-config.json)
@@ -28,20 +28,20 @@ Read `config.yaml` for:
 **Builtin packages:**
 ```bash
 # Check each builtin path exists
-ls ~/trabian-ai/packages/trabian-cli
-ls ~/trabian-ai/mcp/trabian-server
+ls ~/trabian/packages/trabian-cli
+ls ~/trabian/mcp/trabian-server
 ```
 
 **Worktrees:**
 ```bash
-ls -d ~/trabian-ai/.trees/*/ 2>/dev/null
+ls -d ~/trabian/.trees/*/ 2>/dev/null
 ```
 
 **Clones:**
 ```bash
 # Read clone-config.json and check which exist
-cat ~/trabian-ai/clones/clone-config.json
-ls ~/trabian-ai/clones/
+cat ~/trabian/clones/clone-config.json
+ls ~/trabian/clones/
 ```
 
 **Additional repos:**
@@ -125,7 +125,7 @@ If `$ARGUMENTS` specifies a repo, show expanded info:
 Status: trabian-cli
 ===================
 
-Path:   ~/trabian-ai/packages/trabian-cli
+Path:   ~/trabian/packages/trabian-cli
 Branch: main
 Remote: origin/main (up to date)
 Status: clean
@@ -146,7 +146,7 @@ For worktrees, show parent branch info:
 Status: feature-new-auth (worktree)
 ===================================
 
-Path:   ~/trabian-ai/.trees/feature-new-auth
+Path:   ~/trabian/.trees/feature-new-auth
 Branch: feature/new-auth
 Parent: main (5 commits ahead)
 Status: 3 files modified

@@ -38,7 +38,7 @@ Switched to: trabian-cli
 ========================
 
 Type:   Package (builtin)
-Path:   ~/trabian-ai/packages/trabian-cli
+Path:   ~/trabian/packages/trabian-cli
 Branch: main
 Status: clean
 
@@ -59,7 +59,7 @@ Switched to: feature-new-auth (worktree)
 =========================================
 
 Type:   Worktree
-Path:   ~/trabian-ai/.trees/feature-new-auth
+Path:   ~/trabian/.trees/feature-new-auth
 Branch: feature/new-auth
 Parent: main (5 commits ahead)
 Status: 3 modified
@@ -80,7 +80,7 @@ Switched to: q2-sdk (clone)
 ===========================
 
 Type:   Clone (reference)
-Path:   ~/trabian-ai/clones/q2-sdk
+Path:   ~/trabian/clones/q2-sdk
 Branch: main
 Status: clean (read-only reference)
 
@@ -88,7 +88,7 @@ Description: Q2 SDK core banking APIs
 
 Quick actions:
   /kb/q2                   Load Q2 knowledge base
-  Search: grep -r "pattern" ~/trabian-ai/clones/q2-sdk/
+  Search: grep -r "pattern" ~/trabian/clones/q2-sdk/
 
 Note: This is a reference clone. Changes should not be committed here.
 ```
@@ -99,7 +99,7 @@ Switched to: client-project
 ===========================
 
 Type:   App
-Path:   ~/trabian-ai/client-project
+Path:   ~/trabian/client-project
 Branch: feature/new-feature
 Status: 2 modified
 
@@ -125,7 +125,7 @@ Show key info from repo's CLAUDE.md (if exists):
 
 For trabian packages, also reference main CLAUDE.md:
 ```
-Workspace context from ~/trabian-ai/CLAUDE.md:
+Workspace context from ~/trabian/CLAUDE.md:
 - Node.js >=18.0.0 required
 - TypeScript ES2022 target, strict mode
 - Run `npm run build` before testing

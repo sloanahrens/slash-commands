@@ -14,7 +14,7 @@ Update project documentation for a repository, following trabian patterns and ma
 
 ## Documentation Structure (Trabian)
 
-### Workspace Level (`~/trabian-ai/`)
+### Workspace Level (`~/trabian/`)
 
 | File | Purpose |
 |------|---------|
@@ -46,7 +46,7 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Updating docs
 ls -la <repo-path>/README.md <repo-path>/CLAUDE.md <repo-path>/docs/ 2>/dev/null
 
 # Check for workspace-level mentions
-grep -l "<repo-name>" ~/trabian-ai/CLAUDE.md ~/trabian-ai/docs/**/*.md 2>/dev/null
+grep -l "<repo-name>" ~/trabian/CLAUDE.md ~/trabian/docs/**/*.md 2>/dev/null
 ```
 
 ### Step 3: Gather Current State
@@ -109,7 +109,7 @@ If repo changes affect workspace documentation:
 
 ```bash
 # Check if workspace CLAUDE.md needs updates
-cat ~/trabian-ai/CLAUDE.md | grep -A5 "<repo-name>"
+cat ~/trabian/CLAUDE.md | grep -A5 "<repo-name>"
 ```
 
 Only update workspace CLAUDE.md if:
@@ -136,7 +136,7 @@ Only update workspace CLAUDE.md if:
 ### Knowledge Base Docs
 
 For system documentation (Q2, Tecton, etc.):
-- Location: `~/trabian-ai/docs/<system>/`
+- Location: `~/trabian/docs/<system>/`
 - Use system tags consistently
 - Cross-reference with clone repos
 
@@ -144,8 +144,8 @@ For system documentation (Q2, Tecton, etc.):
 
 When updating leads to new plans:
 ```
-~/trabian-ai/docs/plans/YYYY-MM-DD-<topic>-design.md
-~/trabian-ai/docs/plans/YYYY-MM-DD-<topic>-plan.md
+~/trabian/docs/plans/YYYY-MM-DD-<topic>-design.md
+~/trabian/docs/plans/YYYY-MM-DD-<topic>-plan.md
 ```
 
 ### MCP Server Docs

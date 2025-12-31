@@ -8,13 +8,13 @@ This file contains shared patterns used by all repo-targeting slash commands in 
 
 Commands use `config.yaml` in this directory. The trabian branch supports:
 
-- `builtin` - trabian-ai's own packages (fixed paths)
+- `builtin` - trabian's own packages (fixed paths)
 - `worktrees_dir` - auto-discovers `.trees/*` worktrees
 - `clones_config` - reads trabian's `clones/clone-config.json`
 - `repos` - additional repos cloned into base_path
 
 ```yaml
-base_path: ~/trabian-ai
+base_path: ~/trabian
 
 builtin:
   - name: trabian-cli
@@ -35,7 +35,7 @@ repos:
 
 ## Critical Rule
 
-**CRITICAL**: Always stay within `~/trabian-ai/` - never navigate above this directory.
+**CRITICAL**: Always stay within `~/trabian/` - never navigate above this directory.
 
 ---
 
@@ -46,14 +46,14 @@ Parse repos from multiple sources in order:
 ### 1. Builtin Components
 
 Read `config.yaml` → `builtin[]`:
-- These are fixed trabian-ai packages
+- These are fixed trabian packages
 - Always available regardless of clones
 
 ### 2. Worktrees (Dynamic)
 
 Scan `<base_path>/.trees/` directory:
 ```bash
-ls -d ~/trabian-ai/.trees/*/ 2>/dev/null
+ls -d ~/trabian/.trees/*/ 2>/dev/null
 ```
 
 For each worktree, extract:
@@ -90,7 +90,7 @@ Read `config.yaml` → `repos[]`:
 
 | Group | Source | Description |
 |-------|--------|-------------|
-| `packages` | builtin | trabian-ai TypeScript packages |
+| `packages` | builtin | trabian TypeScript packages |
 | `mcp` | builtin | trabian MCP server |
 | `worktrees` | dynamic | Active feature branches in .trees/ |
 | `clones` | clone-config.json | Reference repositories (Q2 SDK, Tecton) |
@@ -147,7 +147,7 @@ Once a repo is selected, resolve its full path:
 
 | Source | Path Pattern |
 |--------|--------------|
-| builtin | `<base_path>/<path>` (e.g., `~/trabian-ai/packages/trabian-cli`) |
+| builtin | `<base_path>/<path>` (e.g., `~/trabian/packages/trabian-cli`) |
 | worktree | `<base_path>/.trees/<name>` |
 | clone | `<base_path>/clones/<name>` |
 | repo | `<base_path>/<name>` |
@@ -170,7 +170,7 @@ When committing changes in any repo:
 
 After selecting a repo, load relevant context:
 
-1. **Always read**: `~/trabian-ai/CLAUDE.md` (workspace rules)
+1. **Always read**: `~/trabian/CLAUDE.md` (workspace rules)
 2. **If repo has CLAUDE.md**: Read `<repo-path>/CLAUDE.md`
 3. **For MCP server**: Note Python/uv patterns
 4. **For packages**: Note TypeScript/npm patterns
