@@ -1,58 +1,100 @@
-# Shared Repo Logic
+# Shared Repo Logic (Trabian Branch)
 
-This file contains shared patterns used by all repo-targeting slash commands.
+This file contains shared patterns used by all repo-targeting slash commands in the trabian workspace.
 
 ---
 
 ## Configuration
 
-Commands use `config.yaml` for repository definitions. Copy `config.yaml.example` to `config.yaml` and add your repos.
+Commands use `config.yaml` in this directory. The trabian branch supports:
+
+- `builtin` - trabian-ai's own packages (fixed paths)
+- `worktrees_dir` - auto-discovers `.trees/*` worktrees
+- `clones_config` - reads trabian's `clones/clone-config.json`
+- `repos` - additional repos cloned into base_path
 
 ```yaml
-base_path: ~/code/mono-claude
+base_path: ~/trabian-ai
+
+builtin:
+  - name: trabian-cli
+    group: packages
+    path: packages/trabian-cli
+    language: typescript
+
+worktrees_dir: .trees
+clones_config: clones/clone-config.json
+
 repos:
-  - name: my-app
+  - name: client-project
     group: apps
-    aliases: [app]
-    language: typescript        # optional: typescript | go | python | rust | shell
-    work_dir: src               # optional: subdirectory for commands
-    commands:                   # optional: override default commands
-      test: npm test
-      lint: npm run lint
+    aliases: [client]
 ```
 
 ---
 
 ## Critical Rule
 
-**CRITICAL**: Always stay within `~/code/mono-claude/` - never navigate above this directory.
+**CRITICAL**: Always stay within `~/trabian-ai/` - never navigate above this directory.
 
 ---
 
 ## Repo Discovery
 
-Parse `config.yaml` in this commands directory for repository definitions:
+Parse repos from multiple sources in order:
 
-| Group | Description |
-|-------|-------------|
-| `devops` | DevOps/Infrastructure repos |
-| `apps` | Application repos |
+### 1. Builtin Components
+
+Read `config.yaml` → `builtin[]`:
+- These are fixed trabian-ai packages
+- Always available regardless of clones
+
+### 2. Worktrees (Dynamic)
+
+Scan `<base_path>/.trees/` directory:
+```bash
+ls -d ~/trabian-ai/.trees/*/ 2>/dev/null
+```
+
+For each worktree, extract:
+- Name: directory name (e.g., `feature-new-auth`)
+- Path: `.trees/<name>`
+- Branch: `git -C .trees/<name> branch --show-current`
+
+### 3. Clones (From trabian config)
+
+Read `<base_path>/clones/clone-config.json`:
+```json
+{
+  "repositories": {
+    "q2-sdk": { "url": "...", "description": "..." },
+    "tecton": { "url": "...", "description": "..." }
+  }
+}
+```
+
+For each clone:
+- Name: key name
+- Path: `clones/<name>`
+- Group: `clones`
+
+### 4. Additional Repos
+
+Read `config.yaml` → `repos[]`:
+- These are working repos cloned into base_path
+- Added via `/sloan/add-repo`
 
 ---
 
-## Language Detection
+## Groups
 
-If `language` is not specified in config, detect from files:
-
-| File Found | Language | Default Commands |
-|------------|----------|------------------|
-| `package.json` | typescript | `npm run lint`, `npx tsc --noEmit`, `npm run build`, `npm test` |
-| `go.mod` | go | `golangci-lint run`, `go build ./...`, `go test ./...` |
-| `pyproject.toml` or `requirements.txt` | python | `ruff check .`, `mypy .`, `pytest` |
-| `Cargo.toml` | rust | `cargo clippy`, `cargo build`, `cargo test` |
-| `Makefile` only | shell | `make lint`, `make build`, `make test` |
-
-Commands can be overridden per-repo in `config.yaml`.
+| Group | Source | Description |
+|-------|--------|-------------|
+| `packages` | builtin | trabian-ai TypeScript packages |
+| `mcp` | builtin | trabian MCP server |
+| `worktrees` | dynamic | Active feature branches in .trees/ |
+| `clones` | clone-config.json | Reference repositories (Q2 SDK, Tecton) |
+| `apps` | repos | Additional working repos |
 
 ---
 
@@ -65,26 +107,50 @@ Display grouped list and ask user to select:
 ```
 Select a repository:
 
-DevOps/Infrastructure:
-  1. my-infra-pulumi
-  2. my-terraform
+Packages:
+  1. trabian-cli
+  2. trabian-server
+
+Worktrees:
+  3. feature/new-auth
+  4. fix/mcp-bug
+
+Clones:
+  5. q2-sdk
+  6. tecton
 
 Apps:
-  3. my-nextjs-app
-  4. my-api
+  7. client-project
 
 Enter number or name:
 ```
 
 **If `$ARGUMENTS` is provided:**
 
-Fuzzy match against directory names and configured aliases:
+Fuzzy match against:
+1. Directory names
+2. Configured aliases
+3. Worktree branch names
 
-| Input | Matches (example) |
-|-------|-------------------|
-| `pulumi` | my-infra-pulumi |
-| `app` | my-nextjs-app |
-| `api` | my-api |
+| Input | Matches |
+|-------|---------|
+| `cli` | trabian-cli |
+| `server` | trabian-server |
+| `q2` | q2-sdk |
+| `auth` | feature/new-auth (worktree) |
+
+---
+
+## Path Resolution
+
+Once a repo is selected, resolve its full path:
+
+| Source | Path Pattern |
+|--------|--------------|
+| builtin | `<base_path>/<path>` (e.g., `~/trabian-ai/packages/trabian-cli`) |
+| worktree | `<base_path>/.trees/<name>` |
+| clone | `<base_path>/clones/<name>` |
+| repo | `<base_path>/<name>` |
 
 ---
 
@@ -100,14 +166,27 @@ When committing changes in any repo:
 
 ---
 
+## Trabian Context
+
+After selecting a repo, load relevant context:
+
+1. **Always read**: `~/trabian-ai/CLAUDE.md` (workspace rules)
+2. **If repo has CLAUDE.md**: Read `<repo-path>/CLAUDE.md`
+3. **For MCP server**: Note Python/uv patterns
+4. **For packages**: Note TypeScript/npm patterns
+
+---
+
 ## Standard Process Start
 
-1. **Apply dev rules** → `/dev-rules` (path safety, file creation, commit rules)
+1. **Apply dev rules** → Reference trabian's CLAUDE.md
 2. Parse `config.yaml` for base path and repo definitions
-3. If `$ARGUMENTS` empty → show selection prompt
-4. If `$ARGUMENTS` provided → fuzzy match to repo
-5. Confirm selection: "Working on: <repo-name>"
-6. Read `<repo>/CLAUDE.md` for repo-specific guidance
+3. Discover worktrees from `.trees/`
+4. Discover clones from `clones/clone-config.json`
+5. If `$ARGUMENTS` empty → show selection prompt
+6. If `$ARGUMENTS` provided → fuzzy match to repo
+7. Confirm selection: "Working on: <repo-name>"
+8. Read repo's CLAUDE.md (if exists) for repo-specific guidance
 
 ---
 
@@ -143,3 +222,22 @@ mcp__plugin_mlx-hub_mlx-hub__mlx_infer(
   max_tokens=200
 )
 ```
+
+---
+
+## Linear Integration
+
+For repos with `linear_project` in config:
+- Use trabian's Linear MCP plugin tools
+- `mcp__plugin_linear_linear__list_issues`
+- `mcp__plugin_linear_linear__get_issue`
+- `mcp__plugin_linear_linear__create_issue`
+
+---
+
+## GitHub Integration
+
+Use trabian's GitHub MCP for project data:
+- `mcp__trabian__github_get_assigned_issues_with_project_status`
+- `mcp__trabian__github_get_project_items`
+- `mcp__trabian__github_find_project_by_name`

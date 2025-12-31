@@ -1,96 +1,176 @@
-# Claude Code Commands
+# Claude Code Commands (Trabian Branch)
 
 Portable slash commands for managing multi-repo workspaces with Claude Code.
 
-## Setup
+**This is the trabian branch**, adapted for the trabian-ai workspace with:
+- Integration with trabian's Linear MCP plugin
+- GitHub Projects v2 via trabian MCP tools
+- RAID log management via trabian MCP
+- Support for trabian's workspace structure (packages/, mcp/, clones/, .trees/)
 
-1. Copy this folder to your workspace at `.claude/commands/`
-2. Copy `config.yaml.example` to `config.yaml`
-3. Edit `config.yaml` with your base path and repositories
+## Setup (Trabian)
+
+The commands are pre-configured for the trabian-ai workspace:
+
+1. Commands are located at `.claude/commands/sloan/`
+2. `config.yaml` is configured for trabian structure
+3. Reference clones are managed via `clones/clone-config.json`
 
 ```yaml
-base_path: ~/code/my-workspace
+# config.yaml - trabian structure
+base_path: ~/trabian-ai
 
-repos:
-  - name: my-app
-    group: apps
-    aliases: [app]
+builtin:
+  - name: trabian-cli
+    group: packages
+    path: packages/trabian-cli
+    language: typescript
+
+  - name: trabian-server
+    group: mcp
+    path: mcp/trabian-server
+    language: python
+
+worktrees_dir: .trees
+clones_config: clones/clone-config.json
+repos: []
 ```
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| `/super <repo>` | Start brainstorming session with full context |
-| `/find-tasks <repo>` | Suggest 3-5 high-priority tasks |
-| `/run-tests <repo>` | Run lint, type-check, build, and tests |
-| `/make-test <repo>` | Test Makefile targets interactively |
-| `/yes-commit <repo>` | Draft and commit changes |
-| `/push <repo>` | Push commits to origin |
-| `/update-docs <repo>` | Update CLAUDE.md, README, docs |
-| `/review-project <repo>` | Technical review to docs/tech-review.md |
-| `/resolve-pr <url>` | Resolve GitHub PR review feedback |
-| `/add-repo <url>` | Clone repo and add to config |
-| `/status [repo]` | Show status overview of all or one repo |
-| `/sync [repo]` | Pull latest changes for all or one repo |
-| `/switch <repo>` | Quick context switch to a repo |
-| `/linear <subcommand>` | Interact with Linear issues |
-| `/dev-rules` | Remind Claude of workspace rules |
-| `/setup-plugins` | Install all recommended plugins |
-| `/list-commands` | List all available commands |
-| `/list-skills` | List available skills from plugins |
+| `/sloan/super <repo>` | Start brainstorming session with trabian context |
+| `/sloan/find-tasks <repo>` | Find tasks from Linear, GitHub, RAID logs |
+| `/sloan/run-tests <repo>` | Run lint, type-check, build, and tests |
+| `/sloan/make-test <repo>` | Test Makefile targets interactively |
+| `/sloan/yes-commit <repo>` | Draft and commit following trabian conventions |
+| `/sloan/push <repo>` | Push commits to origin |
+| `/sloan/update-docs <repo>` | Update docs following trabian patterns |
+| `/sloan/review-project <repo>` | Technical review with RAID integration |
+| `/sloan/resolve-pr <url>` | Resolve GitHub PR review feedback |
+| `/sloan/add-repo <url>` | Clone repo (reference or app) |
+| `/sloan/status [repo]` | Show status with Linear issue counts |
+| `/sloan/sync [repo]` | Pull latest changes |
+| `/sloan/switch <repo>` | Context switch with trabian suggestions |
+| `/sloan/linear <subcommand>` | Linear issues via trabian MCP |
+| `/sloan/dev-rules` | Trabian workspace development rules |
+| `/sloan/setup-plugins` | Install recommended plugins |
+| `/sloan/list-commands` | List all available commands |
+| `/sloan/list-skills` | List available skills from plugins |
 
-All repo commands support fuzzy matching via aliases (e.g., `/run-tests app`).
+All repo commands support fuzzy matching (e.g., `/sloan/run-tests cli`).
 
-## Configuration
+## Trabian Workspace Structure
 
-### config.yaml
+### Repository Types
 
-```yaml
-base_path: ~/code/workspace    # Root directory for all repos
+| Type | Location | Description |
+|------|----------|-------------|
+| **Packages** | `packages/` | TypeScript packages (trabian-cli) |
+| **MCP** | `mcp/` | Python MCP servers (trabian-server) |
+| **Worktrees** | `.trees/` | Git worktrees for feature branches |
+| **Clones** | `clones/` | Read-only reference repos (Q2, Tecton) |
+| **Apps** | `~/trabian-ai/<name>` | Additional project repos |
 
-repos:
-  - name: my-nextjs-app        # Directory name
-    group: apps                # 'apps' or 'devops'
-    aliases: [app, next]       # Fuzzy match shortcuts
-    work_dir: src              # Optional: subdirectory for commands
-    language: typescript       # Optional: typescript | go | python | rust | shell
-    commands:                  # Optional: override default commands
-      test: pnpm test
-      lint: pnpm lint
-      build: pnpm build
+### Configuration Files
+
+| File | Purpose |
+|------|---------|
+| `config.yaml` | Sloan command config (builtin, repos) |
+| `clones/clone-config.json` | Trabian's reference clone definitions |
+
+## Trabian MCP Integration
+
+These commands integrate with trabian's MCP tools:
+
+### Linear (via Linear Plugin)
+```
+mcp__plugin_linear_linear__list_issues
+mcp__plugin_linear_linear__get_issue
+mcp__plugin_linear_linear__create_issue
+mcp__plugin_linear_linear__update_issue
+mcp__plugin_linear_linear__create_comment
 ```
 
-### Language Detection
+### GitHub Projects v2 (via Trabian Server)
+```
+mcp__trabian__github_get_assigned_issues_with_project_status
+mcp__trabian__github_get_project_items
+mcp__trabian__github_update_issue_status_by_number
+```
 
-If `language` is not specified, it's auto-detected from files:
-- `package.json` → typescript
-- `go.mod` → go
-- `pyproject.toml` → python
-- `Cargo.toml` → rust
+### RAID Logs (via Trabian Server)
+```
+mcp__trabian__projects_fetch_raid_entries
+mcp__trabian__projects_create_raid_entry
+```
 
-### Groups
+## Documentation Patterns (Trabian)
 
-- **devops**: Infrastructure repos (Pulumi, Terraform, etc.)
-- **apps**: Application repos (Next.js, Go, Python, etc.)
+| Type | Location |
+|------|----------|
+| Design docs | `~/trabian-ai/docs/plans/YYYY-MM-DD-<topic>-design.md` |
+| Implementation plans | `~/trabian-ai/docs/plans/YYYY-MM-DD-<topic>-plan.md` |
+| Knowledge base | `~/trabian-ai/docs/<system>/` |
+| Technical reviews | `<repo>/docs/tech-review.md` |
+
+## Commit Rules (Trabian)
+
+| Do | Don't |
+|----|-------|
+| Use imperative mood | Include Claude/Anthropic attribution |
+| Keep summary under 72 chars | Include co-author lines |
+| Focus on WHY not WHAT | Include "Generated with" tags |
+| Consider compliance | Commit secrets |
+
+## Worktree Workflow
+
+For feature development, use git worktrees in `.trees/`:
+
+```bash
+# Create worktree for feature branch
+git worktree add .trees/feature-name -b feature/feature-name
+
+# Switch to worktree
+/sloan/switch feature-name
+
+# Commands work in worktrees
+/sloan/run-tests feature-name
+/sloan/yes-commit feature-name
+/sloan/push feature-name
+```
+
+## Related Trabian Commands
+
+These sloan commands complement existing trabian commands:
+
+| Trabian Command | Sloan Equivalent | Notes |
+|-----------------|------------------|-------|
+| `/dev/commit` | `/sloan/yes-commit` | Sloan adds worktree handling |
+| `/dev/start-session` | `/sloan/super` | Different workflows |
+| `/pm/raid` | - | Use directly for RAID updates |
+| `/kb/q2` | - | Use directly for Q2 knowledge |
 
 ## Files
 
 | File | Purpose |
 |------|---------|
-| `config.yaml.example` | Template (checked in) |
-| `config.yaml` | Your config (gitignored) |
-| `_shared-repo-logic.md` | Common patterns for repo commands |
+| `config.yaml` | Trabian workspace config |
+| `config.yaml.example` | Template showing trabian structure |
+| `_shared-repo-logic.md` | Multi-source repo discovery logic |
 
 ## Requirements
 
 - [Claude Code](https://claude.ai/code) CLI
 - Git
-- Repos should have a `CLAUDE.md` for best results
+- Node.js >=18.0.0 (for TypeScript packages)
+- Python >=3.12 with uv (for MCP server)
+- SSH access for Q2/Tecton repos
 
 ## Recommended Plugins
 
-Run `/setup-plugins` to install all recommended plugins, or install manually:
+Run `/sloan/setup-plugins` to install all recommended plugins, or install manually:
 
 ### Add Marketplaces
 
@@ -129,7 +209,7 @@ claude plugin install gopls-lsp@claude-plugins-official            # Go LSP
 
 ### Key Skills
 
-The `/super` command uses the `superpowers:brainstorming` skill. Other useful skills:
+The `/sloan/super` command uses the `superpowers:brainstorming` skill. Other useful skills:
 
 | Skill | When to Use |
 |-------|-------------|
@@ -139,62 +219,25 @@ The `/super` command uses the `superpowers:brainstorming` skill. Other useful sk
 | `superpowers:test-driven-development` | Writing new code (test first) |
 | `superpowers:verification-before-completion` | Before claiming work is done |
 
-## Commit Rules
+## Portability Notes
 
-These commands enforce:
-- No Claude/Anthropic attribution in commits
-- Imperative mood ("Add feature" not "Added feature")
-- Summary under 72 characters
+This is the **trabian branch** of the portable commands. The main branch contains the generic version that works with any workspace.
 
-## Portability
+### What's Different in Trabian Branch
 
-These commands are designed to be portable across different workspaces.
+- Multi-source repo discovery (builtin, worktrees, clones, repos)
+- Integration with trabian's clone-config.json
+- Linear MCP plugin integration
+- GitHub Projects v2 via trabian MCP
+- RAID log integration
+- Trabian documentation patterns
+- Financial services context awareness
 
-### Using in a New Workspace
+### Merging Updates
 
-1. Copy the entire `.claude/commands/` folder to your workspace
-2. Create `config.yaml` from the example template
-3. Update `base_path` and add your repos
-4. Commands work immediately - no code changes needed
-
-### Customizing for Your Stack
-
-**Different package managers:**
-```yaml
-commands:
-  test: pnpm test
-  lint: pnpm lint
-  build: pnpm build
+To merge updates from the main branch:
+```bash
+cd .claude/commands/sloan
+git fetch origin
+git merge origin/main  # Resolve conflicts as needed
 ```
-
-**Monorepos with multiple languages:**
-```yaml
-- name: my-fullstack
-  commands:
-    test: "cd backend && go test ./... && cd ../frontend && npm test"
-    lint: "cd backend && golangci-lint run && cd ../frontend && npm run lint"
-```
-
-**Custom test patterns:**
-```yaml
-- name: my-django-app
-  language: python
-  commands:
-    test: python manage.py test
-    lint: ruff check . && black --check .
-```
-
-### What's Portable vs Local
-
-| Portable (commit these) | Local (gitignored) |
-|------------------------|-------------------|
-| `*.md` command files | `config.yaml` |
-| `config.yaml.example` | |
-| `_shared-repo-logic.md` | |
-
-### Forking for Your Organization
-
-1. Fork this commands folder
-2. Modify `_shared-repo-logic.md` for org-specific rules
-3. Update `config.yaml.example` with your standard repos
-4. Add org-specific commands as needed

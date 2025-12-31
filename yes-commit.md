@@ -2,9 +2,9 @@
 description: Commit changes for a repository
 ---
 
-# Commit
+# Commit (Trabian Branch)
 
-Help commit git changes for a repository.
+Help commit git changes for a repository following trabian conventions.
 
 **Arguments**: `$ARGUMENTS` - Optional repo name (supports fuzzy match). If empty, shows selection menu.
 
@@ -21,7 +21,7 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Committing fo
 ### Step 2: Check Repository Status
 
 ```bash
-cd <repo-path> && git status
+git -C <repo-path> status
 ```
 
 If no changes, report "No changes to commit" and exit.
@@ -38,16 +38,16 @@ cat <repo-path>/package.json | grep -q "husky\|lint-staged"
 
 If hooks exist, warn:
 ```
-⚠️  Pre-commit hooks detected (husky/lint-staged)
-    Hooks will run: lint, format, tests
-    This may modify files or reject the commit.
+Pre-commit hooks detected (husky/lint-staged)
+Hooks will run: lint, format, tests
+This may modify files or reject the commit.
 ```
 
 ### Step 4: Review Changes
 
 ```bash
-cd <repo-path> && git diff --stat
-cd <repo-path> && git diff
+git -C <repo-path> diff --stat
+git -C <repo-path> diff
 ```
 
 ### Step 5: Generate Commit Message (Local Model First)
@@ -113,7 +113,7 @@ Would you like to proceed? (yes/no/edit)
 
 If approved:
 ```bash
-cd <repo-path> && git add -A && git commit -m "<message>"
+git -C <repo-path> add -A && git -C <repo-path> commit -m "<message>"
 ```
 
 If user wants edits, ask what to modify and regenerate.
@@ -122,32 +122,65 @@ If user wants edits, ask what to modify and regenerate.
 
 Confirm commit succeeded:
 ```bash
-cd <repo-path> && git log -1 --oneline
+git -C <repo-path> log -1 --oneline
 ```
 
 If pre-commit hooks modified files, include them in an amended commit.
 
 ---
 
-## Commit Guidelines
+## Commit Guidelines (Trabian)
 
 | Do | Don't |
 |----|-------|
 | Summarize nature of changes | Include Claude/Anthropic attribution |
 | Keep summary under 72 chars | Include co-author lines |
-| Use imperative mood | Commit secrets (.env, credentials) |
+| Use imperative mood | Include "Generated with" tags |
+| Focus on why | Commit secrets (.env, credentials) |
+
+**From trabian CLAUDE.md:**
+- Follow existing patterns in the codebase
+- Consider financial services context for security-related changes
+- Note any compliance implications in commit body if relevant
+
+---
+
+## Worktree Handling
+
+When committing in a worktree (`.trees/<name>`):
+
+1. Confirm the target branch:
+   ```bash
+   git -C ~/.trees/<name> branch --show-current
+   ```
+
+2. Show commits ahead of main:
+   ```bash
+   git -C ~/.trees/<name> rev-list --count main..HEAD
+   ```
+
+3. After commit, suggest next steps:
+   ```
+   Committed to feature/new-auth (6 commits ahead of main)
+
+   Next steps:
+     /sloan/push <worktree>        Push to remote
+     /sloan/run-tests <worktree>   Verify tests pass
+     Create PR when ready
+   ```
 
 ---
 
 ## Example Output
 
 ```
-Proposed commit message for my-infra-pulumi:
+Proposed commit message for trabian-cli:
 ---
-Add custom IAM role for Cloud Run deployments
+Add MCP header configuration command
 
-Define granular permissions for deploy service account,
-replacing broad predefined roles with minimum required access.
+Implement config mcp-headers subcommand for managing
+authentication headers on MCP servers. Supports add,
+remove, list, and show-config operations.
 ---
 
 Would you like to proceed? (yes/no/edit)
@@ -167,7 +200,8 @@ Would you like to proceed? (yes/no/edit)
 ## Examples
 
 ```bash
-/yes-commit                       # Interactive selection
-/yes-commit pulumi                # Fuzzy match → my-infra-pulumi
-/yes-commit my-app --conventional # Use conventional commits format
+/sloan/yes-commit                        # Interactive selection
+/sloan/yes-commit cli                    # Commit for trabian-cli
+/sloan/yes-commit server --conventional  # Use conventional commits
+/sloan/yes-commit auth                   # Commit for auth worktree
 ```

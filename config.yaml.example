@@ -1,62 +1,43 @@
-# Portable Commands Configuration
-# Copy this file to config.yaml and add your repos
+# Trabian Workspace Configuration (trabian branch)
+# Copy this file to config.yaml
 # config.yaml is gitignored and will not be committed
 
-# Base path - always use ~/code/mono-claude
-base_path: ~/code/mono-claude
+base_path: ~/trabian-ai
 
-# Repository definitions
-# Each repo needs:
-#   - name: directory name (required)
-#   - group: 'devops' or 'apps' (required)
-#   - aliases: list of fuzzy match shortcuts (optional)
-#   - work_dir: subdirectory to run commands from (optional)
-#   - language: typescript | go | python | rust | shell (optional, auto-detected if omitted)
-#   - commands: override default commands (optional)
-
-repos:
-  # DevOps/Infrastructure examples
-  - name: my-infra-pulumi
-    group: devops
-    aliases: [pulumi, infra]
+# Built-in trabian-ai components (always present)
+# These are fixed paths within the trabian-ai mono-repo
+builtin:
+  - name: trabian-cli
+    group: packages
+    path: packages/trabian-cli
     language: typescript
-
-  - name: my-terraform
-    group: devops
-    aliases: [tf, terraform]
-    language: shell
-
-  # Application examples
-  - name: my-nextjs-app
-    group: apps
-    aliases: [app, next]
-    # language auto-detected from package.json
-
-  - name: my-go-api
-    group: apps
-    aliases: [api]
-    language: go
-    work_dir: backend
     commands:
-      test: go test ./...
-      lint: golangci-lint run
-      build: go build ./cmd/api
+      test: npm test
+      lint: npm run lint
+      build: npm run build
 
-  - name: my-python-service
-    group: apps
-    aliases: [py, service]
+  - name: trabian-server
+    group: mcp
+    path: mcp/trabian-server
     language: python
     commands:
-      test: pytest
-      lint: ruff check .
-      typecheck: mypy .
+      test: uv run pytest
+      lint: uv run ruff check .
+      typecheck: uv run mypy .
 
-  # Monorepo with subdirectories
-  - name: my-monorepo
-    group: apps
-    aliases: [mono]
-    work_dir: packages/app
-    commands:
-      test: pnpm test
-      lint: pnpm lint
-      build: pnpm build
+# Dynamic directories (auto-discovered)
+# worktrees_dir: scans for git worktrees (feature branches)
+# clones_config: reads trabian's clone-config.json for reference repos
+worktrees_dir: .trees
+clones_config: clones/clone-config.json
+
+# Additional repos cloned into base_path
+# Added via /sloan/add-repo
+# These are working repos (not just references)
+repos:
+  # Example: client project cloned into ~/trabian-ai/
+  # - name: client-mobile-app
+  #   group: apps
+  #   aliases: [mobile, client]
+  #   language: typescript
+  #   linear_project: client-mobile

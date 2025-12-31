@@ -2,13 +2,13 @@
 description: Start brainstorming session with workspace context
 ---
 
-# Super Command
+# Super Command (Trabian Branch)
 
-Start a structured brainstorming session with full context about the workspace and selected repository. Leverages local MLX models for acceleration where appropriate.
+Start a structured brainstorming session with full context about the workspace and selected repository. Leverages local MLX models for acceleration where appropriate and integrates with trabian's documentation and planning patterns.
 
 **Arguments**: `$ARGUMENTS` - Optional repo name or task description. If repo recognized, selects it. Otherwise treated as brainstorm topic.
 
-**Shared logic**: See `_shared-repo-logic.md` for repo discovery, selection, and commit rules.
+**Shared logic**: See `_shared-repo-logic.md` for repo discovery and selection.
 
 ---
 
@@ -24,7 +24,7 @@ claude plugin list 2>/dev/null | grep -E "(superpowers|mlx)"
 
 #### 0.1: Superpowers Plugin (Required)
 
-The superpowers plugin provides the `/superpowers:brainstorming` skill used in Step 4.
+The superpowers plugin provides the `/superpowers:brainstorming` skill used in Step 5.
 
 **If superpowers is NOT installed:**
 
@@ -47,29 +47,54 @@ If not installed, continue without acceleration - install via `/setup-plugins` i
 
 ---
 
-### Step 1: Resolve Repository
+### Step 1: Load Workspace Context
+
+**Always load trabian workspace context first:**
+
+```bash
+cat ~/trabian-ai/CLAUDE.md
+```
+
+Key context to extract:
+- Repository structure (packages/, mcp/, clones/, .trees/)
+- Build commands (npm run build, uv sync)
+- MCP server architecture
+- Available commands (kb/, pm/, dev/)
+
+### Step 2: Resolve Repository
 
 Follow repo selection from `_shared-repo-logic.md`:
-1. Read `config.yaml` for base path and repo definitions
+1. Parse `config.yaml` for builtin, worktrees, clones, repos
 2. Match `$ARGUMENTS` to repo name or alias
 3. If no repo recognized, ask which repo the task relates to
 4. Confirm: "Brainstorming for: <repo-name>"
 
-### Step 2: Load Workspace Context
-
-**Always read the workspace root CLAUDE.md first** for workspace-wide notes, MLX model guidance, and cross-repo context:
-
-Read: `<base_path>/CLAUDE.md` (where `base_path` is from `config.yaml`)
-
 ### Step 3: Load Repo Context
 
+**For builtin packages:**
 ```bash
-pwd  # Verify again before repo commands
-cd <base_path>/<repo> && git status
-cd <base_path>/<repo> && git log --oneline -5
+cat ~/trabian-ai/packages/<name>/CLAUDE.md  # or mcp/<name>
+git -C <repo-path> status
+git -C <repo-path> log --oneline -5
 ```
 
-Read: `<repo>/CLAUDE.md`, `README.md`, `docs/overview.md`
+**For worktrees:**
+```bash
+git -C ~/.trees/<name> branch --show-current
+git -C ~/.trees/<name> log --oneline main..HEAD
+```
+
+**For clones (reference repos):**
+```bash
+cat ~/trabian-ai/clones/<name>/README.md
+# Note: These are read-only references
+```
+
+**For apps:**
+```bash
+cat <repo-path>/CLAUDE.md
+git -C <repo-path> status
+```
 
 ### Step 4: Local Model Acceleration (Optional)
 
@@ -85,37 +110,98 @@ See `_shared-repo-logic.md` for model tiers and routing rules.
 - Security-sensitive analysis
 - Final synthesis and recommendations
 
+### Step 4b: Check Related Issues (Trabian MCP)
+
+If brainstorming about a specific feature/bug, check for related issues:
+
+```
+# Search Linear for related issues
+mcp__plugin_linear_linear__list_issues with query="<topic>"
+
+# Check GitHub assigned issues
+mcp__trabian__github_get_assigned_issues_with_project_status
+```
+
 ### Step 5: Run Brainstorming
 
 Invoke `/superpowers:brainstorming` with:
-- Selected repo name and path
+- Trabian workspace context
+- Selected repo name, type, and path
 - Task/topic from `$ARGUMENTS`
 - Key context from repo's CLAUDE.md
 - Current git status
+- Any related Linear/GitHub issues
 - **Awareness of local model for acceleration**
 
 ---
 
-## Documentation Location
+## Documentation Location (Trabian Pattern)
 
-When creating documentation:
+When creating documentation, follow trabian's structure:
 
 | Type | Location |
 |------|----------|
+| Design docs | `~/trabian-ai/docs/plans/YYYY-MM-DD-<topic>-design.md` |
+| Implementation plans | `~/trabian-ai/docs/plans/YYYY-MM-DD-<topic>-plan.md` |
+| Knowledge base | `~/trabian-ai/docs/<system>/` |
 | Technical reviews | `<repo>/docs/tech-review.md` |
-| Design docs | `<repo>/docs/plans/<date>-<topic>-design.md` |
-| Implementation plans | `<repo>/docs/plans/<date>-<topic>-plan.md` |
+
+**Pattern for design doc filenames:**
+```
+docs/plans/2025-01-15-mcp-authentication-design.md
+docs/plans/2025-01-15-cli-refactor-plan.md
+```
 
 **If unsure where docs belong, ASK the user.**
+
+---
+
+## Post-Brainstorming Suggestions
+
+After brainstorming completes, suggest relevant trabian commands:
+
+| Task Type | Suggested Commands |
+|-----------|-------------------|
+| Feature implementation | `/dev/start-session`, `/dev/create-plan` |
+| Bug fix | `/sloan/find-tasks`, `/sloan/linear` |
+| Infrastructure | `/pm/raid`, review RAID log implications |
+| Documentation | `/sloan/update-docs`, `/kb/q2` (if Q2-related) |
+
+---
+
+## Integration with Trabian Workflows
+
+### Link to Linear issues
+
+If brainstorming leads to new tasks:
+```bash
+# Create Linear issue from brainstorm outcome
+/sloan/linear create "<task title>"
+```
+
+### Start development session
+
+If ready to implement:
+```bash
+/dev/start-session <issue-url-or-description>
+```
+
+### Update RAID log
+
+If brainstorming reveals risks or blockers:
+```bash
+/pm/raid "<project-name>"
+```
 
 ---
 
 ## Examples
 
 ```bash
-/super my-app add user authentication   # Brainstorm for my-app repo
-/super optimize database queries        # Prompts for repo selection
-/super pulumi                           # Start brainstorming for infra repo
+/sloan/super cli add config validation     # Brainstorm for trabian-cli
+/sloan/super server add new endpoint       # Brainstorm for trabian-server
+/sloan/super optimize harvest integration  # Prompts for repo selection
+/sloan/super                               # Shows selection menu
 ```
 
 ## Local Model Tips

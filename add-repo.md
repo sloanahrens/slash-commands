@@ -2,9 +2,9 @@
 description: Add a new repository to the workspace
 ---
 
-# Add Repository
+# Add Repository (Trabian Branch)
 
-Clone a repository and add it to the workspace configuration.
+Clone a repository and add it to the workspace configuration, integrating with trabian's structure.
 
 **Arguments**: `$ARGUMENTS` - Git URL (HTTPS or SSH). If empty, prompts user.
 
@@ -29,90 +29,183 @@ Use the URL from arguments.
 
 Extract from URL:
 - **Repo name**: Last path segment without `.git`
-- **Host**: github.com, gitlab.com, bitbucket.org, etc.
+- **Host**: github.com, gitlab.com, code.q2developer.com, etc.
 
 Examples:
 | URL | Repo Name |
 |-----|-----------|
 | `https://github.com/user/my-app.git` | my-app |
-| `git@github.com:user/my-app.git` | my-app |
-| `https://github.com/user/my-app` | my-app |
+| `git@github.com:org/my-app.git` | my-app |
+| `git@code.q2developer.com:q2/sdk.git` | sdk |
 
-### Step 3: Confirm Details
+### Step 3: Determine Repository Type
 
-Ask the user to confirm or customize:
+Ask user to classify the repository:
 
 ```
-Adding repository:
+What type of repository is this?
+
+1. Reference clone (read-only, for knowledge base)
+   → Will be added to clones/clone-config.json
+   → Located in ~/trabian-ai/clones/
+
+2. App/project (active development)
+   → Will be added to config.yaml repos[]
+   → Located in ~/trabian-ai/<name>/
+
+Choose (1/2):
+```
+
+### Step 4: Confirm Details
+
+**For reference clones:**
+```
+Adding reference clone:
   URL: <url>
   Name: <repo-name>
-  Group: apps (or devops)
-  Aliases: <suggested-alias>
+  Location: ~/trabian-ai/clones/<repo-name>
+  Config: clones/clone-config.json
+  Description: <ask user>
 
 Proceed? (yes/edit/cancel)
 ```
 
-If user chooses "edit", ask what to change.
+**For app repos:**
+```
+Adding app repository:
+  URL: <url>
+  Name: <repo-name>
+  Location: ~/trabian-ai/<repo-name>
+  Group: apps
+  Config: .claude/commands/sloan/config.yaml
 
-### Step 4: Clone Repository
-
-```bash
-cd <base_path> && git clone <url>
+Proceed? (yes/edit/cancel)
 ```
 
-If clone fails, report error and stop.
+### Step 5: Clone Repository
 
-### Step 5: Update config.yaml
+**For reference clones:**
+```bash
+cd ~/trabian-ai/clones && git clone <url>
+```
 
-Add new entry to `config.yaml`:
+**For app repos:**
+```bash
+cd ~/trabian-ai && git clone <url>
+```
 
+If clone fails (e.g., SSH access required), report error:
+```
+Clone failed. This might require SSH access.
+For Q2/Tecton repos, ensure you have SSH keys configured for the host.
+```
+
+### Step 6: Update Configuration
+
+**For reference clones** - Update `clones/clone-config.json`:
+
+```bash
+cat ~/trabian-ai/clones/clone-config.json
+```
+
+Add new entry following existing pattern:
+```json
+{
+  "repos": [
+    ...existing...,
+    {
+      "name": "<repo-name>",
+      "url": "<url>",
+      "description": "<user-provided description>"
+    }
+  ]
+}
+```
+
+**For app repos** - Update `config.yaml`:
+
+Add new entry to `repos[]`:
 ```yaml
+repos:
   - name: <repo-name>
-    group: <apps|devops>
-    aliases: [<alias>]
+    path: <repo-name>
+    language: <typescript|python|go|other>
+    linear_project: <optional - ask if they want to link>
 ```
 
-### Step 6: Check for CLAUDE.md
+### Step 7: Check for CLAUDE.md
 
 ```bash
-ls <base_path>/<repo-name>/CLAUDE.md
+ls <repo-path>/CLAUDE.md
 ```
 
-If missing, ask:
+If missing for app repos, ask:
 ```
 No CLAUDE.md found. Would you like to create one? (yes/no)
 ```
 
-If yes, create a basic template.
+If yes, create a basic template following trabian patterns.
 
-### Step 7: Confirm Success
+### Step 8: Confirm Success
 
+**For reference clones:**
+```
+Reference clone added successfully:
+  Location: ~/trabian-ai/clones/<repo-name>
+  Config: Updated clones/clone-config.json
+
+This repo is for reference only. Use it to:
+  - Search for patterns: grep -r "pattern" ~/trabian-ai/clones/<repo-name>/
+  - Read documentation: cat ~/trabian-ai/clones/<repo-name>/README.md
+  - Load knowledge base: /kb/<tag> (if applicable)
+```
+
+**For app repos:**
 ```
 Repository added successfully:
-  Location: <base_path>/<repo-name>
+  Location: ~/trabian-ai/<repo-name>
   Config: Updated config.yaml
 
-Run `/super <repo-name>` to start working with it.
+Quick actions:
+  /sloan/switch <repo-name>      Switch to this repo
+  /sloan/find-tasks <repo-name>  Find tasks
+  /sloan/super <repo-name>       Start brainstorming
 ```
 
 ---
 
-## Group Selection
+## Group Selection (App Repos)
 
 Ask user or infer from repo contents:
 
-| Indicator | Group |
-|-----------|-------|
-| Contains `pulumi/`, `terraform/`, `infra` | devops |
-| Contains `package.json`, `go.mod`, `src/` | apps |
-| Unclear | Ask user |
+| Indicator | Language |
+|-----------|----------|
+| `package.json` | typescript |
+| `pyproject.toml`, `requirements.txt` | python |
+| `go.mod` | go |
+| `Cargo.toml` | rust |
+
+---
+
+## Linear Integration (Optional)
+
+For app repos, ask:
+```
+Link to a Linear project? This enables:
+  - /sloan/find-tasks integration
+  - Issue tracking in /sloan/status
+
+Enter Linear project name (or skip):
+```
+
+If provided, add `linear_project: "<name>"` to config.yaml entry.
 
 ---
 
 ## Examples
 
 ```bash
-/add-repo https://github.com/user/my-new-app.git
-/add-repo git@github.com:org/infrastructure.git
-/add-repo                                          # Prompts for URL
+/sloan/add-repo https://github.com/user/my-new-app.git       # App repo
+/sloan/add-repo git@code.q2developer.com:q2/new-sdk.git      # Reference clone
+/sloan/add-repo                                               # Prompts for URL
 ```

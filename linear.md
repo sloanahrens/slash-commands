@@ -2,9 +2,9 @@
 description: Interact with Linear issues and projects
 ---
 
-# Linear Command
+# Linear Command (Trabian Branch)
 
-Query, create, and manage Linear issues directly from the workspace.
+Query, create, and manage Linear issues using trabian's Linear MCP plugin.
 
 **Arguments**: `$ARGUMENTS` - Subcommand and options (see below)
 
@@ -15,75 +15,92 @@ Query, create, and manage Linear issues directly from the workspace.
 ### `my` - Show my assigned issues
 
 ```bash
-/linear my              # All assigned issues
-/linear my --limit 10   # Limit results
+/sloan/linear my              # All assigned issues
+/sloan/linear my --limit 10   # Limit results
 ```
 
-Uses `mcp__linear__get_user_issues` to fetch issues assigned to current user.
+Uses `mcp__plugin_linear_linear__list_issues` with `assignee="me"`.
 
 ### `search <query>` - Search issues
 
 ```bash
-/linear search Plaid              # Text search
-/linear search --status "In Progress"
-/linear search --priority 1       # Urgent only
-/linear search Plaid --status Backlog
+/sloan/linear search Plaid              # Text search
+/sloan/linear search --state "In Progress"
+/sloan/linear search --label "Bug"
+/sloan/linear search Plaid --state Backlog
 ```
 
-Uses `mcp__linear__search_issues` with filters.
+Uses `mcp__plugin_linear_linear__list_issues` with query filters.
 
-### `project <repo>` - Show project issues
+### `project <name>` - Show project issues
 
 ```bash
-/linear project my-app            # Fuzzy match repo with linear_project
-/linear project                   # Interactive selection
+/sloan/linear project "VACU Card"       # Search by project name
+/sloan/linear project                   # Interactive selection
 ```
 
-Looks up `linear_project` from config.yaml and searches related issues.
+Uses `mcp__plugin_linear_linear__list_projects` to find project, then `list_issues` with project filter.
+
+### `issue <id>` - Get issue details
+
+```bash
+/sloan/linear issue TRB-123             # Get full issue details
+```
+
+Uses `mcp__plugin_linear_linear__get_issue` with includeRelations=true.
 
 ### `create <title>` - Create new issue
 
 ```bash
-/linear create "Fix token refresh bug"
-/linear create "Add retry logic" --priority 2
+/sloan/linear create "Fix token refresh bug"
+/sloan/linear create "Add retry logic" --priority 2
 ```
 
 Prompts for:
 - Description (optional)
-- Team (from config or prompt)
+- Team (from trabian teams)
 - Priority (1=urgent, 2=high, 3=normal, 4=low)
-- Status (default: Backlog)
+- State (default: Backlog)
 
-Uses `mcp__linear__create_issue`.
+Uses `mcp__plugin_linear_linear__create_issue`.
 
 ### `comment <issue-id> <message>` - Add comment
 
 ```bash
-/linear comment PROJ-123 "Fixed in commit abc123"
+/sloan/linear comment TRB-123 "Fixed in commit abc123"
 ```
 
-Uses `mcp__linear__add_comment`.
+Uses `mcp__plugin_linear_linear__create_comment`.
 
 ### `update <issue-id>` - Update issue
 
 ```bash
-/linear update PROJ-123 --status "In Progress"
-/linear update PROJ-123 --priority 2
+/sloan/linear update TRB-123 --state "In Progress"
+/sloan/linear update TRB-123 --priority 2
+/sloan/linear update TRB-123 --assignee me
 ```
 
-Uses `mcp__linear__update_issue`.
+Uses `mcp__plugin_linear_linear__update_issue`.
 
 ---
 
-## Available MCP Tools
+## Available MCP Tools (Trabian Plugin)
 
 | Tool | Purpose |
 |------|---------|
-| `mcp__linear__get_user_issues` | Get issues assigned to a user |
-| `mcp__linear__search_issues` | Search with filters (query, status, priority, team, labels) |
-| `mcp__linear__create_issue` | Create new issue (title, description, teamId, priority, status) |
-| `mcp__linear__update_issue` | Update issue (id, title, description, priority, status) |
-| `mcp__linear__add_comment` | Add comment to issue (issueId, body) |
+| `mcp__plugin_linear_linear__list_issues` | List issues with filters (assignee, state, project, label, team) |
+| `mcp__plugin_linear_linear__get_issue` | Get issue details with relations |
+| `mcp__plugin_linear_linear__create_issue` | Create new issue |
+| `mcp__plugin_linear_linear__update_issue` | Update issue fields |
+| `mcp__plugin_linear_linear__create_comment` | Add comment to issue |
+| `mcp__plugin_linear_linear__list_comments` | List comments on issue |
+| `mcp__plugin_linear_linear__list_projects` | List Linear projects |
+| `mcp__plugin_linear_linear__get_project` | Get project details |
+| `mcp__plugin_linear_linear__list_teams` | List Linear teams |
+| `mcp__plugin_linear_linear__list_users` | List workspace users |
+| `mcp__plugin_linear_linear__list_issue_statuses` | List available statuses for a team |
+| `mcp__plugin_linear_linear__list_issue_labels` | List available labels |
+| `mcp__plugin_linear_linear__list_cycles` | List team cycles (sprints) |
 
 ---
 
@@ -98,24 +115,26 @@ Uses `mcp__linear__update_issue`.
 
 ---
 
-## Configuration
+## Integration with Trabian Workflows
 
-Repos can specify their Linear project in `config.yaml`:
+### Link issues to development sessions
 
-```yaml
-repos:
-  - name: my-client-project
-    linear_project: my-client-api
+```bash
+# Start session from Linear issue
+/dev/start-session https://linear.app/trabian/issue/TRB-123
+
+# Update issue when done
+/sloan/linear update TRB-123 --state "Done"
+/sloan/linear comment TRB-123 "Completed in PR #45"
 ```
 
-The workspace Linear config is in `external_sources.linear`:
+### RAID log integration
 
-```yaml
-external_sources:
-  linear:
-    workspace: my-org
-    projects:
-      - my-client-api
+When working on issues, consider updating RAID logs:
+
+```bash
+# If issue reveals a risk or blocker
+/pm/raid "Project Name" "Discovered dependency issue from TRB-123"
 ```
 
 ---
@@ -123,10 +142,11 @@ external_sources:
 ## Examples
 
 ```bash
-/linear my                                    # My assigned issues
-/linear search "authentication" --status Todo # Search with filter
-/linear project my-app                        # Project issues for my-app
-/linear create "Add error handling"           # Create issue (prompts for details)
-/linear comment PROJ-123 "WIP - 50% done"     # Add comment
-/linear update PROJ-123 --status "In Progress" # Update status
+/sloan/linear my                                      # My assigned issues
+/sloan/linear search "authentication" --state Todo    # Search with filter
+/sloan/linear project "VACU"                          # Project issues
+/sloan/linear issue TRB-123                           # Issue details
+/sloan/linear create "Add error handling"             # Create issue
+/sloan/linear comment TRB-123 "WIP - 50% done"        # Add comment
+/sloan/linear update TRB-123 --state "In Progress"    # Update status
 ```

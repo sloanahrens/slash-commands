@@ -2,9 +2,9 @@
 description: Conduct technical review for a repository
 ---
 
-# Review Project
+# Review Project (Trabian Branch)
 
-Conduct a technical review of a repository and update its documentation.
+Conduct a technical review of a repository and update its documentation, following trabian patterns.
 
 **Arguments**: `$ARGUMENTS` - Optional repo name (supports fuzzy match). If empty, shows selection menu.
 
@@ -18,19 +18,44 @@ Conduct a technical review of a repository and update its documentation.
 
 Follow repo selection from `_shared-repo-logic.md`, then confirm: "Reviewing: <repo-name>"
 
-### Step 2: Understand the Repository
+**Note:** Reference clones in `clones/` are typically not reviewed - they're external repos. If user selects a clone, confirm they want to review it.
 
-1. Read documentation: `<repo>/CLAUDE.md`, `README.md`, `docs/overview.md`
-2. Examine structure: `ls -la <repo-path>`
-3. Check `package.json` for dependencies and scripts
+### Step 2: Load Context
+
+1. Read trabian workspace context:
+   ```bash
+   cat ~/trabian-ai/CLAUDE.md
+   ```
+
+2. Read repo documentation:
+   - `<repo>/CLAUDE.md`
+   - `<repo>/README.md`
+   - `<repo>/docs/overview.md` (if exists)
+
+3. Examine structure:
+   ```bash
+   ls -la <repo-path>
+   tree <repo-path> -L 2 -I 'node_modules|.git|dist|__pycache__'
+   ```
 
 ### Step 3: Run Available Checks
 
+**For TypeScript packages (packages/):**
 ```bash
-npm run lint        # If available
-npm run type-check  # If available
-npm test            # If available
+cd <repo-path> && npm run lint
+cd <repo-path> && npm run build
+cd <repo-path> && npm test
 ```
+
+**For Python MCP server (mcp/):**
+```bash
+cd <repo-path> && uv run ruff check .
+cd <repo-path> && uv run mypy .
+cd <repo-path> && uv run pytest
+```
+
+**For app repos:**
+Check `package.json` or `pyproject.toml` for available commands.
 
 ### Step 4: Review Key Areas
 
@@ -48,33 +73,49 @@ mlx_infer(
 
 See `_shared-repo-logic.md` for MLX routing and fallback patterns.
 
-Use the `pr-review-toolkit:code-reviewer` agent to analyze the codebase systematically. The agent will check:
+Use the `pr-review-toolkit:code-reviewer` agent to analyze systematically.
 
-**App Repos (Next.js, React):**
+**TypeScript Packages (trabian-cli):**
+- CLI command organization
+- Error handling patterns
+- Test coverage
+- TypeScript strictness
+
+**Python MCP Server (trabian-server):**
+- FastMCP patterns
+- Sub-server composition
+- Authentication middleware
+- API client implementations
+- Test coverage
+
+**App Repos:**
 - Architecture & component organization
 - State management patterns
-- API route design
+- API design
 - Error handling, test coverage
 
-**Infrastructure Repos (Pulumi, Terraform):**
-- Resource organization
-- Security patterns (IAM, secrets)
-- State management
-- CI/CD integration
+**For all repos, consider:**
+- Financial services compliance implications
+- Security patterns (secrets, auth)
+- Production readiness
 
-**General:**
-- Code organization and discoverability
-- Dependency management
-- Environment configuration
-- Documentation quality
+### Step 5: Check RAID Log (if applicable)
 
-Invoke the agent with the repo path and focus areas relevant to the stack.
+For app repos with project associations:
+```
+mcp__trabian__projects_fetch_raid_entries with project_id
+```
 
-### Step 5: Update Documentation
+Note any:
+- Unresolved issues related to this repo
+- Outstanding risks
+- Pending actions
+
+### Step 6: Update Documentation
 
 **Primary: Update `<repo>/CLAUDE.md`**
 
-Incorporate key findings directly into the repo's CLAUDE.md:
+Incorporate key findings directly:
 - Update commands if they've changed
 - Add warnings or gotchas discovered
 - Refine architecture descriptions
@@ -82,7 +123,7 @@ Incorporate key findings directly into the repo's CLAUDE.md:
 
 **If detailed analysis needed: `<repo>/docs/tech-review.md`**
 
-Only create this file if findings are too detailed for CLAUDE.md:
+Only create if findings are too detailed for CLAUDE.md:
 
 ```markdown
 # Technical Review: <repo-name>
@@ -95,30 +136,41 @@ Only create this file if findings are too detailed for CLAUDE.md:
 [What the project does well]
 
 ## Issues & Recommendations
-- **Issue**: Description
-- **Impact**: Why this matters
-- **Fix**: Action items
+| Priority | Issue | Impact | Recommendation |
+|----------|-------|--------|----------------|
+| High | ... | ... | ... |
+| Medium | ... | ... | ... |
 
 ## Future Considerations
 [Long-term improvements]
 ```
 
-**If registry info changed: Update root CLAUDE.md**
+**Update trabian workspace CLAUDE.md only if:**
+- Major structural changes to the repo
+- New commands or key information
+- Critical warnings for the workspace
 
-Only update `<base_path>/CLAUDE.md` if:
-- Repo name or alias changed
-- New gotchas that affect the registry table
-- Stack or description is outdated
+### Step 7: Create RAID Entries (if applicable)
+
+If review reveals issues that should be tracked:
+```
+mcp__trabian__projects_create_raid_entry with:
+  - type: "Issue" or "Risk"
+  - project_id: <from project association>
+  - title: <issue summary>
+  - content: <details from review>
+```
 
 ---
 
-## Documentation Rules
+## Documentation Rules (Trabian)
 
 | DO | DON'T |
 |----|-------|
 | Update `<repo>/CLAUDE.md` | Create docs at workspace root |
 | Write details to `<repo>/docs/` | Duplicate info across files |
-| Update root CLAUDE.md registry | Create standalone review files at root |
+| Consider compliance implications | Ignore security findings |
+| Create RAID entries for blockers | Leave issues undocumented |
 
 ---
 
@@ -128,13 +180,15 @@ Only update `<base_path>/CLAUDE.md` if:
 - Balance **ideal** with **pragmatic**
 - Acknowledge **good patterns** already in place
 - Prioritize by **impact vs effort**
+- Consider **financial services context**
 
 ---
 
 ## Examples
 
 ```bash
-/review-project              # Interactive selection
-/review-project pulumi       # Fuzzy match → my-infra-pulumi
-/review-project my-app       # Fuzzy match → my-nextjs-app
+/sloan/review-project              # Interactive selection
+/sloan/review-project cli          # Review trabian-cli
+/sloan/review-project server       # Review trabian-server
+/sloan/review-project my-app       # Review app repo
 ```
