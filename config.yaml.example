@@ -2,7 +2,7 @@
 # Copy this file to config.yaml
 # config.yaml is gitignored and will not be committed
 
-base_path: ~/trabian
+base_path: ~/code/trabian-ai
 
 # Built-in trabian components (always present)
 # These are fixed paths within the trabian mono-repo
@@ -35,7 +35,7 @@ clones_config: clones/clone-config.json
 # Added via /sloan/add-repo
 # These are working repos (not just references)
 repos:
-  # Example: client project cloned into ~/trabian/
+  # Example: client project cloned into ~/code/trabian-ai/
   # - name: client-mobile-app
   #   group: apps
   #   aliases: [mobile, client]

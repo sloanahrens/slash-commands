@@ -1,20 +1,22 @@
-# Shared Repo Logic (Trabian Branch)
+# Shared Repo Logic
 
-This file contains shared patterns used by all repo-targeting slash commands in the trabian workspace.
+This file contains shared patterns used by all repo-targeting slash commands.
 
 ---
 
 ## Configuration
 
-Commands use `config.yaml` in this directory. The trabian branch supports:
+Commands use `config.yaml` in this directory. The config supports:
 
-- `builtin` - trabian's own packages (fixed paths)
+- `base_path` - trabian product workspace (~/code/trabian-ai)
+- `builtin` - trabian's own packages (fixed paths under base_path)
 - `worktrees_dir` - auto-discovers `.trees/*` worktrees
 - `clones_config` - reads trabian's `clones/clone-config.json`
-- `repos` - additional repos cloned into base_path
+- `code_path` - location of working code repos (~/code)
+- `repos` - working repos at code_path
 
 ```yaml
-base_path: ~/trabian
+base_path: ~/code/trabian-ai
 
 builtin:
   - name: trabian-cli
@@ -25,17 +27,23 @@ builtin:
 worktrees_dir: .trees
 clones_config: clones/clone-config.json
 
+code_path: ~/code
+
 repos:
-  - name: client-project
-    group: apps
-    aliases: [client]
+  - name: hanscom-fcu-poc-plaid-token-manager
+    group: projects
+    aliases: [hanscom, plaid-poc]
 ```
 
 ---
 
 ## Critical Rule
 
-**CRITICAL**: Always stay within `~/trabian/` - never navigate above this directory.
+**CRITICAL**: Stay within the configured paths:
+- `~/code/trabian-ai/` for trabian product work
+- `~/code/` for working repos
+
+Never navigate above these directories.
 
 ---
 
@@ -47,21 +55,21 @@ Parse repos from multiple sources in order:
 
 Read `config.yaml` → `builtin[]`:
 - These are fixed trabian packages
-- Always available regardless of clones
+- Path resolved as `<base_path>/<path>`
 
 ### 2. Worktrees (Dynamic)
 
 Scan `<base_path>/.trees/` directory:
 ```bash
-ls -d ~/trabian/.trees/*/ 2>/dev/null
+ls -d ~/code/trabian-ai/.trees/*/ 2>/dev/null
 ```
 
 For each worktree, extract:
 - Name: directory name (e.g., `feature-new-auth`)
-- Path: `.trees/<name>`
+- Path: `<base_path>/.trees/<name>`
 - Branch: `git -C .trees/<name> branch --show-current`
 
-### 3. Clones (From trabian config)
+### 3. Clones (Reference Repos)
 
 Read `<base_path>/clones/clone-config.json`:
 ```json
@@ -75,26 +83,29 @@ Read `<base_path>/clones/clone-config.json`:
 
 For each clone:
 - Name: key name
-- Path: `clones/<name>`
+- Path: `<base_path>/clones/<name>`
 - Group: `clones`
+- **Note**: These are read-only reference repos
 
-### 4. Additional Repos
+### 4. Working Repos
 
 Read `config.yaml` → `repos[]`:
-- These are working repos cloned into base_path
-- Added via `/sloan/add-repo`
+- These are working repos at `<code_path>/<name>`
+- Added via `/add-repo` or manually to config
 
 ---
 
 ## Groups
 
-| Group | Source | Description |
-|-------|--------|-------------|
-| `packages` | builtin | trabian TypeScript packages |
-| `mcp` | builtin | trabian MCP server |
-| `worktrees` | dynamic | Active feature branches in .trees/ |
-| `clones` | clone-config.json | Reference repositories (Q2 SDK, Tecton) |
-| `apps` | repos | Additional working repos |
+| Group | Source | Location | Description |
+|-------|--------|----------|-------------|
+| `packages` | builtin | ~/code/trabian-ai/packages/ | trabian TypeScript packages |
+| `mcp` | builtin | ~/code/trabian-ai/mcp/ | trabian MCP server |
+| `worktrees` | dynamic | ~/code/trabian-ai/.trees/ | Active feature branches |
+| `clones` | clone-config.json | ~/code/trabian-ai/clones/ | Reference repos (Q2 SDK, Tecton) |
+| `projects` | repos | ~/code/ | Active project work |
+| `devops` | repos | ~/code/ | Infrastructure repos |
+| `personal` | repos | ~/code/ | Personal/exploration repos |
 
 ---
 
@@ -113,14 +124,21 @@ Packages:
 
 Worktrees:
   3. feature/new-auth
-  4. fix/mcp-bug
 
 Clones:
-  5. q2-sdk
-  6. tecton
+  4. q2-sdk
+  5. tecton
 
-Apps:
-  7. client-project
+Projects:
+  6. hanscom-fcu-poc-plaid-token-manager
+  7. service-cu-cloud-services-platform
+
+DevOps:
+  8. devops-pulumi-ts
+
+Personal:
+  9. fractals-nextjs
+  10. mango
 
 Enter number or name:
 ```
@@ -137,7 +155,9 @@ Fuzzy match against:
 | `cli` | trabian-cli |
 | `server` | trabian-server |
 | `q2` | q2-sdk |
-| `auth` | feature/new-auth (worktree) |
+| `hanscom` | hanscom-fcu-poc-plaid-token-manager |
+| `pulumi` | devops-pulumi-ts |
+| `fractals` | fractals-nextjs |
 
 ---
 
@@ -147,10 +167,10 @@ Once a repo is selected, resolve its full path:
 
 | Source | Path Pattern |
 |--------|--------------|
-| builtin | `<base_path>/<path>` (e.g., `~/trabian/packages/trabian-cli`) |
-| worktree | `<base_path>/.trees/<name>` |
-| clone | `<base_path>/clones/<name>` |
-| repo | `<base_path>/<name>` |
+| builtin | `<base_path>/<path>` (e.g., `~/code/trabian-ai/packages/trabian-cli`) |
+| worktree | `<base_path>/.trees/<name>` (e.g., `~/code/trabian-ai/.trees/feature-x`) |
+| clone | `<base_path>/clones/<name>` (e.g., `~/code/trabian-ai/clones/q2-sdk`) |
+| repo | `<code_path>/<name>` (e.g., `~/code/hanscom-fcu-poc-plaid-token-manager`) |
 
 ---
 
@@ -166,12 +186,12 @@ When committing changes in any repo:
 
 ---
 
-## Trabian Context
+## Context Loading
 
 After selecting a repo, load relevant context:
 
-1. **Always read**: `~/trabian/CLAUDE.md` (workspace rules)
-2. **If repo has CLAUDE.md**: Read `<repo-path>/CLAUDE.md`
+1. **For trabian repos**: Read `~/code/trabian-ai/CLAUDE.md`
+2. **For code repos**: Read `<repo-path>/CLAUDE.md` if it exists
 3. **For MCP server**: Note Python/uv patterns
 4. **For packages**: Note TypeScript/npm patterns
 
@@ -179,14 +199,13 @@ After selecting a repo, load relevant context:
 
 ## Standard Process Start
 
-1. **Apply dev rules** → Reference trabian's CLAUDE.md
-2. Parse `config.yaml` for base path and repo definitions
-3. Discover worktrees from `.trees/`
-4. Discover clones from `clones/clone-config.json`
-5. If `$ARGUMENTS` empty → show selection prompt
-6. If `$ARGUMENTS` provided → fuzzy match to repo
-7. Confirm selection: "Working on: <repo-name>"
-8. Read repo's CLAUDE.md (if exists) for repo-specific guidance
+1. Parse `config.yaml` for base_path, code_path, and repo definitions
+2. Discover worktrees from `<base_path>/.trees/`
+3. Discover clones from `clones/clone-config.json`
+4. If `$ARGUMENTS` empty → show selection prompt
+5. If `$ARGUMENTS` provided → fuzzy match to repo
+6. Confirm selection: "Working on: <repo-name>"
+7. Read repo's CLAUDE.md (if exists) for repo-specific guidance
 
 ---
 

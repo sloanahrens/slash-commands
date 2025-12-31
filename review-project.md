@@ -24,7 +24,7 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Reviewing: <r
 
 1. Read trabian workspace context:
    ```bash
-   cat ~/trabian/CLAUDE.md
+   cat ~/code/trabian-ai/CLAUDE.md
    ```
 
 2. Read repo documentation:

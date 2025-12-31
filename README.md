@@ -12,13 +12,13 @@ Portable slash commands for managing multi-repo workspaces with Claude Code.
 
 The commands are pre-configured for the trabian workspace:
 
-1. Commands are located at `.claude/commands/sloan/`
+1. Commands are located at `~/.claude/commands/`
 2. `config.yaml` is configured for trabian structure
 3. Reference clones are managed via `clones/clone-config.json`
 
 ```yaml
 # config.yaml - trabian structure
-base_path: ~/trabian
+base_path: ~/code/trabian-ai
 
 builtin:
   - name: trabian-cli
@@ -71,7 +71,7 @@ All repo commands support fuzzy matching (e.g., `/sloan/run-tests cli`).
 | **MCP** | `mcp/` | Python MCP servers (trabian-server) |
 | **Worktrees** | `.trees/` | Git worktrees for feature branches |
 | **Clones** | `clones/` | Read-only reference repos (Q2, Tecton) |
-| **Apps** | `~/trabian/<name>` | Additional project repos |
+| **Apps** | `~/code/trabian-ai/<name>` | Additional project repos |
 
 ### Configuration Files
 
@@ -110,9 +110,9 @@ mcp__trabian__projects_create_raid_entry
 
 | Type | Location |
 |------|----------|
-| Design docs | `~/trabian/docs/plans/YYYY-MM-DD-<topic>-design.md` |
-| Implementation plans | `~/trabian/docs/plans/YYYY-MM-DD-<topic>-plan.md` |
-| Knowledge base | `~/trabian/docs/<system>/` |
+| Design docs | `~/code/trabian-ai/docs/plans/YYYY-MM-DD-<topic>-design.md` |
+| Implementation plans | `~/code/trabian-ai/docs/plans/YYYY-MM-DD-<topic>-plan.md` |
+| Knowledge base | `~/code/trabian-ai/docs/<system>/` |
 | Technical reviews | `<repo>/docs/tech-review.md` |
 
 ## Commit Rules (Trabian)
@@ -237,7 +237,7 @@ This is the **trabian branch** of the portable commands. The main branch contain
 
 To merge updates from the main branch:
 ```bash
-cd .claude/commands/sloan
+cd ~/.claude/commands
 git fetch origin
 git merge origin/main  # Resolve conflicts as needed
 ```

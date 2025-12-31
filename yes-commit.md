@@ -151,12 +151,12 @@ When committing in a worktree (`.trees/<name>`):
 
 1. Confirm the target branch:
    ```bash
-   git -C ~/.trees/<name> branch --show-current
+   git -C ~/code/trabian-ai/.trees/<name> branch --show-current
    ```
 
 2. Show commits ahead of main:
    ```bash
-   git -C ~/.trees/<name> rev-list --count main..HEAD
+   git -C ~/code/trabian-ai/.trees/<name> rev-list --count main..HEAD
    ```
 
 3. After commit, suggest next steps:

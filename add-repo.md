@@ -47,11 +47,11 @@ What type of repository is this?
 
 1. Reference clone (read-only, for knowledge base)
    → Will be added to clones/clone-config.json
-   → Located in ~/trabian/clones/
+   → Located in ~/code/trabian-ai/clones/
 
 2. App/project (active development)
    → Will be added to config.yaml repos[]
-   → Located in ~/trabian/<name>/
+   → Located in ~/code/trabian-ai/<name>/
 
 Choose (1/2):
 ```
@@ -63,7 +63,7 @@ Choose (1/2):
 Adding reference clone:
   URL: <url>
   Name: <repo-name>
-  Location: ~/trabian/clones/<repo-name>
+  Location: ~/code/trabian-ai/clones/<repo-name>
   Config: clones/clone-config.json
   Description: <ask user>
 
@@ -75,9 +75,9 @@ Proceed? (yes/edit/cancel)
 Adding app repository:
   URL: <url>
   Name: <repo-name>
-  Location: ~/trabian/<repo-name>
+  Location: ~/code/trabian-ai/<repo-name>
   Group: apps
-  Config: .claude/commands/sloan/config.yaml
+  Config: ~/.claude/commands/config.yaml
 
 Proceed? (yes/edit/cancel)
 ```
@@ -86,12 +86,12 @@ Proceed? (yes/edit/cancel)
 
 **For reference clones:**
 ```bash
-cd ~/trabian/clones && git clone <url>
+cd ~/code/trabian-ai/clones && git clone <url>
 ```
 
 **For app repos:**
 ```bash
-cd ~/trabian && git clone <url>
+cd ~/code/trabian-ai && git clone <url>
 ```
 
 If clone fails (e.g., SSH access required), report error:
@@ -105,7 +105,7 @@ For Q2/Tecton repos, ensure you have SSH keys configured for the host.
 **For reference clones** - Update `clones/clone-config.json`:
 
 ```bash
-cat ~/trabian/clones/clone-config.json
+cat ~/code/trabian-ai/clones/clone-config.json
 ```
 
 Add new entry following existing pattern:
@@ -151,19 +151,19 @@ If yes, create a basic template following trabian patterns.
 **For reference clones:**
 ```
 Reference clone added successfully:
-  Location: ~/trabian/clones/<repo-name>
+  Location: ~/code/trabian-ai/clones/<repo-name>
   Config: Updated clones/clone-config.json
 
 This repo is for reference only. Use it to:
-  - Search for patterns: grep -r "pattern" ~/trabian/clones/<repo-name>/
-  - Read documentation: cat ~/trabian/clones/<repo-name>/README.md
+  - Search for patterns: grep -r "pattern" ~/code/trabian-ai/clones/<repo-name>/
+  - Read documentation: cat ~/code/trabian-ai/clones/<repo-name>/README.md
   - Load knowledge base: /kb/<tag> (if applicable)
 ```
 
 **For app repos:**
 ```
 Repository added successfully:
-  Location: ~/trabian/<repo-name>
+  Location: ~/code/trabian-ai/<repo-name>
   Config: Updated config.yaml
 
 Quick actions:

@@ -21,7 +21,7 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Finding tasks
 ### Step 2: Review Current State
 
 1. Read repo documentation:
-   - `~/trabian/CLAUDE.md` - Workspace rules (always)
+   - `~/code/trabian-ai/CLAUDE.md` - Workspace rules (always)
    - `<repo>/CLAUDE.md` - Repo-specific guidance
    - `<repo>/docs/overview.md` - If exists
    - `<repo>/README.md` - Project overview
@@ -50,7 +50,7 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Finding tasks
 
 5. Check for incomplete implementation plans:
    ```bash
-   ls ~/trabian/docs/plans/*.md 2>/dev/null
+   ls ~/code/trabian-ai/docs/plans/*.md 2>/dev/null
    ls <repo-path>/docs/plans/*.md 2>/dev/null
    ```
 
