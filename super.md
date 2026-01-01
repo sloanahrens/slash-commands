@@ -14,6 +14,48 @@ Start a structured brainstorming session with full context about the workspace a
 
 ## Process
 
+### Step 0: Check Plugins
+
+Before running the brainstorming session, verify required and optional plugins are available:
+
+```bash
+claude plugin list 2>/dev/null | grep -E "(superpowers|mlx)"
+```
+
+#### 0.1: Superpowers Plugin (Required)
+
+The superpowers plugin provides the `/superpowers:brainstorming` skill used in Step 4.
+
+**If superpowers is NOT installed:**
+
+1. Inform the user: "The superpowers plugin is required for structured brainstorming but isn't currently installed."
+2. Offer to install it:
+   ```bash
+   claude plugin add superpowers@superpowers-marketplace
+   ```
+3. If the user declines or installation fails, **stop here** - the `/super` command cannot complete without the brainstorming skill. Suggest alternatives:
+   - Install the plugin and retry
+   - Use basic context gathering without the structured brainstorming workflow
+
+**If superpowers IS installed:** Continue to the next check.
+
+#### 0.2: MLX-Hub Plugin (Optional)
+
+The mlx-hub plugin enables local model acceleration for faster task processing.
+
+**If mlx-hub is NOT installed:**
+
+1. Inform the user: "The mlx-hub plugin enables local MLX model acceleration but isn't currently installed."
+2. Offer to install it:
+   ```bash
+   claude plugin add https://github.com/sloanahrens/mlx-hub-claude-plugin
+   ```
+3. If the user declines or installation fails, **continue without local model acceleration** - the brainstorming session works fine using Claude alone, just without the speed boost from local models.
+
+**If mlx-hub IS installed:** Proceed to Step 3 (Local Model Acceleration) when appropriate.
+
+---
+
 ### Step 1: Resolve Repository
 
 Follow repo selection from `_shared-repo-logic.md`:
