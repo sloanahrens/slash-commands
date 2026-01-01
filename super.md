@@ -4,7 +4,7 @@ description: Start brainstorming session with workspace context
 
 # Super Command
 
-Start a structured brainstorming session with full context about the workspace and selected repository.
+Start a structured brainstorming session with full context about the workspace and selected repository. Leverages local MLX models for acceleration where appropriate.
 
 **Arguments**: `$ARGUMENTS` - Optional repo name or task description. If repo recognized, selects it. Otherwise treated as brainstorm topic.
 
@@ -32,13 +32,62 @@ cd <base_path>/<repo> && git log --oneline -5
 
 Read: `<repo>/CLAUDE.md`, `README.md`, `docs/overview.md`
 
-### Step 3: Run Brainstorming
+### Step 3: Local Model Acceleration
+
+Use local MLX models to speed up tasks. Two tiers available:
+
+| Tier | Model | Size | Speed | Use For |
+|------|-------|------|-------|---------|
+| **Fast** | `mlx-community/Llama-3.2-1B-Instruct-4bit` | 0.7GB | ~100 tok/s | Simple tasks, bulk operations |
+| **Quality** | `mlx-community/Llama-3.3-70B-Instruct-8bit` | 70GB | ~15 tok/s | Complex reasoning, code generation |
+
+**Routing rules:**
+
+| Task | Tier | Review |
+|------|------|--------|
+| One-line summaries | Fast | No |
+| List/enumerate items | Fast | No |
+| Format/restructure text | Fast | No |
+| File summaries (detailed) | Quality | No |
+| Code generation | Quality | Yes - Claude reviews |
+| Test stubs | Quality | Yes - Claude reviews |
+| Doc drafts | Quality | Light review |
+| Explore approaches | Quality | No |
+
+**Keep on Claude:**
+- Architectural decisions
+- Security-sensitive code
+- Complex debugging
+- Final review of local-generated code
+- Orchestration and synthesis
+
+**Examples:**
+
+```python
+# Fast tier - simple extraction
+mlx_infer(
+  model_id="mlx-community/Llama-3.2-1B-Instruct-4bit",
+  prompt="List the function names in this file:\n\n{content}",
+  max_tokens=128
+)
+
+# Quality tier - code generation
+mlx_infer(
+  model_id="mlx-community/Llama-3.3-70B-Instruct-8bit",
+  prompt="Write a TypeScript function that validates email format.",
+  max_tokens=256
+)
+# Then: Claude reviews and refines
+```
+
+### Step 4: Run Brainstorming
 
 Invoke `/superpowers:brainstorming` with:
 - Selected repo name and path
 - Task/topic from `$ARGUMENTS`
 - Key context from repo's CLAUDE.md
 - Current git status
+- **Awareness of local model for acceleration**
 
 ---
 
@@ -63,3 +112,10 @@ When creating documentation:
 /super optimize database queries        # Prompts for repo selection
 /super pulumi                           # Start brainstorming for infra repo
 ```
+
+## Local Model Tips
+
+- **Prompt tersely** - Llama responds well to direct instructions
+- **Set appropriate max_tokens** - 256 for small functions, 1024 for larger drafts
+- **Review code output** - Always have Claude review before committing
+- **Use for parallelism** - Draft multiple approaches while Claude analyzes
