@@ -29,38 +29,13 @@ If `language` not specified, detect from files (see `_shared-repo-logic.md`).
 
 ### Step 3: Run Quality Checks
 
-Run commands in order based on language (skip if command not available):
+Run commands in order based on detected language. See `_shared-repo-logic.md` for:
+- Language detection rules
+- Default commands per language (lint → typecheck → build → test)
 
-**TypeScript/JavaScript** (package.json):
-```bash
-npm run lint
-npx tsc --noEmit      # or npm run type-check
-npm run build
-npm test
-```
+If `commands` block exists in repo's config.yaml, use those instead of defaults.
 
-**Go** (go.mod):
-```bash
-golangci-lint run     # if available
-go build ./...
-go test ./...
-```
-
-**Python** (pyproject.toml):
-```bash
-ruff check .          # or flake8
-mypy .                # if available
-pytest
-```
-
-**Rust** (Cargo.toml):
-```bash
-cargo clippy
-cargo build
-cargo test
-```
-
-If `commands` block exists in config, use those instead.
+Skip any command that's not available for the project.
 
 ### Step 4: Report Results
 
