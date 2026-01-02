@@ -54,6 +54,9 @@ repos: []
 | `/sloan/sync [repo]` | Pull latest changes |
 | `/sloan/switch <repo>` | Context switch with trabian suggestions |
 | `/sloan/linear <subcommand>` | Linear issues via trabian MCP |
+| `/sloan/quick-explain <code>` | Quick code explanation using local model |
+| `/sloan/quick-gen <desc>` | Quick code generation using local model |
+| `/sloan/yes-proceed` | Accept recommendation and proceed |
 | `/sloan/dev-rules` | Trabian workspace development rules |
 | `/sloan/setup-plugins` | Install recommended plugins |
 | `/sloan/list-commands` | List all available commands |
@@ -105,6 +108,42 @@ mcp__trabian__github_update_issue_status_by_number
 mcp__trabian__projects_fetch_raid_entries
 mcp__trabian__projects_create_raid_entry
 ```
+
+## MLX Local Model Acceleration
+
+Commands can use a local MLX model (Qwen2.5-Coder) for faster processing of simple tasks. This requires the mlx-hub plugin.
+
+### Supported Commands
+
+| Command | Local Model Use |
+|---------|-----------------|
+| `/sloan/yes-commit` | Draft commit messages |
+| `/sloan/quick-explain` | Code explanations |
+| `/sloan/quick-gen` | Simple code generation |
+| `/sloan/super` | Summarization during brainstorming |
+
+### Model Configuration
+
+**Model**: `mlx-community/Qwen2.5-Coder-14B-Instruct-4bit`
+**Size**: 7.7 GB
+**Speed**: ~15-50 tok/s (cold/warm)
+
+### Output Labeling
+
+Local model output is labeled `[qwen]`, Claude output is labeled `[claude]`:
+
+```
+[qwen] Commit message:
+---
+Add user validation to signup form
+---
+
+(y) Accept  (c) Regenerate with Claude  (e) Edit
+```
+
+### Fallback Behavior
+
+If the local model fails or isn't available, commands automatically fall back to Claude.
 
 ## Documentation Patterns (Trabian)
 
@@ -159,6 +198,7 @@ These sloan commands complement existing trabian commands:
 | `config.yaml` | Trabian workspace config |
 | `config.yaml.example` | Template showing trabian structure |
 | `_shared-repo-logic.md` | Multi-source repo discovery logic |
+| `_local-model.md` | Local MLX model invocation helper |
 
 ## Requirements
 
@@ -177,6 +217,14 @@ Run `/sloan/setup-plugins` to install all recommended plugins, or install manual
 ```bash
 claude plugin marketplace add obra/superpowers-marketplace
 claude plugin marketplace add anthropics/claude-plugins-official
+```
+
+### MLX Local Model (Optional)
+
+For local model acceleration (commit messages, quick explanations):
+
+```bash
+claude plugin add https://github.com/sloanahrens/mlx-hub-claude-plugin
 ```
 
 ### Core Plugins (Superpowers Marketplace)
@@ -232,12 +280,18 @@ This is the **trabian branch** of the portable commands. The main branch contain
 - RAID log integration
 - Trabian documentation patterns
 - Financial services context awareness
+- MLX local model acceleration (mlx-hub plugin)
 
-### Merging Updates
+### Integrating Updates from Master
 
-To merge updates from the main branch:
+To integrate updates from the master branch:
 ```bash
 cd ~/.claude/commands
 git fetch origin
-git merge origin/main  # Resolve conflicts as needed
+git rebase origin/master  # Resolve conflicts as needed
+```
+
+A backup branch is recommended before rebasing:
+```bash
+git branch trabian-backup-$(date +%Y%m%d)
 ```
