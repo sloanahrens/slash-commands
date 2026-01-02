@@ -4,7 +4,7 @@ description: Quick code explanation using local model
 
 # Quick Explain
 
-Get a fast, concise explanation of code using a local MLX model.
+Get a fast, concise explanation of code using the local Qwen2.5-Coder model.
 
 **Arguments**: `$ARGUMENTS` - Code snippet, file path, or function name to explain
 
@@ -23,21 +23,18 @@ Determine what to explain:
 
 ### Step 2: Generate Explanation (Local Model)
 
-```bash
-mlx_lm.generate \
-  --model mlx-community/DeepSeek-Coder-V2-Lite-Instruct-4bit-mlx \
-  --max-tokens 150 \
-  --prompt "Explain this code concisely (under 100 words):
-
-<code>
-
-Explanation:"
+Use the mlx-hub MCP tool:
+```
+mcp__plugin_mlx-hub_mlx-hub__mlx_infer
+  model_id: mlx-community/Qwen2.5-Coder-14B-Instruct-4bit
+  prompt: "Explain this code concisely (under 100 words):\n\n<code>\n\nExplanation:"
+  max_tokens: 150
 ```
 
 ### Step 3: Display Result
 
 ```
-[local] Explanation:
+[qwen] Explanation:
 ---
 <explanation from local model>
 ---
@@ -69,7 +66,7 @@ If user wants more detail `(c)`:
 Always show model label:
 
 ```
-[local] Explanation (0.4s):
+[qwen] Explanation (0.4s):
 ---
 The retry function attempts to execute an async function multiple times
 with exponential backoff. It catches errors, waits with increasing delays,

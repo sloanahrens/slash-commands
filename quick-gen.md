@@ -4,7 +4,7 @@ description: Quick code generation using local model
 
 # Quick Gen
 
-Generate simple code snippets using a local MLX model.
+Generate simple code snippets using the local Qwen2.5-Coder model.
 
 **Arguments**: `$ARGUMENTS` - Description of what to generate
 
@@ -34,22 +34,18 @@ head -30 <similar-file>
 
 ### Step 3: Generate Code (Local Model)
 
-```bash
-mlx_lm.generate \
-  --model mlx-community/DeepSeek-Coder-V2-Lite-Instruct-4bit-mlx \
-  --max-tokens 200 \
-  --prompt "Generate <language> code for: $ARGUMENTS
-
-Follow this style:
-<sample from repo>
-
-Code:"
+Use the mlx-hub MCP tool:
+```
+mcp__plugin_mlx-hub_mlx-hub__mlx_infer
+  model_id: mlx-community/Qwen2.5-Coder-14B-Instruct-4bit
+  prompt: "Generate <language> code for: $ARGUMENTS\n\nFollow this style:\n<sample from repo>\n\nCode:"
+  max_tokens: 200
 ```
 
 ### Step 4: Display Result
 
 ```
-[local] Generated code:
+[qwen] Generated code:
 ---
 <code from local model>
 ---
@@ -80,7 +76,7 @@ If user accepts:
 Always show model label:
 
 ```
-[local] Generated (0.6s):
+[qwen] Generated (0.6s):
 ---
 export function validatePhone(phone: string): boolean {
   const pattern = /^\+?1?[-.\s]?\(?[0-9]{3}\)?[-.\s]?[0-9]{3}[-.\s]?[0-9]{4}$/;

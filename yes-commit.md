@@ -56,22 +56,20 @@ git -C <repo-path> diff
 
 ```bash
 # Get the diff for context
-DIFF=$(cd <repo-path> && git diff --staged 2>/dev/null || git diff)
+DIFF=$(git -C <repo-path> diff --staged 2>/dev/null || git -C <repo-path> diff)
+```
 
-# Generate with local model
-mlx_lm.generate \
-  --model mlx-community/DeepSeek-Coder-V2-Lite-Instruct-4bit-mlx \
-  --max-tokens 100 \
-  --prompt "Write a git commit message for this diff. Use imperative mood, under 72 chars:
-
-$DIFF
-
-Commit message:"
+Use the mlx-hub MCP tool:
+```
+mcp__plugin_mlx-hub_mlx-hub__mlx_infer
+  model_id: mlx-community/Qwen2.5-Coder-14B-Instruct-4bit
+  prompt: "Write a git commit message for this diff. Use imperative mood, under 72 chars:\n\n$DIFF\n\nCommit message:"
+  max_tokens: 100
 ```
 
 **Display with label:**
 ```
-[local] Proposed commit message:
+[qwen] Proposed commit message:
 ---
 <message from local model>
 ---
