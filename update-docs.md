@@ -68,13 +68,7 @@ wc -l <repo-path>/README.md <repo-path>/CLAUDE.md 2>/dev/null  # Line counts
 git -C <repo-path> log --oneline -5                             # Recent changes
 ```
 
-**Optional: MLX Acceleration** - If mlx-hub available and significant updates needed, use Quality tier (if available) to draft doc sections:
-
-- README quick-start section
-- CLAUDE.md command summaries
-- overview.md structure descriptions
-
-If Quality tier unavailable, use Fast tier for simple drafts or skip acceleration. Claude reviews all drafts before writing. See `_shared-repo-logic.md` for MLX routing.
+For significant updates, consider using local model to draft sections (see `_shared-repo-logic.md` → "Local Model Acceleration"). Claude reviews all drafts before writing.
 
 ### Step 4: Update Files
 

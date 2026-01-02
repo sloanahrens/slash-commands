@@ -50,36 +50,15 @@ git -C <repo-path> diff --stat
 git -C <repo-path> diff
 ```
 
-### Step 5: Generate Commit Message (Local Model First)
+### Step 5: Generate Commit Message
 
-**If local model available** (see `_local-model.md`), try it first:
+Try local model first if available (see `_shared-repo-logic.md` → "Local Model Acceleration"):
 
-```bash
-# Get the diff for context
-DIFF=$(git -C <repo-path> diff --staged 2>/dev/null || git -C <repo-path> diff)
-```
+1. Get diff: `git -C <repo-path> diff --staged` (or `diff` if nothing staged)
+2. Use `mcp__plugin_mlx-hub_mlx-hub__mlx_infer` with Qwen model
+3. Display with `[qwen]` prefix, offer: `(y) Accept  (c) Claude  (e) Edit`
 
-Use the mlx-hub MCP tool:
-```
-mcp__plugin_mlx-hub_mlx-hub__mlx_infer
-  model_id: mlx-community/Qwen2.5-Coder-14B-Instruct-4bit
-  prompt: "Write a git commit message for this diff. Use imperative mood, under 72 chars:\n\n$DIFF\n\nCommit message:"
-  max_tokens: 100
-```
-
-**Display with label:**
-```
-[qwen] Proposed commit message:
----
-<message from local model>
----
-
-(y) Accept  (c) Regenerate with Claude  (e) Edit
-```
-
-**If user chooses Claude (c)**, regenerate using Claude and label `[claude]`.
-
-**If local model unavailable**, use Claude directly (no label needed).
+If local model unavailable or user chooses Claude, use Claude directly.
 
 **Message requirements:**
 - Short summary (50-72 characters)
