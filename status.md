@@ -6,116 +6,53 @@ description: Show status overview of all repositories
 
 Display a quick overview of all configured repositories.
 
-**Arguments**: `$ARGUMENTS` - Optional repo name to show detailed status for just one repo.
-
-**Shared logic**: See `_shared-repo-logic.md` for repo discovery.
+**Arguments**: `$ARGUMENTS` - Optional repo name for detailed view.
 
 ---
 
 ## Process
 
-### Step 1: Load Configuration
+### Step 1: Run Status Script
 
-Read `config.yaml` for base path and repo list.
+Execute the status check as a single command block. **Do NOT use multi-line for loops** - they fail in Claude Code's bash tool.
 
-### Step 2: Gather Status
-
-For each repo, run:
+Run this **one repo at a time** using simple commands:
 
 ```bash
-cd <repo-path> && git status --porcelain && git rev-parse --abbrev-ref HEAD && git log -1 --format="%cr"
+# For each repo directory that exists, run:
+cd /path/to/repo && echo "repo-name: $(git branch --show-current) | $(git status --porcelain | wc -l | xargs) dirty | $(git log -1 --format='%cr')"
 ```
 
-### Step 2b: Gather Linear Status (if configured)
+### Step 2: Format Output
 
-For repos with `linear_project` in config, use Linear MCP tools:
-
-```
-# Get open issue counts
-mcp__linear__search_issues(query: "<project-keywords>", status: "In Progress")
-mcp__linear__search_issues(query: "<project-keywords>", status: "Todo")
-```
-
-Summarize as: `N In Progress` or `N Todo` or `-` if no Linear config
-
-### Step 3: Display Overview
-
-**Optional: MLX Acceleration** - If mlx-hub available and displaying many repos (>5), use Fast tier to format the summary table faster. See `_shared-repo-logic.md` for MLX routing.
+Present results as a simple table:
 
 ```
 Workspace Status
 ================
 
-| Repo              | Branch  | Status  | Last Commit    | Linear        |
-|-------------------|---------|---------|----------------|---------------|
-| my-infra-pulumi   | master  | clean   | 2 hours ago    | -             |
-| my-nextjs-app     | feature | 3 dirty | 1 day ago      | -             |
-| my-client-project | main    | clean   | 3 hours ago    | 2 In Progress |
-| my-go-api         | master  | clean   | 3 days ago     | -             |
-
-Legend: clean = no changes, N dirty = N modified/untracked files
-Linear: shows issue count if repo has linear_project in config
+| Repo             | Branch  | Dirty | Last Commit    |
+|------------------|---------|-------|----------------|
+| devops-pulumi-ts | master  | 0     | 26 minutes ago |
+| git-monitor      | main    | 0     | 44 minutes ago |
+| mango            | master  | 0     | 21 hours ago   |
 ```
 
-### Step 4: Show Sync Status (if remote configured)
+### Step 3: Detailed Mode (if repo specified)
 
-For repos with remotes:
-
-```bash
-git rev-list --left-right --count origin/HEAD...HEAD
-```
-
-Add to output:
-- `↑2` = 2 commits ahead
-- `↓1` = 1 commit behind
-- `↑2↓1` = diverged
+If `$ARGUMENTS` contains a repo name, show:
+- Full `git status`
+- Recent commits (`git log --oneline -5`)
+- Any uncommitted changes
 
 ---
 
-## Detailed Mode
+## Key Rules
 
-If `$ARGUMENTS` specifies a repo, show expanded info:
-
-```
-Status: my-nextjs-app
-=====================
-
-Branch: feature/new-canvas
-Remote: origin/feature/new-canvas (↑1)
-Status: 3 files modified, 1 untracked
-
-Modified:
-  M src/lib/fractalRenderer.ts
-  M src/app/page.tsx
-  M package.json
-  ? src/lib/newFeature.ts
-
-Recent commits:
-  abc1234 Add progressive rendering (2 hours ago)
-  def5678 Fix zoom bounds calculation (1 day ago)
-  ghi9012 Update dependencies (3 days ago)
-```
-
-For repos with `linear_project` configured, add Linear section:
-
-```
-Status: my-client-project
-=========================
-
-Branch: main
-Remote: origin/main (up to date)
-Status: clean
-
-Linear Project: my-client-api
-  In Progress (1):
-    └── PROJ-123: API redesign (High) - https://linear.app/my-org/issue/PROJ-123
-  Backlog (2):
-    ├── PROJ-456: Add retry logic (High)
-    └── PROJ-789: Create payment resource
-
-Recent commits:
-  abc1234 Add token refresh endpoint (3 hours ago)
-```
+1. **One bash call per repo** - Don't try complex loops
+2. **Simple output** - Branch, dirty count, last commit time
+3. **Skip missing repos** - Just note them as "not found"
+4. **No fancy features** - No Linear, no MLX, no sync calculations
 
 ---
 
@@ -123,5 +60,5 @@ Recent commits:
 
 ```bash
 /status              # Overview of all repos
-/status my-app       # Detailed status for my-nextjs-app
+/status mango        # Detailed status for mango
 ```
