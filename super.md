@@ -55,7 +55,13 @@ Follow repo selection from `_shared-repo-logic.md`:
 3. If no repo recognized, ask which repo the task relates to
 4. Confirm: "Brainstorming for: <repo-name>"
 
-### Step 2: Load Repo Context
+### Step 2: Load Workspace Context
+
+**Always read the workspace root CLAUDE.md first** for workspace-wide notes, MLX model guidance, and cross-repo context:
+
+Read: `<base_path>/CLAUDE.md` (where `base_path` is from `config.yaml`)
+
+### Step 3: Load Repo Context
 
 ```bash
 pwd  # Verify again before repo commands
@@ -65,7 +71,7 @@ cd <base_path>/<repo> && git log --oneline -5
 
 Read: `<repo>/CLAUDE.md`, `README.md`, `docs/overview.md`
 
-### Step 3: Local Model Acceleration (Optional)
+### Step 4: Local Model Acceleration (Optional)
 
 See `_shared-repo-logic.md` for model tiers and routing rules.
 
@@ -79,7 +85,7 @@ See `_shared-repo-logic.md` for model tiers and routing rules.
 - Security-sensitive analysis
 - Final synthesis and recommendations
 
-### Step 4: Run Brainstorming
+### Step 5: Run Brainstorming
 
 Invoke `/superpowers:brainstorming` with:
 - Selected repo name and path
