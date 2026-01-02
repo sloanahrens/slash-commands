@@ -57,13 +57,13 @@ Invoke `/superpowers:brainstorming` with:
 
 ## Documentation Location
 
-When creating documentation, follow trabian's structure:
+Place documentation in the relevant repository:
 
 | Type | Location |
 |------|----------|
-| Design docs | `~/code/trabian-ai/docs/plans/YYYY-MM-DD-<topic>-design.md` |
-| Implementation plans | `~/code/trabian-ai/docs/plans/YYYY-MM-DD-<topic>-plan.md` |
-| Knowledge base | `~/code/trabian-ai/docs/<system>/` |
+| Design docs | `<repo>/docs/YYYY-MM-DD-<topic>-design.md` |
+| Implementation plans | `<repo>/docs/YYYY-MM-DD-<topic>-plan.md` |
+| Knowledge base | `~/code/trabian-ai/docs/<system>/` (trabian-specific) |
 | Technical reviews | `<repo>/docs/tech-review.md` |
 
 **If unsure where docs belong, ASK the user.**
