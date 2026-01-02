@@ -8,7 +8,7 @@ Start a structured brainstorming session with full context about the workspace a
 
 **Arguments**: `$ARGUMENTS` - Optional repo name or task description. If repo recognized, selects it. Otherwise treated as brainstorm topic.
 
-**Shared logic**: See `_shared-repo-logic.md` for repo discovery and selection.
+**Shared logic**: See `_shared-repo-logic.md` for repo discovery, selection, and commit rules.
 
 ---
 
@@ -56,27 +56,25 @@ The mlx-hub plugin enables local model acceleration for faster task processing. 
 
 ---
 
-### Step 1: Load Workspace Context
-
-**Always load trabian workspace context first:**
-
-```bash
-cat ~/code/trabian-ai/CLAUDE.md
-```
-
-Key context to extract:
-- Repository structure (packages/, mcp/, clones/, .trees/)
-- Build commands (npm run build, uv sync)
-- MCP server architecture
-- Available commands (kb/, pm/, dev/)
-
-### Step 2: Resolve Repository
+### Step 1: Resolve Repository
 
 Follow repo selection from `_shared-repo-logic.md`:
-1. Parse `config.yaml` for builtin, worktrees, clones, repos
+1. Read `config.yaml` for base path and repo definitions
 2. Match `$ARGUMENTS` to repo name or alias
 3. If no repo recognized, ask which repo the task relates to
 4. Confirm: "Brainstorming for: <repo-name>"
+
+### Step 2: Load Workspace Context
+
+**Always read the workspace root CLAUDE.md first** for workspace-wide notes, MLX model guidance, and cross-repo context:
+
+Read: `~/code/CLAUDE.md`
+
+This provides:
+- Project relationships and overview
+- Common patterns across projects
+- MCP integrations available
+- Slash command reference
 
 ### Step 3: Load Repo Context
 
