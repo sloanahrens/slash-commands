@@ -4,7 +4,7 @@ description: Commit changes for a repository
 
 # Commit (Trabian Branch)
 
-Help commit git changes for a repository following trabian conventions.
+Commit git changes for a repository following trabian conventions. Shows the proposed message then proceeds to commit immediately.
 
 **Arguments**: `$ARGUMENTS` - Optional repo name (supports fuzzy match). If empty, shows selection menu.
 
@@ -26,39 +26,21 @@ git -C <repo-path> status
 
 If no changes, report "No changes to commit" and exit.
 
-### Step 3: Detect Pre-commit Hooks
-
-Check for hooks that will run on commit:
-
-```bash
-ls <repo-path>/.husky/pre-commit 2>/dev/null
-ls <repo-path>/.git/hooks/pre-commit 2>/dev/null
-cat <repo-path>/package.json | grep -q "husky\|lint-staged"
-```
-
-If hooks exist, warn:
-```
-Pre-commit hooks detected (husky/lint-staged)
-Hooks will run: lint, format, tests
-This may modify files or reject the commit.
-```
-
-### Step 4: Review Changes
+### Step 3: Review Changes
 
 ```bash
 git -C <repo-path> diff --stat
-git -C <repo-path> diff
 ```
 
-### Step 5: Generate Commit Message
+### Step 4: Generate Commit Message
 
 Try local model first if available (see `_shared-repo-logic.md` → "Local Model Acceleration"):
 
 1. Get diff: `git -C <repo-path> diff --staged` (or `diff` if nothing staged)
 2. Use `mcp__plugin_mlx-hub_mlx-hub__mlx_infer` with Qwen model
-3. Display with `[qwen]` prefix, offer: `(y) Accept  (c) Claude  (e) Edit`
+3. Display with `[qwen]` prefix
 
-If local model unavailable or user chooses Claude, use Claude directly.
+If local model unavailable, use Claude directly.
 
 **Message requirements:**
 - Short summary (50-72 characters)
@@ -75,29 +57,25 @@ If local model unavailable or user chooses Claude, use Claude directly.
 
 Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `build`, `ci`
 
-### Step 6: Present for Approval
+### Step 5: Display and Execute
+
+Display the proposed message, then immediately execute the commit:
 
 ```
-Proposed commit message for <repo-name>:
+Committing to <repo-name>:
 ---
 <commit message>
 ---
-
-Would you like to proceed? (yes/no/edit)
 ```
 
-### Step 7: Execute Commit
-
-If approved:
 ```bash
 git -C <repo-path> add -A && git -C <repo-path> commit -m "<message>"
 ```
 
-If user wants edits, ask what to modify and regenerate.
+The user approves via Claude Code's tool permission dialog.
 
-### Step 8: Verify Success
+### Step 6: Verify Success
 
-Confirm commit succeeded:
 ```bash
 git -C <repo-path> log -1 --oneline
 ```
@@ -115,52 +93,16 @@ If pre-commit hooks modified files, include them in an amended commit.
 | Use imperative mood | Include "Generated with" tags |
 | Focus on why | Commit secrets (.env, credentials) |
 
-**From trabian CLAUDE.md:**
-- Follow existing patterns in the codebase
-- Consider financial services context for security-related changes
-- Note any compliance implications in commit body if relevant
-
 ---
 
 ## Worktree Handling
 
-When committing in a worktree (`.trees/<name>`):
-
-1. Confirm the target branch:
-   ```bash
-   git -C ~/code/trabian-ai/.trees/<name> branch --show-current
-   ```
-
-2. Show commits ahead of main:
-   ```bash
-   git -C ~/code/trabian-ai/.trees/<name> rev-list --count main..HEAD
-   ```
-
-3. After commit, suggest next steps:
-   ```
-   Committed to feature/new-auth (6 commits ahead of main)
-
-   Next steps:
-     /sloan/push <worktree>        Push to remote
-     /sloan/run-tests <worktree>   Verify tests pass
-     Create PR when ready
-   ```
-
----
-
-## Example Output
+When committing in a worktree (`.trees/<name>`), after commit show:
 
 ```
-Proposed commit message for trabian-cli:
----
-Add MCP header configuration command
+Committed to feature/new-auth (N commits ahead of main)
 
-Implement config mcp-headers subcommand for managing
-authentication headers on MCP servers. Supports add,
-remove, list, and show-config operations.
----
-
-Would you like to proceed? (yes/no/edit)
+Next: /sloan/push <worktree>
 ```
 
 ---
@@ -177,8 +119,7 @@ Would you like to proceed? (yes/no/edit)
 ## Examples
 
 ```bash
-/sloan/yes-commit                        # Interactive selection
-/sloan/yes-commit cli                    # Commit for trabian-cli
-/sloan/yes-commit server --conventional  # Use conventional commits
-/sloan/yes-commit auth                   # Commit for auth worktree
+/sloan/yes-commit              # Interactive selection
+/sloan/yes-commit cli          # Commit for trabian-cli
+/sloan/yes-commit server       # Commit for trabian-server
 ```
