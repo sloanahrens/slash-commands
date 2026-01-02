@@ -2,6 +2,7 @@
 # Copy this file to config.yaml
 # config.yaml is gitignored and will not be committed
 
+# Trabian product workspace
 base_path: ~/code/trabian-ai
 
 # Built-in trabian components (always present)
@@ -31,13 +32,34 @@ builtin:
 worktrees_dir: .trees
 clones_config: clones/clone-config.json
 
-# Additional repos cloned into base_path
-# Added via /sloan/add-repo
-# These are working repos (not just references)
+# All working code repos location
+code_path: ~/code
+
+# Working repos at code_path
+# Added via /sloan/add-repo or manually
 repos:
-  # Example: client project cloned into ~/code/trabian-ai/
-  # - name: client-mobile-app
-  #   group: apps
-  #   aliases: [mobile, client]
+  # Example: client project
+  # - name: hanscom-fcu-poc-plaid-token-manager
+  #   group: projects
+  #   aliases: [hanscom, plaid-poc]
   #   language: typescript
-  #   linear_project: client-mobile
+  #   linear_project: hanscom-fcu-plaid-token-manager-api
+  #   commands:
+  #     test: pnpm test
+  #     typecheck: pnpm -r typecheck
+  #     lint: pnpm lint
+
+  # Example: infrastructure repo
+  # - name: devops-pulumi-ts
+  #   group: devops
+  #   aliases: [pulumi, gcp, azure]
+  #   language: typescript
+
+  # Example: personal project with custom work_dir
+  # - name: mango
+  #   group: personal
+  #   language: go
+  #   work_dir: go-api
+  #   commands:
+  #     test: go test ./internal/... -v
+  #     build: go build -o mango ./cmd/mango
