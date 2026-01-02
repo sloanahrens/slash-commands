@@ -40,6 +40,8 @@ Summarize as: `N In Progress` or `N Todo` or `-` if no Linear config
 
 ### Step 3: Display Overview
 
+**Optional: MLX Acceleration** - If mlx-hub available and displaying many repos (>5), use Fast tier to format the summary table faster. See `_shared-repo-logic.md` for MLX routing.
+
 ```
 Workspace Status
 ================

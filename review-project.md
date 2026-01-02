@@ -34,6 +34,20 @@ npm test            # If available
 
 ### Step 4: Review Key Areas
 
+**Optional: MLX Acceleration** - If mlx-hub available, use Quality tier (if available) or Fast tier + Claude review to draft initial review sections in parallel with analysis:
+
+```python
+# Quality tier (if available)
+mlx_infer(
+  model_id="mlx-community/Llama-3.3-70B-Instruct-8bit",
+  prompt="List 3-5 strengths of this codebase based on the structure:\n\n{file_tree}",
+  max_tokens=512
+)
+# Or use Fast tier + Claude review if Quality unavailable
+```
+
+See `_shared-repo-logic.md` for MLX routing and fallback patterns.
+
 Use the `pr-review-toolkit:code-reviewer` agent to analyze the codebase systematically. The agent will check:
 
 **App Repos (Next.js, React):**

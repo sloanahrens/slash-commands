@@ -108,3 +108,73 @@ When committing changes in any repo:
 4. If `$ARGUMENTS` provided → fuzzy match to repo
 5. Confirm selection: "Working on: <repo-name>"
 6. Read `<repo>/CLAUDE.md` for repo-specific guidance
+
+---
+
+## Local Model Acceleration (Optional)
+
+Commands can use local MLX models for speed. Requires `mlx-hub` plugin (installed via `/setup-plugins`).
+
+### Model Tiers
+
+| Tier | Model | RAM | Speed | Use For |
+|------|-------|-----|-------|---------|
+| **Fast** | `mlx-community/Llama-3.2-1B-Instruct-4bit` | ~2GB | ~100 tok/s | Summaries, formatting, lists |
+| **Quality** | `mlx-community/Llama-3.3-70B-Instruct-8bit` | ~75GB | ~15 tok/s | Drafts, analysis, code review |
+
+### Availability Check
+
+```bash
+# Check if mlx-hub plugin is available
+claude plugin list 2>/dev/null | grep -i mlx
+```
+
+Then check which models are downloaded:
+```
+mcp__plugin_mlx-hub_mlx-hub__mlx_list_local
+```
+
+### Routing Strategy
+
+1. **Fast tier available** → Always use for simple tasks (summaries, lists, formatting)
+2. **Quality tier available** → Use for drafts and analysis
+3. **Quality tier NOT available** → Fallback options:
+   - Use Claude directly (slower but high quality)
+   - Use Fast tier + Claude review (fast draft, Claude refines)
+
+### Fallback Pattern
+
+When Quality tier is preferred but unavailable:
+
+```python
+# Option A: Claude direct (default)
+# Just skip local acceleration, Claude handles it
+
+# Option B: Fast + Claude review
+draft = mlx_infer(
+  model_id="mlx-community/Llama-3.2-1B-Instruct-4bit",
+  prompt="Draft a brief analysis of:\n\n{content}",
+  max_tokens=256
+)
+# Then Claude reviews and expands the draft
+```
+
+Prefer Option A unless the task benefits from a quick initial draft.
+
+### Usage Example
+
+```python
+# Fast tier - simple extraction
+mlx_infer(
+  model_id="mlx-community/Llama-3.2-1B-Instruct-4bit",
+  prompt="List the function names in this file:\n\n{content}",
+  max_tokens=128
+)
+
+# Quality tier - code generation (if available)
+mlx_infer(
+  model_id="mlx-community/Llama-3.3-70B-Instruct-8bit",
+  prompt="Write a TypeScript function that validates email format.",
+  max_tokens=256
+)
+```

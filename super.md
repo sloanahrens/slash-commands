@@ -41,18 +41,9 @@ The superpowers plugin provides the `/superpowers:brainstorming` skill used in S
 
 #### 0.2: MLX-Hub Plugin (Optional)
 
-The mlx-hub plugin enables local model acceleration for faster task processing.
+Check if mlx-hub is available for local model acceleration. See `_shared-repo-logic.md` for availability check pattern.
 
-**If mlx-hub is NOT installed:**
-
-1. Inform the user: "The mlx-hub plugin enables local MLX model acceleration but isn't currently installed."
-2. Offer to install it:
-   ```bash
-   claude plugin add https://github.com/sloanahrens/mlx-hub-claude-plugin
-   ```
-3. If the user declines or installation fails, **continue without local model acceleration** - the brainstorming session works fine using Claude alone, just without the speed boost from local models.
-
-**If mlx-hub IS installed:** Proceed to Step 3 (Local Model Acceleration) when appropriate.
+If not installed, continue without acceleration - install via `/setup-plugins` if desired.
 
 ---
 
@@ -74,53 +65,19 @@ cd <base_path>/<repo> && git log --oneline -5
 
 Read: `<repo>/CLAUDE.md`, `README.md`, `docs/overview.md`
 
-### Step 3: Local Model Acceleration
+### Step 3: Local Model Acceleration (Optional)
 
-Use local MLX models to speed up tasks. Two tiers available:
+See `_shared-repo-logic.md` for model tiers and routing rules.
 
-| Tier | Model | Size | Speed | Use For |
-|------|-------|------|-------|---------|
-| **Fast** | `mlx-community/Llama-3.2-1B-Instruct-4bit` | 0.7GB | ~100 tok/s | Simple tasks, bulk operations |
-| **Quality** | `mlx-community/Llama-3.3-70B-Instruct-8bit` | 70GB | ~15 tok/s | Complex reasoning, code generation |
-
-**Routing rules:**
-
-| Task | Tier | Review |
-|------|------|--------|
-| One-line summaries | Fast | No |
-| List/enumerate items | Fast | No |
-| Format/restructure text | Fast | No |
-| File summaries (detailed) | Quality | No |
-| Code generation | Quality | Yes - Claude reviews |
-| Test stubs | Quality | Yes - Claude reviews |
-| Doc drafts | Quality | Light review |
-| Explore approaches | Quality | No |
+**Use local models for:**
+- Summarizing file contents (Fast tier)
+- Drafting exploration approaches (Quality tier, if available)
+- Parallel task processing while Claude orchestrates
 
 **Keep on Claude:**
 - Architectural decisions
-- Security-sensitive code
-- Complex debugging
-- Final review of local-generated code
-- Orchestration and synthesis
-
-**Examples:**
-
-```python
-# Fast tier - simple extraction
-mlx_infer(
-  model_id="mlx-community/Llama-3.2-1B-Instruct-4bit",
-  prompt="List the function names in this file:\n\n{content}",
-  max_tokens=128
-)
-
-# Quality tier - code generation
-mlx_infer(
-  model_id="mlx-community/Llama-3.3-70B-Instruct-8bit",
-  prompt="Write a TypeScript function that validates email format.",
-  max_tokens=256
-)
-# Then: Claude reviews and refines
-```
+- Security-sensitive analysis
+- Final synthesis and recommendations
 
 ### Step 4: Run Brainstorming
 
@@ -158,6 +115,5 @@ When creating documentation:
 ## Local Model Tips
 
 - **Prompt tersely** - Llama responds well to direct instructions
-- **Set appropriate max_tokens** - 256 for small functions, 1024 for larger drafts
-- **Review code output** - Always have Claude review before committing
-- **Use for parallelism** - Draft multiple approaches while Claude analyzes
+- **Review output** - Always have Claude review before committing
+- See `_shared-repo-logic.md` for model tiers and usage examples

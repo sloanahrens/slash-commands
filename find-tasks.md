@@ -44,6 +44,16 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Finding tasks
    grep -r "TODO\|FIXME" <repo-path> --include="*.py" | head -20
    ```
 
+   **Optional: MLX Acceleration** - If mlx-hub available and many TODOs found (>10), use Fast tier to batch-summarize:
+   ```python
+   mlx_infer(
+     model_id="mlx-community/Llama-3.2-1B-Instruct-4bit",
+     prompt="Summarize each TODO in one line:\n\n{todo_list}",
+     max_tokens=256
+   )
+   ```
+   See `_shared-repo-logic.md` for MLX routing rules.
+
 5. Check for incomplete implementation plans:
    ```bash
    ls <repo-path>/docs/plans/*.md 2>/dev/null

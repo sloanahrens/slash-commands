@@ -24,6 +24,12 @@ Idempotently install all recommended Claude Code plugins for this workspace.
 | `superpowers-lab` | Experimental: vim, menuconfig, REPLs via tmux |
 | `superpowers-chrome` | Chrome DevTools Protocol access (BETA) |
 
+### Local Model Acceleration
+
+| Plugin | Description |
+|--------|-------------|
+| `mlx-hub` | Local MLX model inference for speed (Apple Silicon only) |
+
 ### Official Anthropic
 
 | Plugin | Description |
@@ -88,6 +94,9 @@ claude plugin install superpowers-developing-for-claude-code@superpowers-marketp
 claude plugin install superpowers-lab@superpowers-marketplace
 claude plugin install superpowers-chrome@superpowers-marketplace
 
+# Local Model Acceleration (GitHub-hosted)
+claude plugin add https://github.com/sloanahrens/mlx-hub-claude-plugin
+
 # Official Anthropic
 claude plugin install frontend-design@claude-plugins-official
 claude plugin install feature-dev@claude-plugins-official
@@ -144,7 +153,7 @@ NOTE: Restart Claude Code to activate new plugins.
 |-----------|---------------------|
 | Next.js apps | `frontend-design`, `typescript-lsp` |
 | Go projects | `gopls-lsp` |
-| All repos | `superpowers`, `episodic-memory`, `double-shot-latte` |
+| All repos | `superpowers`, `episodic-memory`, `mlx-hub` |
 | Plugin dev | `superpowers-developing-for-claude-code`, `plugin-dev` |
 
 ---
