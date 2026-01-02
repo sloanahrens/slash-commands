@@ -50,11 +50,42 @@ cd <repo-path> && git diff --stat
 cd <repo-path> && git diff
 ```
 
-### Step 5: Generate Commit Message
+### Step 5: Generate Commit Message (Local Model First)
 
-Analyze changes and draft a message that:
-- Has short summary (50-72 characters)
-- Uses imperative mood ("Fix bug" not "Fixed bug")
+**If local model available** (see `_local-model.md`), try it first:
+
+```bash
+# Get the diff for context
+DIFF=$(cd <repo-path> && git diff --staged 2>/dev/null || git diff)
+
+# Generate with local model
+mlx_lm.generate \
+  --model mlx-community/DeepSeek-Coder-V2-Lite-Instruct-4bit-mlx \
+  --max-tokens 100 \
+  --prompt "Write a git commit message for this diff. Use imperative mood, under 72 chars:
+
+$DIFF
+
+Commit message:"
+```
+
+**Display with label:**
+```
+[local] Proposed commit message:
+---
+<message from local model>
+---
+
+(y) Accept  (c) Regenerate with Claude  (e) Edit
+```
+
+**If user chooses Claude (c)**, regenerate using Claude and label `[claude]`.
+
+**If local model unavailable**, use Claude directly (no label needed).
+
+**Message requirements:**
+- Short summary (50-72 characters)
+- Imperative mood ("Fix bug" not "Fixed bug")
 - Focuses on WHAT and WHY, not HOW
 - Follows commit rules in `_shared-repo-logic.md`
 
