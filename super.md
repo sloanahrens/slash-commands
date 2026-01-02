@@ -41,9 +41,18 @@ The superpowers plugin provides the `/superpowers:brainstorming` skill used in S
 
 #### 0.2: MLX-Hub Plugin (Optional)
 
-Check if mlx-hub is available for local model acceleration. See `_shared-repo-logic.md` for availability check pattern.
+The mlx-hub plugin enables local model acceleration for faster task processing. See `_shared-repo-logic.md` for model tiers and usage.
 
-If not installed, continue without acceleration - install via `/setup-plugins` if desired.
+**If mlx-hub is NOT installed:**
+
+1. Inform the user: "The mlx-hub plugin enables local MLX model acceleration but isn't currently installed."
+2. Offer to install it:
+   ```bash
+   claude plugin add https://github.com/sloanahrens/mlx-hub-claude-plugin
+   ```
+3. If the user declines or installation fails, **continue without local model acceleration** - the brainstorming session works fine using Claude alone, just without the speed boost from local models.
+
+**If mlx-hub IS installed:** Proceed with local acceleration when appropriate.
 
 ---
 
