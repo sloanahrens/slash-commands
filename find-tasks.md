@@ -35,7 +35,7 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Finding tasks
 
 4. Look for TODO/FIXME comments:
    ```bash
-   devbot todos <repo-name> --limit 20
+   devbot todos <repo-name>
    ```
    This scans for TODO, FIXME, HACK, XXX, BUG markers in parallel (~0.1s vs grep's ~2s).
 
