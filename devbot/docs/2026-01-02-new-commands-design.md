@@ -182,7 +182,7 @@ devbot worktrees --branches   # Group by branch name
 ### Output Format
 
 ```
-trabian-ai/
+my-workspace/
   .trees/feature-new-auth     → feature/new-auth (clean)
   .trees/fix-mcp-timeout      → fix/mcp-timeout (2 modified)
 

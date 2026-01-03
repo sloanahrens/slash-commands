@@ -4,7 +4,7 @@ description: Show status overview of all repositories
 
 # Status Command
 
-Fast parallel status of all repositories in ~/code/.
+Fast parallel status of all repositories.
 
 **Arguments**: `$ARGUMENTS` - Optional repo name for single-repo view.
 
@@ -32,7 +32,7 @@ That's it. devbot handles discovery, parallel git status, and formatting.
 ## Examples
 
 ```bash
-/sloan/status              # Quick overview (~0.05s)
-/sloan/status --all        # Include clean repos
-/sloan/status mango        # Single repo details
+/status              # Quick overview (~0.05s)
+/status --all        # Include clean repos
+/status my-project   # Single repo details
 ```

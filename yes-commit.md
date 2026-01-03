@@ -2,9 +2,9 @@
 description: Commit changes for a repository
 ---
 
-# Commit (Trabian Branch)
+# Commit
 
-Commit git changes for a repository following trabian conventions. Shows the proposed message then proceeds to commit immediately.
+Commit git changes for a repository. Shows the proposed message then proceeds to commit immediately.
 
 **Arguments**: `$ARGUMENTS` - Optional repo name (supports fuzzy match). If empty, shows selection menu.
 
@@ -37,8 +37,8 @@ git -C <repo-path> diff --stat
 Try local model first if available (see `_shared-repo-logic.md` → "Local Model Acceleration"):
 
 1. Get diff: `git -C <repo-path> diff --staged` (or `diff` if nothing staged)
-2. Use `mcp__plugin_mlx-hub_mlx-hub__mlx_infer` with Qwen model
-3. Display with `[qwen]` prefix
+2. Use `mcp__plugin_mlx-hub_mlx-hub__mlx_infer` with local model
+3. Display with `[local]` prefix
 
 If local model unavailable, use Claude directly.
 
@@ -84,7 +84,7 @@ If pre-commit hooks modified files, include them in an amended commit.
 
 ---
 
-## Commit Guidelines (Trabian)
+## Commit Guidelines
 
 | Do | Don't |
 |----|-------|
@@ -102,7 +102,7 @@ When committing in a worktree (`.trees/<name>`), after commit show:
 ```
 Committed to feature/new-auth (N commits ahead of main)
 
-Next: /sloan/push <worktree>
+Next: /push <worktree>
 ```
 
 ---
@@ -119,7 +119,7 @@ Next: /sloan/push <worktree>
 ## Examples
 
 ```bash
-/sloan/yes-commit              # Interactive selection
-/sloan/yes-commit cli          # Commit for trabian-cli
-/sloan/yes-commit server       # Commit for trabian-server
+/yes-commit              # Interactive selection
+/yes-commit cli          # Commit for CLI package
+/yes-commit server       # Commit for server
 ```

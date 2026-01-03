@@ -1,25 +1,25 @@
-# Trabian Workspace Configuration (trabian branch)
+# Workspace Configuration
 # Copy this file to config.yaml
 # config.yaml is gitignored and will not be committed
 
-# Trabian product workspace
-base_path: ~/code/trabian-ai
+# Primary workspace (monorepo or main project)
+base_path: ~/code/my-workspace
 
-# Built-in trabian components (always present)
-# These are fixed paths within the trabian mono-repo
+# Built-in components (fixed paths within base_path)
+# These are packages/apps that are always present in your monorepo
 builtin:
-  - name: trabian-cli
+  - name: my-cli
     group: packages
-    path: packages/trabian-cli
+    path: packages/my-cli
     language: typescript
     commands:
       test: npm test
       lint: npm run lint
       build: npm run build
 
-  - name: trabian-server
-    group: mcp
-    path: mcp/trabian-server
+  - name: my-server
+    group: apps
+    path: apps/my-server
     language: python
     commands:
       test: uv run pytest
@@ -28,7 +28,7 @@ builtin:
 
 # Dynamic directories (auto-discovered)
 # worktrees_dir: scans for git worktrees (feature branches)
-# clones_config: reads trabian's clone-config.json for reference repos
+# clones_config: reads clone-config.json for reference repos
 worktrees_dir: .trees
 clones_config: clones/clone-config.json
 
@@ -36,30 +36,30 @@ clones_config: clones/clone-config.json
 code_path: ~/code
 
 # Working repos at code_path
-# Added via /sloan/add-repo or manually
+# Added via /add-repo or manually
 repos:
-  # Example: client project
-  # - name: hanscom-fcu-poc-plaid-token-manager
+  # Example: active project
+  # - name: my-project
   #   group: projects
-  #   aliases: [hanscom, plaid-poc]
+  #   aliases: [proj, mp]
   #   language: typescript
-  #   linear_project: hanscom-fcu-plaid-token-manager-api
+  #   linear_project: my-project-board  # Optional: Linear integration
   #   commands:
   #     test: pnpm test
   #     typecheck: pnpm -r typecheck
   #     lint: pnpm lint
 
   # Example: infrastructure repo
-  # - name: devops-pulumi-ts
+  # - name: my-infra
   #   group: devops
-  #   aliases: [pulumi, gcp, azure]
+  #   aliases: [infra, pulumi]
   #   language: typescript
 
-  # Example: personal project with custom work_dir
-  # - name: mango
+  # Example: Go project with custom work_dir
+  # - name: my-go-app
   #   group: personal
   #   language: go
-  #   work_dir: go-api
+  #   work_dir: cmd/app
   #   commands:
   #     test: go test ./internal/... -v
-  #     build: go build -o mango ./cmd/mango
+  #     build: go build -o app ./cmd/app

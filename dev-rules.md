@@ -2,31 +2,30 @@
 description: Remind Claude of workspace development rules
 ---
 
-# Dev Rules (Trabian Branch)
+# Dev Rules
 
-Continue whatever you were doing, but remember these trabian workspace rules:
+Continue whatever you were doing, but remember these workspace rules:
 
 ---
 
 ## Path Safety
 
 - **Run `pwd` before bash commands** - verify current location before file/path operations
-- **Use absolute paths** - always use full paths from `~/code/trabian-ai/`
-- **Stay within workspace** - never navigate above `~/code/trabian-ai/`
+- **Use absolute paths** - always use full paths from your configured workspace
+- **Stay within workspace** - never navigate above your base_path or code_path
 - **Respect worktree isolation** - `.trees/` worktrees are separate git environments
 
 ---
 
-## Trabian Structure
+## Workspace Structure
 
 | Directory | Purpose |
 |-----------|---------|
-| `packages/` | TypeScript packages (trabian-cli) |
-| `mcp/` | Python MCP servers (trabian-server) |
+| `packages/` | TypeScript packages |
+| `apps/` | Applications |
 | `clones/` | Read-only reference repos |
 | `.trees/` | Git worktrees for feature branches |
-| `docs/` | Knowledge base and plans |
-| `.claude/commands/` | Claude commands |
+| `docs/` | Documentation and plans |
 
 ---
 
@@ -35,11 +34,10 @@ Continue whatever you were doing, but remember these trabian workspace rules:
 - **NO `/tmp` files** - create temporary/working files in `docs/` directories
 - **Prefer editing over creating** - modify existing files when possible
 - **Plans go in** `docs/plans/YYYY-MM-DD-<topic>-<type>.md`
-- **Knowledge base** in `docs/<system>/` with system tags (q2, tecton, etc.)
 
 ---
 
-## Commit Messages (Trabian)
+## Commit Messages
 
 | Do | Don't |
 |----|-------|
@@ -58,39 +56,28 @@ Continue whatever you were doing, but remember these trabian workspace rules:
 
 ---
 
-## Trabian-Specific Rules
+## Language-Specific Rules
 
 ### TypeScript (packages/)
 - ES2022 target, CommonJS output, strict mode
 - Node.js >=18.0.0 required
 - Run `npm run build` before testing
 
-### Python (mcp/)
+### Python
 - Python >=3.12 required
 - Use `uv` for dependency management
 - Run `uv sync` before testing
 - FastMCP with sub-server composition
 
-### Financial Services Context
-- Consider security and compliance requirements
-- Note data sensitivity and privacy concerns
-- Think about regulatory implications
-- Consider production environment impact
-- Evaluate client-facing impact
-
 ---
 
-## MCP Tool Usage
+## MCP Tool Usage (Optional)
 
-When using trabian MCP tools:
+If you have MCP integrations configured:
 
 | Prefix | Service |
 |--------|---------|
 | `mcp__plugin_linear_linear__*` | Linear issues |
-| `mcp__trabian__github_*` | GitHub Projects v2 |
-| `mcp__trabian__harvest_*` | Harvest time tracking |
-| `mcp__trabian__hubspot_*` | HubSpot CRM |
-| `mcp__trabian__projects_*` | RAID log management |
 | `mcp__Notion__*` | Notion workspace |
 
 ---
@@ -98,7 +85,7 @@ When using trabian MCP tools:
 ## General
 
 - Read the repo's `CLAUDE.md` before making changes
-- Read `~/code/trabian-ai/CLAUDE.md` for workspace context
+- Read workspace `CLAUDE.md` for context
 - Run tests after making changes
 - Keep changes focused and minimal
 - Consider clone repos as read-only references

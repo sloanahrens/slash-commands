@@ -8,20 +8,20 @@ This file contains shared patterns used by all repo-targeting slash commands.
 
 Commands use `config.yaml` in this directory. The config supports:
 
-- `base_path` - trabian product workspace (~/code/trabian-ai)
-- `builtin` - trabian's own packages (fixed paths under base_path)
+- `base_path` - primary workspace for monorepo/packages (e.g., ~/code/my-workspace)
+- `builtin` - fixed packages within base_path
 - `worktrees_dir` - auto-discovers `.trees/*` worktrees
-- `clones_config` - reads trabian's `clones/clone-config.json`
+- `clones_config` - reads reference repos from `clones/clone-config.json`
 - `code_path` - location of working code repos (~/code)
 - `repos` - working repos at code_path
 
 ```yaml
-base_path: ~/code/trabian-ai
+base_path: ~/code/my-workspace
 
 builtin:
-  - name: trabian-cli
+  - name: my-cli
     group: packages
-    path: packages/trabian-cli
+    path: packages/my-cli
     language: typescript
 
 worktrees_dir: .trees
@@ -30,9 +30,9 @@ clones_config: clones/clone-config.json
 code_path: ~/code
 
 repos:
-  - name: hanscom-fcu-poc-plaid-token-manager
+  - name: my-project
     group: projects
-    aliases: [hanscom, plaid-poc]
+    aliases: [proj, mp]
 ```
 
 ---
@@ -40,8 +40,8 @@ repos:
 ## Critical Rule
 
 **CRITICAL**: Stay within the configured paths:
-- `~/code/trabian-ai/` for trabian product work
-- `~/code/` for working repos
+- `<base_path>` for monorepo/workspace work
+- `<code_path>` for standalone repos
 
 Never navigate above these directories.
 
@@ -54,7 +54,7 @@ Parse repos from multiple sources in order:
 ### 1. Builtin Components
 
 Read `config.yaml` → `builtin[]`:
-- These are fixed trabian packages
+- These are fixed packages within your monorepo
 - Path resolved as `<base_path>/<path>`
 
 ### 2. Worktrees (Dynamic)
@@ -76,8 +76,8 @@ Read `<base_path>/clones/clone-config.json`:
 ```json
 {
   "repositories": {
-    "q2-sdk": { "url": "...", "description": "..." },
-    "tecton": { "url": "...", "description": "..." }
+    "some-sdk": { "url": "...", "description": "..." },
+    "other-lib": { "url": "...", "description": "..." }
   }
 }
 ```
@@ -100,13 +100,13 @@ Read `config.yaml` → `repos[]`:
 
 | Group | Source | Location | Description |
 |-------|--------|----------|-------------|
-| `packages` | builtin | ~/code/trabian-ai/packages/ | trabian TypeScript packages |
-| `mcp` | builtin | ~/code/trabian-ai/mcp/ | trabian MCP server |
-| `worktrees` | dynamic | ~/code/trabian-ai/.trees/ | Active feature branches |
-| `clones` | clone-config.json | ~/code/trabian-ai/clones/ | Reference repos (Q2 SDK, Tecton) |
-| `projects` | repos | ~/code/ | Active project work |
-| `devops` | repos | ~/code/ | Infrastructure repos |
-| `personal` | repos | ~/code/ | Personal/exploration repos |
+| `packages` | builtin | `<base_path>/packages/` | Monorepo packages |
+| `apps` | builtin | `<base_path>/apps/` | Monorepo applications |
+| `worktrees` | dynamic | `<base_path>/.trees/` | Active feature branches |
+| `clones` | clone-config.json | `<base_path>/clones/` | Reference repos |
+| `projects` | repos | `<code_path>/` | Active project work |
+| `devops` | repos | `<code_path>/` | Infrastructure repos |
+| `personal` | repos | `<code_path>/` | Personal/exploration repos |
 
 ---
 
@@ -120,26 +120,18 @@ Display grouped list and ask user to select:
 Select a repository:
 
 Packages:
-  1. trabian-cli
-  2. trabian-server
+  1. my-cli
+  2. my-server
 
 Worktrees:
   3. feature/new-auth
 
 Clones:
-  4. q2-sdk
-  5. tecton
+  4. some-sdk
 
 Projects:
-  6. hanscom-fcu-poc-plaid-token-manager
-  7. service-cu-cloud-services-platform
-
-DevOps:
-  8. devops-pulumi-ts
-
-Personal:
-  9. fractals-nextjs
-  10. mango
+  5. my-project
+  6. another-project
 
 Enter number or name:
 ```
@@ -153,12 +145,10 @@ Fuzzy match against:
 
 | Input | Matches |
 |-------|---------|
-| `cli` | trabian-cli |
-| `server` | trabian-server |
-| `q2` | q2-sdk |
-| `hanscom` | hanscom-fcu-poc-plaid-token-manager |
-| `pulumi` | devops-pulumi-ts |
-| `fractals` | fractals-nextjs |
+| `cli` | my-cli |
+| `server` | my-server |
+| `sdk` | some-sdk |
+| `proj` | my-project |
 
 ---
 
@@ -168,10 +158,10 @@ Once a repo is selected, resolve its full path:
 
 | Source | Path Pattern |
 |--------|--------------|
-| builtin | `<base_path>/<path>` (e.g., `~/code/trabian-ai/packages/trabian-cli`) |
-| worktree | `<base_path>/.trees/<name>` (e.g., `~/code/trabian-ai/.trees/feature-x`) |
-| clone | `<base_path>/clones/<name>` (e.g., `~/code/trabian-ai/clones/q2-sdk`) |
-| repo | `<code_path>/<name>` (e.g., `~/code/hanscom-fcu-poc-plaid-token-manager`) |
+| builtin | `<base_path>/<path>` (e.g., `~/code/my-workspace/packages/my-cli`) |
+| worktree | `<base_path>/.trees/<name>` (e.g., `~/code/my-workspace/.trees/feature-x`) |
+| clone | `<base_path>/clones/<name>` (e.g., `~/code/my-workspace/clones/some-sdk`) |
+| repo | `<code_path>/<name>` (e.g., `~/code/my-project`) |
 
 ---
 
@@ -191,10 +181,10 @@ When committing changes in any repo:
 
 After selecting a repo, load relevant context:
 
-1. **For trabian repos**: Read `~/code/trabian-ai/CLAUDE.md`
-2. **For code repos**: Read `<repo-path>/CLAUDE.md` if it exists
-3. **For MCP server**: Note Python/uv patterns
-4. **For packages**: Note TypeScript/npm patterns
+1. **For monorepo packages**: Read `<base_path>/CLAUDE.md`
+2. **For standalone repos**: Read `<repo-path>/CLAUDE.md` if it exists
+3. **For Python projects**: Note Python/uv patterns
+4. **For TypeScript projects**: Note TypeScript/npm patterns
 
 ---
 
@@ -210,16 +200,14 @@ After selecting a repo, load relevant context:
 
 ---
 
-## Local Model Acceleration
+## Local Model Acceleration (Optional)
 
-Commands can use local Qwen model for 5-18x speed gains. Requires `mlx-hub` plugin (installed via `/setup-plugins`).
-
-**See workspace `CLAUDE.md` → "Automatic Local Acceleration" for full routing rules.**
+Commands can use local models for speed gains. Requires `mlx-hub` plugin.
 
 ### Quick Reference
 
-| Use Qwen For | Stay on Claude For |
-|--------------|-------------------|
+| Use Local Model For | Stay on Claude For |
+|---------------------|-------------------|
 | Commit messages | Security analysis |
 | Code explanation | Architecture decisions |
 | Simple code gen | Multi-file refactoring |
@@ -229,8 +217,8 @@ Commands can use local Qwen model for 5-18x speed gains. Requires `mlx-hub` plug
 
 Always prefix local model output:
 ```
-[qwen] Drafting commit message...
-[qwen] Generated: "feat(utils): add validation helper"
+[local] Drafting commit message...
+[local] Generated: "feat(utils): add validation helper"
 ```
 
 ### Usage
@@ -245,28 +233,27 @@ mcp__plugin_mlx-hub_mlx-hub__mlx_infer(
 
 ---
 
-## Linear Integration
+## Linear Integration (Optional)
 
 For repos with `linear_project` in config:
-- Use trabian's Linear MCP plugin tools
 - `mcp__plugin_linear_linear__list_issues`
 - `mcp__plugin_linear_linear__get_issue`
 - `mcp__plugin_linear_linear__create_issue`
 
 ---
 
-## GitHub Integration
+## GitHub Integration (Optional)
 
-Use trabian's GitHub MCP for project data:
-- `mcp__trabian__github_get_assigned_issues_with_project_status`
-- `mcp__trabian__github_get_project_items`
-- `mcp__trabian__github_find_project_by_name`
+If you have GitHub MCP tools configured:
+- Search issues by project
+- Get assigned issues with project status
+- Find project items
 
 ---
 
 ## devbot CLI
 
-Fast parallel operations across ~/code/ repos. Use devbot for speed-critical operations:
+Fast parallel operations across repos. Use devbot for speed-critical operations:
 
 | Command | Purpose | Speed |
 |---------|---------|-------|

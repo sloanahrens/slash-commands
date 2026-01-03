@@ -33,16 +33,15 @@ Follow "Standard Process Start" from `_shared-repo-logic.md`.
 ### Step 3: Load Context
 
 Per `_shared-repo-logic.md` → "Context Loading":
-1. Read workspace `~/code/CLAUDE.md`
+1. Read workspace `CLAUDE.md`
 2. Read repo's `CLAUDE.md` (if exists)
 3. Get git status and recent commits
 
-### Step 4: Check Related Issues
+### Step 4: Check Related Issues (Optional)
 
-If brainstorming about a specific feature/bug:
+If brainstorming about a specific feature/bug and Linear integration is configured:
 ```
 mcp__plugin_linear_linear__list_issues with query="<topic>"
-mcp__trabian__github_get_assigned_issues_with_project_status
 ```
 
 ### Step 5: Run Brainstorming
@@ -50,7 +49,7 @@ mcp__trabian__github_get_assigned_issues_with_project_status
 Invoke `/superpowers:brainstorming` with:
 - Workspace and repo context gathered above
 - Task/topic from `$ARGUMENTS`
-- Any related Linear/GitHub issues
+- Any related issues
 - Awareness of local model availability (per shared logic)
 
 ---
@@ -63,7 +62,6 @@ Place documentation in the relevant repository:
 |------|----------|
 | Design docs | `<repo>/docs/YYYY-MM-DD-<topic>-design.md` |
 | Implementation plans | `<repo>/docs/YYYY-MM-DD-<topic>-plan.md` |
-| Knowledge base | `~/code/trabian-ai/docs/<system>/` (trabian-specific) |
 | Technical reviews | `<repo>/docs/tech-review.md` |
 
 **If unsure where docs belong, ASK the user.**
@@ -74,18 +72,17 @@ Place documentation in the relevant repository:
 
 | Task Type | Suggested Commands |
 |-----------|-------------------|
-| Feature implementation | `/dev/start-session`, `/dev/create-plan` |
-| Bug fix | `/sloan/find-tasks`, `/sloan/linear` |
-| Infrastructure | `/pm/raid`, review RAID log implications |
-| Documentation | `/sloan/update-docs`, `/kb/q2` (if Q2-related) |
+| Feature implementation | `/run-tests`, `/yes-commit` |
+| Bug fix | `/find-tasks` |
+| Documentation | `/update-docs` |
 
 ---
 
 ## Examples
 
 ```bash
-/sloan/super cli add config validation     # Brainstorm for trabian-cli
-/sloan/super server add new endpoint       # Brainstorm for trabian-server
-/sloan/super optimize harvest integration  # Prompts for repo selection
-/sloan/super                               # Shows selection menu
+/super cli add config validation     # Brainstorm for CLI package
+/super server add new endpoint       # Brainstorm for server
+/super optimize integration          # Prompts for repo selection
+/super                               # Shows selection menu
 ```

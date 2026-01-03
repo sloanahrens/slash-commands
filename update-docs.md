@@ -2,9 +2,9 @@
 description: Update documentation for a repository
 ---
 
-# Update Documentation (Trabian Branch)
+# Update Documentation
 
-Update project documentation for a repository, following trabian patterns and maintaining consistency.
+Update project documentation for a repository, maintaining consistency across files.
 
 **Arguments**: `$ARGUMENTS` - Optional repo name (supports fuzzy match). If empty, shows selection menu.
 
@@ -12,15 +12,7 @@ Update project documentation for a repository, following trabian patterns and ma
 
 ---
 
-## Documentation Structure (Trabian)
-
-### Workspace Level (`~/code/trabian-ai/`)
-
-| File | Purpose |
-|------|---------|
-| `CLAUDE.md` | Workspace overview, structure, key commands |
-| `docs/plans/` | Design docs and implementation plans |
-| `docs/<system>/` | Knowledge base by system tag (q2, tecton) |
+## Documentation Structure
 
 ### Repository Level
 
@@ -44,9 +36,6 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Updating docs
 ```bash
 # Check repo-level docs
 ls -la <repo-path>/README.md <repo-path>/CLAUDE.md <repo-path>/docs/ 2>/dev/null
-
-# Check for workspace-level mentions
-grep -l "<repo-name>" ~/code/trabian-ai/CLAUDE.md ~/code/trabian-ai/docs/**/*.md 2>/dev/null
 ```
 
 ### Step 3: Gather Current State
@@ -57,7 +46,7 @@ cd <repo-path> && npm test 2>&1 | tail -10      # Test counts
 cd <repo-path> && npm run build 2>&1 | tail -5  # Build status
 ```
 
-**For Python MCP server:**
+**For Python projects:**
 ```bash
 cd <repo-path> && uv run pytest 2>&1 | tail -10
 ```
@@ -102,22 +91,7 @@ Follow `elements-of-style` principles: omit needless words, use active voice, be
 
 Verify documentation consistency across:
 - Repo CLAUDE.md ↔ README.md
-- Repo docs ↔ workspace CLAUDE.md references
 - Commands documented ↔ commands that exist
-
-### Step 6: Update Workspace Docs (if needed)
-
-If repo changes affect workspace documentation:
-
-```bash
-# Check if workspace CLAUDE.md needs updates
-cat ~/code/trabian-ai/CLAUDE.md | grep -A5 "<repo-name>"
-```
-
-Only update workspace CLAUDE.md if:
-- Repo structure changed significantly
-- New key commands added
-- Critical warnings need workspace visibility
 
 ---
 
@@ -129,33 +103,6 @@ Only update workspace CLAUDE.md if:
 | Create README files in test dirs | Unnecessary clutter |
 | Add detailed change history to CLAUDE.md | Use git log instead |
 | Include volatile data in README.md | Gets stale quickly |
-| Create standalone docs at workspace root | Keep docs with their repos |
-
----
-
-## Trabian-Specific Patterns
-
-### Knowledge Base Docs
-
-For system documentation (Q2, Tecton, etc.):
-- Location: `~/code/trabian-ai/docs/<system>/`
-- Use system tags consistently
-- Cross-reference with clone repos
-
-### Plan Documents
-
-When updating leads to new plans:
-```
-~/code/trabian-ai/docs/plans/YYYY-MM-DD-<topic>-design.md
-~/code/trabian-ai/docs/plans/YYYY-MM-DD-<topic>-plan.md
-```
-
-### MCP Server Docs
-
-For trabian-server, ensure docs reflect:
-- Sub-server structure (github.py, harvest.py, etc.)
-- Authentication middleware
-- Available MCP tools with prefixes
 
 ---
 
@@ -172,8 +119,8 @@ Report:
 ## Examples
 
 ```bash
-/sloan/update-docs              # Interactive selection
-/sloan/update-docs cli          # Update trabian-cli docs
-/sloan/update-docs server       # Update trabian-server docs
-/sloan/update-docs my-app       # Update app repo docs
+/update-docs              # Interactive selection
+/update-docs cli          # Update CLI docs
+/update-docs server       # Update server docs
+/update-docs my-app       # Update app repo docs
 ```

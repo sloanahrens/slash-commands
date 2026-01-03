@@ -2,9 +2,9 @@
 description: Find high-priority tasks for a repository
 ---
 
-# Find Next Tasks (Trabian Branch)
+# Find Next Tasks
 
-Analyze the project and suggest 3-5 high-priority tasks for a repository, integrating with trabian's Linear and GitHub MCP tools.
+Analyze the project and suggest 3-5 high-priority tasks for a repository.
 
 **Arguments**: `$ARGUMENTS` - Optional repo name (supports fuzzy match). If empty, shows selection menu.
 
@@ -21,7 +21,6 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Finding tasks
 ### Step 2: Review Current State
 
 1. Read repo documentation:
-   - `~/code/trabian-ai/CLAUDE.md` - Workspace rules (always)
    - `<repo>/CLAUDE.md` - Repo-specific guidance
    - `<repo>/docs/overview.md` - If exists
    - `<repo>/README.md` - Project overview
@@ -37,7 +36,7 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Finding tasks
    ```bash
    devbot todos <repo-name>
    ```
-   This scans for TODO, FIXME, HACK, XXX, BUG markers in parallel (~0.1s vs grep's ~2s).
+   This scans for TODO, FIXME, HACK, XXX, BUG markers in parallel (~0.1s).
 
 5. Check for complexity hotspots:
    ```bash
@@ -51,13 +50,12 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Finding tasks
 
 6. Check for incomplete implementation plans:
    ```bash
-   ls ~/code/trabian-ai/docs/plans/*.md 2>/dev/null
    ls <repo-path>/docs/plans/*.md 2>/dev/null
    ```
 
-### Step 3: Check Linear Issues (Trabian MCP)
+### Step 3: Check Linear Issues (Optional)
 
-Use trabian's Linear MCP to find relevant issues:
+If Linear integration is configured, use Linear MCP to find relevant issues:
 
 ```
 # Get issues assigned to me
@@ -71,60 +69,23 @@ Display Linear issues in output:
 ```
 Linear Issues:
 ├── In Progress
-│   └── TRB-123: API redesign (High) - https://linear.app/trabian/issue/TRB-123
+│   └── PROJ-123: API redesign (High) - https://linear.app/team/issue/PROJ-123
 ├── Backlog
-│   └── TRB-456: Add retry logic (High)
+│   └── PROJ-456: Add retry logic (High)
 └── Todo
-    └── TRB-789: Update documentation (Normal)
+    └── PROJ-789: Update documentation (Normal)
 ```
 
-### Step 4: Check GitHub Issues/PRs (Trabian MCP)
-
-Use trabian's GitHub MCP for project data:
-
-```
-# Get assigned issues with project status
-mcp__trabian__github_get_assigned_issues_with_project_status
-
-# Get project items if known
-mcp__trabian__github_get_project_items with project_id
-```
-
-Display GitHub items:
-```
-GitHub Project Items:
-├── Ready
-│   └── #42: Fix authentication flow
-├── In Progress
-│   └── #38: Add MCP endpoint
-└── Review
-    └── PR #45: Update documentation
-```
-
-### Step 5: Check RAID Log (if applicable)
-
-For app repos with project associations, check RAID entries:
-
-```
-mcp__trabian__projects_fetch_raid_entries with project_id
-```
-
-Flag any:
-- Unresolved Issues
-- Pending Actions
-- Outstanding Risks
-
-### Step 6: Identify High-Impact Work
+### Step 4: Identify High-Impact Work
 
 Focus on tasks that:
 - Unblock other work
 - Are assigned in Linear/GitHub
 - Improve production readiness
 - Are quick wins with high value
-- Address RAID log items
 - Balance testing, features, and infrastructure
 
-### Step 7: Generate Task Options
+### Step 5: Generate Task Options
 
 Provide 3-5 concrete, actionable tasks.
 
@@ -133,11 +94,11 @@ Provide 3-5 concrete, actionable tasks.
 ## Output Format
 
 ```
-Tasks for: trabian-cli
+Tasks for: my-cli
 ======================
 
 From Linear:
-1. **TRB-123: API redesign** (High, In Progress)
+1. **PROJ-123: API redesign** (High, In Progress)
    - Impact: Unblocks mobile team
    - Start: Review current API in src/api/
    - Success: New endpoints pass integration tests
@@ -156,18 +117,12 @@ From TODO Comments:
 
 From Complexity Analysis:
 4. **Refactor runStats function** (Medium)
-   - Location: cmd/devbot/main.go:793 (127 lines)
+   - Location: cmd/main.go:793 (127 lines)
    - Impact: Improves maintainability
    - Success: Function under 50 lines
 
-From RAID Log:
-5. **Resolve Action: Update SSH key documentation** (Low)
-   - RAID Entry: ACT-12, due 2025-01-05
-   - Impact: Reduces support requests
-   - Success: Updated docs/tutorial.md
-
 Quick Win:
-6. **Fix typo in error message** (Low)
+5. **Fix typo in error message** (Low)
    - Location: src/utils/logger.ts:42
    - Impact: Professional error messages
    - Success: Corrected spelling
@@ -180,7 +135,7 @@ Quick Win:
 | Priority | Criteria |
 |----------|----------|
 | High | Assigned in Linear/GitHub, addresses critical gaps, unblocks work |
-| Medium | Improves test coverage, adds features, addresses RAID items |
+| Medium | Improves test coverage, adds features |
 | Low | Nice-to-have improvements, documentation, minor fixes |
 
 ---
@@ -190,18 +145,14 @@ Quick Win:
 | Flag | Effect |
 |------|--------|
 | `--linear` | Include Linear issues (auto-enabled if repo has `linear_project`) |
-| `--github` | Include GitHub project items |
-| `--raid` | Include RAID log items |
 | `--deep` | More thorough analysis (test coverage, dependency audit) |
-| `--all` | Enable all integrations |
 
 ---
 
 ## Examples
 
 ```bash
-/sloan/find-tasks                    # Interactive selection
-/sloan/find-tasks cli                # Tasks for trabian-cli
-/sloan/find-tasks server --deep      # Deep analysis of MCP server
-/sloan/find-tasks client --all       # All integrations for client project
+/find-tasks                    # Interactive selection
+/find-tasks cli                # Tasks for CLI package
+/find-tasks server --deep      # Deep analysis of server
 ```

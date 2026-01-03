@@ -2,9 +2,9 @@
 description: Conduct technical review for a repository
 ---
 
-# Review Project (Trabian Branch)
+# Review Project
 
-Conduct a technical review of a repository and update its documentation, following trabian patterns.
+Conduct a technical review of a repository and update its documentation.
 
 **Arguments**: `$ARGUMENTS` - Optional repo name (supports fuzzy match). If empty, shows selection menu.
 
@@ -22,17 +22,12 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Reviewing: <r
 
 ### Step 2: Load Context
 
-1. Read trabian workspace context:
-   ```bash
-   cat ~/code/trabian-ai/CLAUDE.md
-   ```
-
-2. Read repo documentation:
+1. Read repo documentation:
    - `<repo>/CLAUDE.md`
    - `<repo>/README.md`
    - `<repo>/docs/overview.md` (if exists)
 
-3. Examine structure:
+2. Examine structure:
    ```bash
    ls -la <repo-path>
    tree <repo-path> -L 2 -I 'node_modules|.git|dist|__pycache__'
@@ -61,21 +56,21 @@ devbot stats <repo-path>
 
 ### Step 4: Run Available Checks
 
-**For TypeScript packages (packages/):**
+**For TypeScript packages:**
 ```bash
 cd <repo-path> && npm run lint
 cd <repo-path> && npm run build
 cd <repo-path> && npm test
 ```
 
-**For Python MCP server (mcp/):**
+**For Python projects:**
 ```bash
 cd <repo-path> && uv run ruff check .
 cd <repo-path> && uv run mypy .
 cd <repo-path> && uv run pytest
 ```
 
-**For app repos:**
+**For other repos:**
 Check `package.json` or `pyproject.toml` for available commands.
 
 ### Step 5: Review Key Areas
@@ -84,43 +79,23 @@ Consider using local model for initial draft sections (see `_shared-repo-logic.m
 
 Use the `pr-review-toolkit:code-reviewer` agent to analyze systematically.
 
-**TypeScript Packages (trabian-cli):**
+**TypeScript Projects:**
 - CLI command organization
 - Error handling patterns
 - Test coverage
 - TypeScript strictness
 
-**Python MCP Server (trabian-server):**
-- FastMCP patterns
-- Sub-server composition
+**Python Projects:**
+- Framework patterns
 - Authentication middleware
 - API client implementations
 - Test coverage
 
-**App Repos:**
-- Architecture & component organization
-- State management patterns
-- API design
-- Error handling, test coverage
-
 **For all repos, consider:**
-- Financial services compliance implications
 - Security patterns (secrets, auth)
 - Production readiness
 
-### Step 6: Check RAID Log (if applicable)
-
-For app repos with project associations:
-```
-mcp__trabian__projects_fetch_raid_entries with project_id
-```
-
-Note any:
-- Unresolved issues related to this repo
-- Outstanding risks
-- Pending actions
-
-### Step 7: Update Documentation
+### Step 6: Update Documentation
 
 **Primary: Update `<repo>/CLAUDE.md`**
 
@@ -154,32 +129,15 @@ Only create if findings are too detailed for CLAUDE.md:
 [Long-term improvements]
 ```
 
-**Update trabian workspace CLAUDE.md only if:**
-- Major structural changes to the repo
-- New commands or key information
-- Critical warnings for the workspace
-
-### Step 8: Create RAID Entries (if applicable)
-
-If review reveals issues that should be tracked:
-```
-mcp__trabian__projects_create_raid_entry with:
-  - type: "Issue" or "Risk"
-  - project_id: <from project association>
-  - title: <issue summary>
-  - content: <details from review>
-```
-
 ---
 
-## Documentation Rules (Trabian)
+## Documentation Rules
 
 | DO | DON'T |
 |----|-------|
 | Update `<repo>/CLAUDE.md` | Create docs at workspace root |
 | Write details to `<repo>/docs/` | Duplicate info across files |
-| Consider compliance implications | Ignore security findings |
-| Create RAID entries for blockers | Leave issues undocumented |
+| Consider security findings | Leave issues undocumented |
 
 ---
 
@@ -189,15 +147,14 @@ mcp__trabian__projects_create_raid_entry with:
 - Balance **ideal** with **pragmatic**
 - Acknowledge **good patterns** already in place
 - Prioritize by **impact vs effort**
-- Consider **financial services context**
 
 ---
 
 ## Examples
 
 ```bash
-/sloan/review-project              # Interactive selection
-/sloan/review-project cli          # Review trabian-cli
-/sloan/review-project server       # Review trabian-server
-/sloan/review-project my-app       # Review app repo
+/review-project              # Interactive selection
+/review-project cli          # Review CLI package
+/review-project server       # Review server
+/review-project my-app       # Review app repo
 ```

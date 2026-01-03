@@ -45,7 +45,7 @@ Create or verify symlinks in ~/.claude/commands pointing to slash-commands.
 
 - Uses `-sf` flag: creates symbolic link, overwrites if exists
 - Only symlinks .md and .yaml files (not devbot/ directory)
-- Does not touch symlinks to other directories (trabian-ai's dev/, kb/, pm/)
+- Does not touch symlinks to other directories
 - Safe to run multiple times (idempotent)
 
 ---

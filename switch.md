@@ -2,9 +2,9 @@
 description: Switch context to a repository
 ---
 
-# Switch Command (Trabian Branch)
+# Switch Command
 
-Quickly switch context to a repository with status summary and trabian-specific suggestions.
+Quickly switch context to a repository with status summary and suggestions.
 
 **Arguments**: `$ARGUMENTS` - Repo name (required, supports fuzzy match).
 
@@ -38,11 +38,11 @@ devbot stats adds codebase metrics (files, lines, functions) in ~0.01s.
 
 **For builtin packages:**
 ```
-Switched to: trabian-cli
+Switched to: my-cli
 ========================
 
 Type:   Package (builtin)
-Path:   ~/code/trabian-ai/packages/trabian-cli
+Path:   <base_path>/packages/my-cli
 Branch: main
 Status: clean
 Stats:  45 files, 8.2k lines, 87 functions (avg 12 lines)
@@ -53,9 +53,9 @@ Recent:
   ghi9012 Update dependencies
 
 Quick actions:
-  /sloan/run-tests cli     Run quality checks
-  /sloan/find-tasks cli    Find next tasks
-  /sloan/super cli         Start brainstorming
+  /run-tests my-cli     Run quality checks
+  /find-tasks my-cli    Find next tasks
+  /super my-cli         Start brainstorming
 ```
 
 **For worktrees:**
@@ -64,7 +64,7 @@ Switched to: feature-new-auth (worktree)
 =========================================
 
 Type:   Worktree
-Path:   ~/code/trabian-ai/.trees/feature-new-auth
+Path:   <base_path>/.trees/feature-new-auth
 Branch: feature/new-auth
 Parent: main (5 commits ahead)
 Status: 3 modified
@@ -75,52 +75,47 @@ Recent:
   def5678 Setup auth types
 
 Quick actions:
-  /sloan/run-tests feature-new-auth   Run quality checks
-  /sloan/yes-commit feature-new-auth  Commit changes
-  /dev/implement-plan                  Continue implementation
+  /run-tests feature-new-auth   Run quality checks
+  /yes-commit feature-new-auth  Commit changes
 ```
 
 **For clones:**
 ```
-Switched to: q2-sdk (clone)
+Switched to: some-sdk (clone)
 ===========================
 
 Type:   Clone (reference)
-Path:   ~/code/trabian-ai/clones/q2-sdk
+Path:   <base_path>/clones/some-sdk
 Branch: main
 Status: clean (read-only reference)
 
-Description: Q2 SDK core banking APIs
+Description: SDK for external service
 
 Quick actions:
-  /kb/q2                   Load Q2 knowledge base
-  Search: grep -r "pattern" ~/code/trabian-ai/clones/q2-sdk/
+  Search: grep -r "pattern" <base_path>/clones/some-sdk/
 
 Note: This is a reference clone. Changes should not be committed here.
 ```
 
-**For apps (additional repos):**
+**For working repos:**
 ```
-Switched to: client-project
+Switched to: my-project
 ===========================
 
-Type:   App
-Path:   ~/code/trabian-ai/client-project
+Type:   Working Repo
+Path:   <code_path>/my-project
 Branch: feature/new-feature
 Status: 2 modified
 Stats:  156 files, 12.4k lines, 203 functions (avg 18 lines)
-
-Linear: 3 issues assigned (2 In Progress, 1 Todo)
 
 Recent:
   abc1234 Add feature component
   def5678 Setup project structure
 
 Quick actions:
-  /sloan/run-tests client       Run quality checks
-  /sloan/find-tasks client      Find next tasks
-  /sloan/linear my              Show my Linear issues
-  /pm/raid "Client Project"     Update RAID log
+  /run-tests my-project     Run quality checks
+  /find-tasks my-project    Find next tasks
+  /super my-project         Start brainstorming
 ```
 
 ### Step 4: Read CLAUDE.md
@@ -130,34 +125,25 @@ Show key info from repo's CLAUDE.md (if exists):
 - Key commands
 - Any warnings or gotchas
 
-For trabian packages, also reference main CLAUDE.md:
-```
-Workspace context from ~/code/trabian-ai/CLAUDE.md:
-- Node.js >=18.0.0 required
-- TypeScript ES2022 target, strict mode
-- Run `npm run build` before testing
-```
+### Step 5: Suggest Commands
 
-### Step 5: Suggest Trabian Commands
-
-Based on repo type, suggest relevant trabian commands:
+Based on repo type, suggest relevant commands:
 
 | Repo Type | Suggested Commands |
 |-----------|-------------------|
-| Package (trabian-cli) | `/dev/commit`, `/sloan/run-tests` |
-| MCP Server | `/sloan/run-tests`, `uv run pytest` |
-| Worktree | `/dev/implement-plan`, `/sloan/yes-commit` |
-| Clone (Q2) | `/kb/q2`, search patterns |
-| App | `/pm/raid`, `/sloan/linear`, `/pm/meeting-prep` |
+| Package | `/yes-commit`, `/run-tests` |
+| Worktree | `/yes-commit`, `/push` |
+| Clone | Search patterns |
+| Working Repo | `/find-tasks`, `/run-tests` |
 
 ---
 
 ## Examples
 
 ```bash
-/sloan/switch cli          # Switch to trabian-cli
-/sloan/switch server       # Switch to trabian-server
-/sloan/switch q2           # Switch to q2-sdk clone
-/sloan/switch auth         # Switch to worktree matching "auth"
-/sloan/switch              # Show selection menu
+/switch cli          # Switch to CLI package
+/switch server       # Switch to server
+/switch sdk          # Switch to sdk clone
+/switch auth         # Switch to worktree matching "auth"
+/switch              # Show selection menu
 ```
