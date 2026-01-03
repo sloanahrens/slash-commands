@@ -38,7 +38,28 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Reviewing: <r
    tree <repo-path> -L 2 -I 'node_modules|.git|dist|__pycache__'
    ```
 
-### Step 3: Run Available Checks
+### Step 3: Analyze Codebase Metrics
+
+Run stats analysis to identify complexity hotspots:
+
+```bash
+devbot stats <repo-path>
+```
+
+**Use the output to guide review focus:**
+- Large files (>500 lines) → Check for god objects, consider splitting
+- Long functions (>50 lines) → Review for single responsibility
+- Deep nesting (>4 levels) → Look for early returns, extraction opportunities
+
+**Include in tech review output:**
+```
+## Code Metrics
+- Files: 45 | Lines: 8,234 (6,102 code, 892 comments)
+- Functions: 87 (avg 12 lines)
+- Complexity flags: 2 large files, 3 long functions
+```
+
+### Step 4: Run Available Checks
 
 **For TypeScript packages (packages/):**
 ```bash
@@ -57,7 +78,7 @@ cd <repo-path> && uv run pytest
 **For app repos:**
 Check `package.json` or `pyproject.toml` for available commands.
 
-### Step 4: Review Key Areas
+### Step 5: Review Key Areas
 
 Consider using local model for initial draft sections (see `_shared-repo-logic.md` → "Local Model Acceleration").
 
@@ -87,7 +108,7 @@ Use the `pr-review-toolkit:code-reviewer` agent to analyze systematically.
 - Security patterns (secrets, auth)
 - Production readiness
 
-### Step 5: Check RAID Log (if applicable)
+### Step 6: Check RAID Log (if applicable)
 
 For app repos with project associations:
 ```
@@ -99,7 +120,7 @@ Note any:
 - Outstanding risks
 - Pending actions
 
-### Step 6: Update Documentation
+### Step 7: Update Documentation
 
 **Primary: Update `<repo>/CLAUDE.md`**
 
@@ -138,7 +159,7 @@ Only create if findings are too detailed for CLAUDE.md:
 - New commands or key information
 - Critical warnings for the workspace
 
-### Step 7: Create RAID Entries (if applicable)
+### Step 8: Create RAID Entries (if applicable)
 
 If review reveals issues that should be tracked:
 ```

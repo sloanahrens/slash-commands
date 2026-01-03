@@ -39,7 +39,17 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Finding tasks
    ```
    This scans for TODO, FIXME, HACK, XXX, BUG markers in parallel (~0.1s vs grep's ~2s).
 
-5. Check for incomplete implementation plans:
+5. Check for complexity hotspots:
+   ```bash
+   devbot stats <repo-path>
+   ```
+
+   Flag any complexity issues as potential refactoring tasks:
+   - Large files (>500 lines) → "Consider splitting <file>"
+   - Long functions (>50 lines) → "Refactor <function> (<lines> lines)"
+   - Deep nesting (>4 levels) → "Simplify control flow in <file>"
+
+6. Check for incomplete implementation plans:
    ```bash
    ls ~/code/trabian-ai/docs/plans/*.md 2>/dev/null
    ls <repo-path>/docs/plans/*.md 2>/dev/null
@@ -144,14 +154,20 @@ From TODO Comments:
    - Impact: Reduces failed clone attempts
    - Success: Retry with exponential backoff
 
+From Complexity Analysis:
+4. **Refactor runStats function** (Medium)
+   - Location: cmd/devbot/main.go:793 (127 lines)
+   - Impact: Improves maintainability
+   - Success: Function under 50 lines
+
 From RAID Log:
-4. **Resolve Action: Update SSH key documentation** (Low)
+5. **Resolve Action: Update SSH key documentation** (Low)
    - RAID Entry: ACT-12, due 2025-01-05
    - Impact: Reduces support requests
    - Success: Updated docs/tutorial.md
 
 Quick Win:
-5. **Fix typo in error message** (Low)
+6. **Fix typo in error message** (Low)
    - Location: src/utils/logger.ts:42
    - Impact: Professional error messages
    - Success: Corrected spelling

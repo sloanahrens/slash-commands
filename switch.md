@@ -23,14 +23,16 @@ Follow repo selection from `_shared-repo-logic.md`:
 
 ### Step 2: Load Context
 
-Use devbot for fast status with stack detection:
+Use devbot for fast status with stack detection and stats:
 
 ```bash
 devbot status <repo-name>
+devbot stats <repo-path>
 git -C <repo-path> log --oneline -3
 ```
 
 devbot provides branch, dirty count, ahead/behind, and detected stack in ~0.03s.
+devbot stats adds codebase metrics (files, lines, functions) in ~0.01s.
 
 ### Step 3: Display Summary
 
@@ -43,6 +45,7 @@ Type:   Package (builtin)
 Path:   ~/code/trabian-ai/packages/trabian-cli
 Branch: main
 Status: clean
+Stats:  45 files, 8.2k lines, 87 functions (avg 12 lines)
 
 Recent:
   abc1234 Add config command
@@ -65,6 +68,7 @@ Path:   ~/code/trabian-ai/.trees/feature-new-auth
 Branch: feature/new-auth
 Parent: main (5 commits ahead)
 Status: 3 modified
+Stats:  23 files, 4.5k lines, 42 functions (avg 15 lines)
 
 Recent:
   abc1234 WIP: Add auth handler
@@ -104,6 +108,7 @@ Type:   App
 Path:   ~/code/trabian-ai/client-project
 Branch: feature/new-feature
 Status: 2 modified
+Stats:  156 files, 12.4k lines, 203 functions (avg 18 lines)
 
 Linear: 3 issues assigned (2 In Progress, 1 Todo)
 

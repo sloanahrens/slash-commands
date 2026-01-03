@@ -64,8 +64,16 @@ cd <repo-path> && uv run pytest 2>&1 | tail -10
 
 **Common:**
 ```bash
-wc -l <repo-path>/README.md <repo-path>/CLAUDE.md 2>/dev/null  # Line counts
-git -C <repo-path> log --oneline -5                             # Recent changes
+devbot stats <repo-path>                    # Code metrics
+git -C <repo-path> log --oneline -5         # Recent changes
+```
+
+Use stats output to update CLAUDE.md metrics section if present:
+```markdown
+## Codebase Metrics
+- **Files:** 45 source files
+- **Lines:** 8,234 total (6,102 code, 892 comments, 1,240 blank)
+- **Functions:** 87 (average 12 lines)
 ```
 
 For significant updates, consider using local model to draft sections (see `_shared-repo-logic.md` → "Local Model Acceleration"). Claude reviews all drafts before writing.
