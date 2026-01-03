@@ -1,62 +1,65 @@
-# Portable Commands Configuration
-# Copy this file to config.yaml and add your repos
+# Workspace Configuration
+# Copy this file to config.yaml
 # config.yaml is gitignored and will not be committed
 
-# Base path - always use ~/code/mono-claude
-base_path: ~/code/mono-claude
+# Primary workspace (monorepo or main project)
+base_path: ~/code/my-workspace
 
-# Repository definitions
-# Each repo needs:
-#   - name: directory name (required)
-#   - group: 'devops' or 'apps' (required)
-#   - aliases: list of fuzzy match shortcuts (optional)
-#   - work_dir: subdirectory to run commands from (optional)
-#   - language: typescript | go | python | rust | shell (optional, auto-detected if omitted)
-#   - commands: override default commands (optional)
-
-repos:
-  # DevOps/Infrastructure examples
-  - name: my-infra-pulumi
-    group: devops
-    aliases: [pulumi, infra]
+# Built-in components (fixed paths within base_path)
+# These are packages/apps that are always present in your monorepo
+builtin:
+  - name: my-cli
+    group: packages
+    path: packages/my-cli
     language: typescript
-
-  - name: my-terraform
-    group: devops
-    aliases: [tf, terraform]
-    language: shell
-
-  # Application examples
-  - name: my-nextjs-app
-    group: apps
-    aliases: [app, next]
-    # language auto-detected from package.json
-
-  - name: my-go-api
-    group: apps
-    aliases: [api]
-    language: go
-    work_dir: backend
     commands:
-      test: go test ./...
-      lint: golangci-lint run
-      build: go build ./cmd/api
+      test: npm test
+      lint: npm run lint
+      build: npm run build
 
-  - name: my-python-service
+  - name: my-server
     group: apps
-    aliases: [py, service]
+    path: apps/my-server
     language: python
     commands:
-      test: pytest
-      lint: ruff check .
-      typecheck: mypy .
+      test: uv run pytest
+      lint: uv run ruff check .
+      typecheck: uv run mypy .
 
-  # Monorepo with subdirectories
-  - name: my-monorepo
-    group: apps
-    aliases: [mono]
-    work_dir: packages/app
-    commands:
-      test: pnpm test
-      lint: pnpm lint
-      build: pnpm build
+# Dynamic directories (auto-discovered)
+# worktrees_dir: scans for git worktrees (feature branches)
+# clones_config: reads clone-config.json for reference repos
+worktrees_dir: .trees
+clones_config: clones/clone-config.json
+
+# All working code repos location
+code_path: ~/code
+
+# Working repos at code_path
+# Added via /add-repo or manually
+repos:
+  # Example: active project
+  # - name: my-project
+  #   group: projects
+  #   aliases: [proj, mp]
+  #   language: typescript
+  #   linear_project: my-project-board  # Optional: Linear integration
+  #   commands:
+  #     test: pnpm test
+  #     typecheck: pnpm -r typecheck
+  #     lint: pnpm lint
+
+  # Example: infrastructure repo
+  # - name: my-infra
+  #   group: devops
+  #   aliases: [infra, pulumi]
+  #   language: typescript
+
+  # Example: Go project with custom work_dir
+  # - name: my-go-app
+  #   group: personal
+  #   language: go
+  #   work_dir: cmd/app
+  #   commands:
+  #     test: go test ./internal/... -v
+  #     build: go build -o app ./cmd/app

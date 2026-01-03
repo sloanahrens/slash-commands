@@ -14,38 +14,32 @@ Pull latest changes from remote for one or all repositories.
 
 ## Process
 
-### Step 1: Determine Scope
+### Step 1: Pre-flight Check
 
-- If `$ARGUMENTS` provided → sync single repo (fuzzy match)
-- If empty → sync all repos
-
-### Step 2: Pre-flight Check
-
-For each repo to sync:
+Check for dirty repos first:
 
 ```bash
-cd <repo-path> && git status --porcelain
+devbot status --dirty
 ```
 
-If dirty, warn:
-```
-⚠️  <repo-name> has uncommitted changes. Skip? (yes/no/stash)
-```
+If any dirty repos found, warn and ask how to proceed (skip/abort/stash).
 
-Options:
-- **yes** - Skip this repo
-- **no** - Abort sync
-- **stash** - Stash changes, pull, pop stash
+### Step 2: Sync Repos
 
-### Step 3: Sync Repos
-
+**For all repos (parallel):**
 ```bash
-cd <repo-path> && git pull --rebase
+devbot run -q -- git pull --rebase
 ```
 
-Use `--rebase` to keep history clean. If conflicts occur, report and stop.
+**For single repo:**
+```bash
+devbot run -f <repo-name> -- git pull --rebase
+```
 
-### Step 4: Report Results
+This executes pulls in parallel across all repos (~0.5s vs sequential ~5s for 12 repos).
+Use `-q` to suppress "Already up to date" messages.
+
+### Step 3: Report Results
 
 ```
 Sync Results

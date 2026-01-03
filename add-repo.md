@@ -29,90 +29,175 @@ Use the URL from arguments.
 
 Extract from URL:
 - **Repo name**: Last path segment without `.git`
-- **Host**: github.com, gitlab.com, bitbucket.org, etc.
+- **Host**: github.com, gitlab.com, etc.
 
 Examples:
 | URL | Repo Name |
 |-----|-----------|
 | `https://github.com/user/my-app.git` | my-app |
-| `git@github.com:user/my-app.git` | my-app |
-| `https://github.com/user/my-app` | my-app |
+| `git@github.com:org/my-app.git` | my-app |
 
-### Step 3: Confirm Details
+### Step 3: Determine Repository Type
 
-Ask the user to confirm or customize:
+Ask user to classify the repository:
 
 ```
-Adding repository:
+What type of repository is this?
+
+1. Reference clone (read-only, for knowledge base)
+   → Will be added to clones/clone-config.json
+   → Located in <base_path>/clones/
+
+2. Working repo (active development)
+   → Will be added to config.yaml repos[]
+   → Located in <code_path>/<name>/
+
+Choose (1/2):
+```
+
+### Step 4: Confirm Details
+
+**For reference clones:**
+```
+Adding reference clone:
   URL: <url>
   Name: <repo-name>
-  Group: apps (or devops)
-  Aliases: <suggested-alias>
+  Location: <base_path>/clones/<repo-name>
+  Config: clones/clone-config.json
+  Description: <ask user>
 
 Proceed? (yes/edit/cancel)
 ```
 
-If user chooses "edit", ask what to change.
+**For working repos:**
+```
+Adding working repository:
+  URL: <url>
+  Name: <repo-name>
+  Location: <code_path>/<repo-name>
+  Group: projects
+  Config: config.yaml
 
-### Step 4: Clone Repository
-
-```bash
-cd <base_path> && git clone <url>
+Proceed? (yes/edit/cancel)
 ```
 
-If clone fails, report error and stop.
+### Step 5: Clone Repository
 
-### Step 5: Update config.yaml
+**For reference clones:**
+```bash
+cd <base_path>/clones && git clone <url>
+```
 
-Add new entry to `config.yaml`:
+**For working repos:**
+```bash
+cd <code_path> && git clone <url>
+```
 
+If clone fails (e.g., SSH access required), report error:
+```
+Clone failed. This might require SSH access.
+Ensure you have SSH keys configured for the host.
+```
+
+### Step 6: Update Configuration
+
+**For reference clones** - Update `clones/clone-config.json`:
+
+Add new entry following existing pattern:
+```json
+{
+  "repositories": {
+    ...existing...,
+    "<repo-name>": {
+      "url": "<url>",
+      "description": "<user-provided description>"
+    }
+  }
+}
+```
+
+**For working repos** - Update `config.yaml`:
+
+Add new entry to `repos[]`:
 ```yaml
+repos:
   - name: <repo-name>
-    group: <apps|devops>
-    aliases: [<alias>]
+    group: projects
+    language: <typescript|python|go|other>
 ```
 
-### Step 6: Check for CLAUDE.md
+### Step 7: Check for CLAUDE.md
 
 ```bash
-ls <base_path>/<repo-name>/CLAUDE.md
+ls <repo-path>/CLAUDE.md
 ```
 
-If missing, ask:
+If missing for working repos, ask:
 ```
 No CLAUDE.md found. Would you like to create one? (yes/no)
 ```
 
 If yes, create a basic template.
 
-### Step 7: Confirm Success
+### Step 8: Confirm Success
 
+**For reference clones:**
+```
+Reference clone added successfully:
+  Location: <base_path>/clones/<repo-name>
+  Config: Updated clones/clone-config.json
+
+This repo is for reference only. Use it to:
+  - Search for patterns: grep -r "pattern" <base_path>/clones/<repo-name>/
+  - Read documentation: cat <base_path>/clones/<repo-name>/README.md
+```
+
+**For working repos:**
 ```
 Repository added successfully:
-  Location: <base_path>/<repo-name>
+  Location: <code_path>/<repo-name>
   Config: Updated config.yaml
 
-Run `/super <repo-name>` to start working with it.
+Quick actions:
+  /switch <repo-name>      Switch to this repo
+  /find-tasks <repo-name>  Find tasks
+  /super <repo-name>       Start brainstorming
 ```
 
 ---
 
-## Group Selection
+## Group Selection (Working Repos)
 
 Ask user or infer from repo contents:
 
-| Indicator | Group |
-|-----------|-------|
-| Contains `pulumi/`, `terraform/`, `infra` | devops |
-| Contains `package.json`, `go.mod`, `src/` | apps |
-| Unclear | Ask user |
+| Indicator | Language |
+|-----------|----------|
+| `package.json` | typescript |
+| `pyproject.toml`, `requirements.txt` | python |
+| `go.mod` | go |
+| `Cargo.toml` | rust |
+
+---
+
+## Linear Integration (Optional)
+
+For working repos, ask:
+```
+Link to a Linear project? This enables:
+  - /find-tasks integration
+  - Issue tracking in /status
+
+Enter Linear project name (or skip):
+```
+
+If provided, add `linear_project: "<name>"` to config.yaml entry.
 
 ---
 
 ## Examples
 
 ```bash
-/add-repo https://github.com/user/my-new-app.git
-/add-repo git@github.com:org/infrastructure.git
-/add-repo                                          # Prompts for URL
+/add-repo https://github.com/user/my-new-app.git   # Working repo
+/add-repo git@github.com:org/some-sdk.git          # Reference clone
+/add-repo                                           # Prompts for URL
 ```

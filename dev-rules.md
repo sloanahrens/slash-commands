@@ -4,48 +4,70 @@ description: Remind Claude of workspace development rules
 
 # Dev Rules
 
-Continue whatever you were doing, but remember these rules:
+Continue whatever you were doing, but remember these workspace rules:
 
 ---
 
 ## Path Safety
 
 - **Run `pwd` before bash commands** - verify current location before file/path operations
-- **Use absolute paths** - always use full paths from your configured `base_path`
-- **Stay within workspace** - never navigate above your configured `base_path`
+- **Use absolute paths** - always use full paths from your configured workspace
+- **Stay within workspace** - never navigate above your base_path or code_path
+- **Respect worktree isolation** - `.trees/` worktrees are separate git environments
+
 
 ---
 
 ## File Creation
 
-- **NO `/tmp` files** - create temporary/working files in a `docs/` directory within the workspace
+- **NO `/tmp` files** - create temporary/working files in `docs/` directories
 - **Prefer editing over creating** - modify existing files when possible
+- **Plans go in** `docs/plans/YYYY-MM-DD-<topic>-<type>.md`
 
 ---
 
 ## Commit Messages
 
-- **NO** Claude/Anthropic attribution
-- **NO** co-author lines
-- **NO** "generated with" tags
-- Use imperative mood ("Add feature" not "Added feature")
-- Keep summary under 72 characters
+| Do | Don't |
+|----|-------|
+| Use imperative mood ("Add feature") | Include Claude/Anthropic attribution |
+| Keep summary under 72 characters | Include co-author lines |
+| Focus on WHY not just WHAT | Include "Generated with" tags |
+| Consider compliance implications | Commit secrets (.env, credentials) |
 
 ---
 
 ## YAML Gotchas
 
-- **Avoid colons in list items** - even inside quotes, `- echo "Service URL: foo"` becomes `{'echo "Service URL': 'foo"'}`. Use dashes instead: `- echo "Service URL - foo"`
+- **Avoid colons in list items** - even inside quotes, `- echo "Service URL: foo"` becomes `{'echo "Service URL': 'foo"'}`. Use dashes instead.
 - **Use `|` for multiline scripts** - avoids escaping issues
 - **Validate with Python** - `python3 -c "import yaml; print(yaml.safe_load(open('file.yml')))"` reveals parsing surprises
+
+---
+
+## Language-Specific Rules
+
+### TypeScript (packages/)
+- ES2022 target, CommonJS output, strict mode
+- Node.js >=18.0.0 required
+- Run `npm run build` before testing
+
+### Python
+- Python >=3.12 required
+- Use `uv` for dependency management
+- Run `uv sync` before testing
+- FastMCP with sub-server composition
+
 
 ---
 
 ## General
 
 - Read the repo's `CLAUDE.md` before making changes
+- Read workspace `CLAUDE.md` or global `~/.claude/CLAUDE.md` for context
 - Run tests after making changes
 - Keep changes focused and minimal
+- Consider clone repos as read-only references
 
 ---
 

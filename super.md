@@ -4,122 +4,85 @@ description: Start brainstorming session with workspace context
 
 # Super Command
 
-Start a structured brainstorming session with full context about the workspace and selected repository. Leverages local MLX models for acceleration where appropriate.
+Start a structured brainstorming session with full workspace and repo context.
 
 **Arguments**: `$ARGUMENTS` - Optional repo name or task description. If repo recognized, selects it. Otherwise treated as brainstorm topic.
 
-**Shared logic**: See `_shared-repo-logic.md` for repo discovery, selection, and commit rules.
+**Shared logic**: See `_shared-repo-logic.md` for repo discovery, selection, context loading, local model usage, and integration patterns.
 
 ---
 
 ## Process
 
-### Step 0: Check Plugins
+### Step 1: Check Superpowers Plugin
 
-Before running the brainstorming session, verify required and optional plugins are available:
-
-```bash
-claude plugin list 2>/dev/null | grep -E "(superpowers|mlx)"
-```
-
-#### 0.1: Superpowers Plugin (Required)
-
-The superpowers plugin provides the `/superpowers:brainstorming` skill used in Step 4.
-
-**If superpowers is NOT installed:**
-
-1. Inform the user: "The superpowers plugin is required for structured brainstorming but isn't currently installed."
-2. Offer to install it:
-   ```bash
-   claude plugin add superpowers@superpowers-marketplace
-   ```
-3. If the user declines or installation fails, **stop here** - the `/super` command cannot complete without the brainstorming skill. Suggest alternatives:
-   - Install the plugin and retry
-   - Use basic context gathering without the structured brainstorming workflow
-
-**If superpowers IS installed:** Continue to the next check.
-
-#### 0.2: MLX-Hub Plugin (Optional)
-
-Check if mlx-hub is available for local model acceleration. See `_shared-repo-logic.md` for availability check pattern.
-
-If not installed, continue without acceleration - install via `/setup-plugins` if desired.
-
----
-
-### Step 1: Resolve Repository
-
-Follow repo selection from `_shared-repo-logic.md`:
-1. Read `config.yaml` for base path and repo definitions
-2. Match `$ARGUMENTS` to repo name or alias
-3. If no repo recognized, ask which repo the task relates to
-4. Confirm: "Brainstorming for: <repo-name>"
-
-### Step 2: Load Workspace Context
-
-**Always read the workspace root CLAUDE.md first** for workspace-wide notes, MLX model guidance, and cross-repo context:
-
-Read: `<base_path>/CLAUDE.md` (where `base_path` is from `config.yaml`)
-
-### Step 3: Load Repo Context
+The superpowers plugin provides `/superpowers:brainstorming` (required).
 
 ```bash
-pwd  # Verify again before repo commands
-cd <base_path>/<repo> && git status
-cd <base_path>/<repo> && git log --oneline -5
+claude plugin list 2>/dev/null | grep superpowers
 ```
 
-Read: `<repo>/CLAUDE.md`, `README.md`, `docs/overview.md`
+If not installed, offer: `claude plugin add superpowers@superpowers-marketplace`
 
-### Step 4: Local Model Acceleration (Optional)
+If user declines, **stop** - cannot complete without the brainstorming skill.
 
-See `_shared-repo-logic.md` for model tiers and routing rules.
+### Step 2: Resolve Repository
 
-**Use local models for:**
-- Summarizing file contents (Fast tier)
-- Drafting exploration approaches (Quality tier, if available)
-- Parallel task processing while Claude orchestrates
+Follow "Standard Process Start" from `_shared-repo-logic.md`.
 
-**Keep on Claude:**
-- Architectural decisions
-- Security-sensitive analysis
-- Final synthesis and recommendations
+### Step 3: Load Context
+
+Per `_shared-repo-logic.md` → "Context Loading":
+1. Read workspace `CLAUDE.md`
+2. Read repo's `CLAUDE.md` (if exists)
+3. Get git status and recent commits
+
+### Step 4: Check Related Issues (Optional)
+
+If brainstorming about a specific feature/bug and Linear integration is configured:
+```
+mcp__plugin_linear_linear__list_issues with query="<topic>"
+```
 
 ### Step 5: Run Brainstorming
 
 Invoke `/superpowers:brainstorming` with:
-- Selected repo name and path
+- Workspace and repo context gathered above
 - Task/topic from `$ARGUMENTS`
-- Key context from repo's CLAUDE.md
-- Current git status
-- **Awareness of local model for acceleration**
+- Any related issues
+- Awareness of local model availability (per shared logic)
 
 ---
 
 ## Documentation Location
 
-When creating documentation:
+Place documentation in the relevant repository:
 
 | Type | Location |
 |------|----------|
+| Design docs | `<repo>/docs/YYYY-MM-DD-<topic>-design.md` |
+| Implementation plans | `<repo>/docs/YYYY-MM-DD-<topic>-plan.md` |
 | Technical reviews | `<repo>/docs/tech-review.md` |
-| Design docs | `<repo>/docs/plans/<date>-<topic>-design.md` |
-| Implementation plans | `<repo>/docs/plans/<date>-<topic>-plan.md` |
 
 **If unsure where docs belong, ASK the user.**
+
+---
+
+## Post-Brainstorming Suggestions
+
+| Task Type | Suggested Commands |
+|-----------|-------------------|
+| Feature implementation | `/run-tests`, `/yes-commit` |
+| Bug fix | `/find-tasks` |
+| Documentation | `/update-docs` |
 
 ---
 
 ## Examples
 
 ```bash
-/super my-app add user authentication   # Brainstorm for my-app repo
-/super optimize database queries        # Prompts for repo selection
-/super pulumi                           # Start brainstorming for infra repo
+/super cli add config validation     # Brainstorm for CLI package
+/super server add new endpoint       # Brainstorm for server
+/super optimize integration          # Prompts for repo selection
+/super                               # Shows selection menu
 ```
-
-## Local Model Tips
-
-- **Prompt tersely** - Llama responds well to direct instructions
-- **Review output** - Always have Claude review before committing
-- See `_shared-repo-logic.md` for model tiers and usage examples

@@ -4,7 +4,7 @@ description: Update documentation for a repository
 
 # Update Documentation
 
-Update project documentation for a repository, maintaining consistency across doc files.
+Update project documentation for a repository, maintaining consistency across files.
 
 **Arguments**: `$ARGUMENTS` - Optional repo name (supports fuzzy match). If empty, shows selection menu.
 
@@ -14,13 +14,14 @@ Update project documentation for a repository, maintaining consistency across do
 
 ## Documentation Structure
 
+### Repository Level
+
 | File | Purpose | Guidelines |
 |------|---------|------------|
 | `CLAUDE.md` | Primary Claude Code reference | Commands, patterns, warnings. 100-200 lines max. |
 | `README.md` | Human entry point | Brief, link to details. Under 100 lines. |
-| `docs/overview.md` | Detailed documentation | Full details, metrics, architecture. |
-
-Documentation lives in each repo - not centralized in mono-claude root.
+| `docs/overview.md` | Detailed documentation | Full details, architecture. |
+| `docs/tech-review.md` | Technical review findings | Only if needed. |
 
 ---
 
@@ -33,49 +34,75 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Updating docs
 ### Step 2: Inventory Documentation
 
 ```bash
-ls -la <repo-path>/README.md <repo-path>/CLAUDE.md <repo-path>/docs/overview.md 2>/dev/null
+# Check repo-level docs
+ls -la <repo-path>/README.md <repo-path>/CLAUDE.md <repo-path>/docs/ 2>/dev/null
 ```
 
 ### Step 3: Gather Current State
 
+**For TypeScript packages:**
 ```bash
 cd <repo-path> && npm test 2>&1 | tail -10      # Test counts
-wc -l <repo-path>/README.md <repo-path>/CLAUDE.md  # Line counts
-cd <repo-path> && git log --oneline -5          # Recent changes
+cd <repo-path> && npm run build 2>&1 | tail -5  # Build status
 ```
 
-**Optional: MLX Acceleration** - If mlx-hub available and significant updates needed, use Quality tier (if available) to draft doc sections:
+**For Python projects:**
+```bash
+cd <repo-path> && uv run pytest 2>&1 | tail -10
+```
 
-- README quick-start section
-- CLAUDE.md command summaries
-- overview.md structure descriptions
+**Common:**
+```bash
+devbot stats <repo-path>                    # Code metrics
+git -C <repo-path> log --oneline -5         # Recent changes
+```
 
-If Quality tier unavailable, use Fast tier for simple drafts or skip acceleration. Claude reviews all drafts before writing. See `_shared-repo-logic.md` for MLX routing.
+Use stats output to update CLAUDE.md metrics section if present:
+```markdown
+## Codebase Metrics
+- **Files:** 45 source files
+- **Lines:** 8,234 total (6,102 code, 892 comments, 1,240 blank)
+- **Functions:** 87 (average 12 lines)
+```
+
+For significant updates, consider using local model to draft sections (see `_shared-repo-logic.md` → "Local Model Acceleration"). Claude reviews all drafts before writing.
 
 ### Step 4: Update Files
 
-Follow `elements-of-style` principles when writing: omit needless words, use active voice, be specific.
+Follow `elements-of-style` principles: omit needless words, use active voice, be specific.
 
-**CLAUDE.md**: Verify commands are current, patterns accurate, links work.
+**CLAUDE.md** (Priority):
+- Verify commands are current
+- Ensure patterns match actual code
+- Update warnings/gotchas
+- Keep under 200 lines
 
-**README.md**: Keep brief, include quick start, link to detailed docs.
+**README.md**:
+- Keep brief, include quick start
+- Link to detailed docs
+- Under 100 lines
 
-**docs/overview.md**: Update test counts, metrics, "Last Updated" date.
+**docs/overview.md** (if exists):
+- Update "Last Updated" date
+- Refresh architecture descriptions
+- Update test/coverage metrics
 
-### Step 5: Verify
+### Step 5: Check Consistency
 
-- No metrics duplicated across files
-- Line counts are reasonable
-- Cross-links work
+Verify documentation consistency across:
+- Repo CLAUDE.md ↔ README.md
+- Commands documented ↔ commands that exist
 
 ---
 
 ## Anti-Patterns
 
-- **DON'T** duplicate metrics across multiple files
-- **DON'T** create README files in test directories
-- **DON'T** add detailed change history to CLAUDE.md
-- **DON'T** include volatile data (test counts) in README.md
+| DON'T | WHY |
+|-------|-----|
+| Duplicate metrics across files | Creates maintenance burden |
+| Create README files in test dirs | Unnecessary clutter |
+| Add detailed change history to CLAUDE.md | Use git log instead |
+| Include volatile data in README.md | Gets stale quickly |
 
 ---
 
@@ -84,7 +111,8 @@ Follow `elements-of-style` principles when writing: omit needless words, use act
 Report:
 1. Files updated with line counts
 2. Summary of changes made
-3. Any files created or deleted
+3. Any inconsistencies found and fixed
+4. Suggestions for further documentation improvements
 
 ---
 
@@ -92,6 +120,7 @@ Report:
 
 ```bash
 /update-docs              # Interactive selection
-/update-docs pulumi       # Fuzzy match → my-infra-pulumi
-/update-docs my-app       # Fuzzy match → my-nextjs-app
+/update-docs cli          # Update CLI docs
+/update-docs server       # Update server docs
+/update-docs my-app       # Update app repo docs
 ```

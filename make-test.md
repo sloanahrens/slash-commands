@@ -18,19 +18,24 @@ Parse and interactively test Makefile targets for a repository.
 
 Follow repo selection from `_shared-repo-logic.md`, then confirm: "Testing Makefile for: <repo-name>"
 
-### Step 2: Find and Parse Makefile
+### Step 2: Parse Makefile with devbot
 
-1. Check for Makefile in repo root (or `work_dir` if configured)
-2. If no Makefile found, report error and exit
-3. Parse Makefile to extract:
-   - All target names (lines matching `^target-name:`)
-   - `.PHONY` declarations
-   - Target descriptions (comments above targets)
-   - Target dependencies
+Use devbot for instant Makefile analysis:
+
+```bash
+devbot make <repo-name>
+```
+
+This parses in ~0.01s and returns:
+- All targets with `.PHONY` status
+- Category classification (setup, dev, database, test, build, clean, other)
+- Comments/descriptions from lines above targets
+
+If no Makefile found, report error and exit.
 
 ### Step 3: Analyze Targets
 
-Categorize targets by type:
+devbot categorizes targets by type:
 
 | Category | Detection | Examples |
 |----------|-----------|----------|

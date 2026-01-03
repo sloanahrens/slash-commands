@@ -18,63 +18,88 @@ Conduct a technical review of a repository and update its documentation.
 
 Follow repo selection from `_shared-repo-logic.md`, then confirm: "Reviewing: <repo-name>"
 
-### Step 2: Understand the Repository
+**Note:** Reference clones in `clones/` are typically not reviewed - they're external repos. If user selects a clone, confirm they want to review it.
 
-1. Read documentation: `<repo>/CLAUDE.md`, `README.md`, `docs/overview.md`
-2. Examine structure: `ls -la <repo-path>`
-3. Check `package.json` for dependencies and scripts
+### Step 2: Load Context
 
-### Step 3: Run Available Checks
+1. Read repo documentation:
+   - `<repo>/CLAUDE.md`
+   - `<repo>/README.md`
+   - `<repo>/docs/overview.md` (if exists)
+
+2. Examine structure:
+   ```bash
+   ls -la <repo-path>
+   tree <repo-path> -L 2 -I 'node_modules|.git|dist|__pycache__'
+   ```
+
+### Step 3: Analyze Codebase Metrics
+
+Run stats analysis to identify complexity hotspots:
 
 ```bash
-npm run lint        # If available
-npm run type-check  # If available
-npm test            # If available
+devbot stats <repo-path>
 ```
 
-### Step 4: Review Key Areas
+**Use the output to guide review focus:**
+- Large files (>500 lines) → Check for god objects, consider splitting
+- Long functions (>50 lines) → Review for single responsibility
+- Deep nesting (>4 levels) → Look for early returns, extraction opportunities
 
-**Optional: MLX Acceleration** - If mlx-hub available, use Quality tier (if available) or Fast tier + Claude review to draft initial review sections in parallel with analysis:
-
-```python
-# Quality tier (if available)
-mlx_infer(
-  model_id="mlx-community/Llama-3.3-70B-Instruct-8bit",
-  prompt="List 3-5 strengths of this codebase based on the structure:\n\n{file_tree}",
-  max_tokens=512
-)
-# Or use Fast tier + Claude review if Quality unavailable
+**Include in tech review output:**
+```
+## Code Metrics
+- Files: 45 | Lines: 8,234 (6,102 code, 892 comments)
+- Functions: 87 (avg 12 lines)
+- Complexity flags: 2 large files, 3 long functions
 ```
 
-See `_shared-repo-logic.md` for MLX routing and fallback patterns.
+### Step 4: Run Available Checks
 
-Use the `pr-review-toolkit:code-reviewer` agent to analyze the codebase systematically. The agent will check:
+**For TypeScript packages:**
+```bash
+cd <repo-path> && npm run lint
+cd <repo-path> && npm run build
+cd <repo-path> && npm test
+```
 
-**App Repos (Next.js, React):**
-- Architecture & component organization
-- State management patterns
-- API route design
-- Error handling, test coverage
+**For Python projects:**
+```bash
+cd <repo-path> && uv run ruff check .
+cd <repo-path> && uv run mypy .
+cd <repo-path> && uv run pytest
+```
 
-**Infrastructure Repos (Pulumi, Terraform):**
-- Resource organization
-- Security patterns (IAM, secrets)
-- State management
-- CI/CD integration
+**For other repos:**
+Check `package.json` or `pyproject.toml` for available commands.
 
-**General:**
-- Code organization and discoverability
-- Dependency management
-- Environment configuration
-- Documentation quality
+### Step 5: Review Key Areas
 
-Invoke the agent with the repo path and focus areas relevant to the stack.
+Consider using local model for initial draft sections (see `_shared-repo-logic.md` → "Local Model Acceleration").
 
-### Step 5: Update Documentation
+Use the `pr-review-toolkit:code-reviewer` agent to analyze systematically.
+
+**TypeScript Projects:**
+- CLI command organization
+- Error handling patterns
+- Test coverage
+- TypeScript strictness
+
+**Python Projects:**
+- Framework patterns
+- Authentication middleware
+- API client implementations
+- Test coverage
+
+**For all repos, consider:**
+- Security patterns (secrets, auth)
+- Production readiness
+
+### Step 6: Update Documentation
 
 **Primary: Update `<repo>/CLAUDE.md`**
 
-Incorporate key findings directly into the repo's CLAUDE.md:
+Incorporate key findings directly:
 - Update commands if they've changed
 - Add warnings or gotchas discovered
 - Refine architecture descriptions
@@ -82,7 +107,7 @@ Incorporate key findings directly into the repo's CLAUDE.md:
 
 **If detailed analysis needed: `<repo>/docs/tech-review.md`**
 
-Only create this file if findings are too detailed for CLAUDE.md:
+Only create if findings are too detailed for CLAUDE.md:
 
 ```markdown
 # Technical Review: <repo-name>
@@ -95,20 +120,14 @@ Only create this file if findings are too detailed for CLAUDE.md:
 [What the project does well]
 
 ## Issues & Recommendations
-- **Issue**: Description
-- **Impact**: Why this matters
-- **Fix**: Action items
+| Priority | Issue | Impact | Recommendation |
+|----------|-------|--------|----------------|
+| High | ... | ... | ... |
+| Medium | ... | ... | ... |
 
 ## Future Considerations
 [Long-term improvements]
 ```
-
-**If registry info changed: Update root CLAUDE.md**
-
-Only update `<base_path>/CLAUDE.md` if:
-- Repo name or alias changed
-- New gotchas that affect the registry table
-- Stack or description is outdated
 
 ---
 
@@ -118,7 +137,7 @@ Only update `<base_path>/CLAUDE.md` if:
 |----|-------|
 | Update `<repo>/CLAUDE.md` | Create docs at workspace root |
 | Write details to `<repo>/docs/` | Duplicate info across files |
-| Update root CLAUDE.md registry | Create standalone review files at root |
+| Consider security findings | Leave issues undocumented |
 
 ---
 
@@ -135,6 +154,7 @@ Only update `<base_path>/CLAUDE.md` if:
 
 ```bash
 /review-project              # Interactive selection
-/review-project pulumi       # Fuzzy match → my-infra-pulumi
-/review-project my-app       # Fuzzy match → my-nextjs-app
+/review-project cli          # Review CLI package
+/review-project server       # Review server
+/review-project my-app       # Review app repo
 ```

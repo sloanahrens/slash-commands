@@ -1,2 +1,19 @@
-# Local configuration (contains user-specific paths)
+# Local configuration (user-specific paths)
 config.yaml
+
+# devbot build artifacts
+devbot/devbot
+*.exe
+
+# Coverage
+coverage.out
+coverage.html
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Temp files
+*.out

@@ -21,87 +21,71 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Finding tasks
 ### Step 2: Review Current State
 
 1. Read repo documentation:
-   - `<repo>/CLAUDE.md` - Primary reference
+   - `<repo>/CLAUDE.md` - Repo-specific guidance
    - `<repo>/docs/overview.md` - If exists
    - `<repo>/README.md` - Project overview
 
 2. Check recent commits:
    ```bash
-   cd <repo-path> && git log --oneline -10
+   git -C <repo-path> log --oneline -10
    ```
 
 3. Examine test coverage gaps (if test scripts exist)
 
-4. Look for TODO/FIXME comments (use language-appropriate patterns):
+4. Look for TODO/FIXME comments:
    ```bash
-   # TypeScript/JavaScript
-   grep -r "TODO\|FIXME" <repo-path> --include="*.ts" --include="*.tsx" --include="*.js" | head -20
+   devbot todos <repo-name>
+   ```
+   This scans for TODO, FIXME, HACK, XXX, BUG markers in parallel (~0.1s).
 
-   # Go
-   grep -r "TODO\|FIXME" <repo-path> --include="*.go" | head -20
-
-   # Python
-   grep -r "TODO\|FIXME" <repo-path> --include="*.py" | head -20
+5. Check for complexity hotspots:
+   ```bash
+   devbot stats <repo-path>
    ```
 
-   **Optional: MLX Acceleration** - If mlx-hub available and many TODOs found (>10), use Fast tier to batch-summarize:
-   ```python
-   mlx_infer(
-     model_id="mlx-community/Llama-3.2-1B-Instruct-4bit",
-     prompt="Summarize each TODO in one line:\n\n{todo_list}",
-     max_tokens=256
-   )
-   ```
-   See `_shared-repo-logic.md` for MLX routing rules.
+   Flag any complexity issues as potential refactoring tasks:
+   - Large files (>500 lines) → "Consider splitting <file>"
+   - Long functions (>50 lines) → "Refactor <function> (<lines> lines)"
+   - Deep nesting (>4 levels) → "Simplify control flow in <file>"
 
-5. Check for incomplete implementation plans:
+6. Check for incomplete implementation plans:
    ```bash
    ls <repo-path>/docs/plans/*.md 2>/dev/null
    ```
 
-6. **(If `--linear` flag OR repo has `linear_project` in config)** Check Linear issues:
+### Step 3: Check Linear Issues (Optional)
 
-   Use Linear MCP tools to fetch open issues:
-   ```
-   # Search for issues related to the project
-   mcp__linear__search_issues(query: "<project-keywords>", status: "In Progress")
-   mcp__linear__search_issues(query: "<project-keywords>", status: "Backlog")
-   mcp__linear__search_issues(query: "<project-keywords>", status: "Todo")
-   ```
+If Linear integration is configured, use Linear MCP to find relevant issues:
 
-   Display Linear issues in output:
-   ```
-   Linear Issues (<project-name>):
-   ├── In Progress
-   │   └── PROJ-123: API redesign (High)
-   ├── Backlog
-   │   └── PROJ-456: Add retry logic (High)
-   └── Todo
-       └── (none)
-   ```
+```
+# Get issues assigned to me
+mcp__plugin_linear_linear__list_issues with assignee="me"
 
-7. **(If `--issues` flag)** Check GitHub/Bitbucket issues/PRs:
-   ```bash
-   # Detect remote type from git remote
-   git remote get-url origin
+# Search by project if repo has linear_project config
+mcp__plugin_linear_linear__list_issues with project="<project-name>"
+```
 
-   # GitHub
-   gh issue list --limit 10
-   gh pr list --limit 5
+Display Linear issues in output:
+```
+Linear Issues:
+├── In Progress
+│   └── PROJ-123: API redesign (High) - https://linear.app/team/issue/PROJ-123
+├── Backlog
+│   └── PROJ-456: Add retry logic (High)
+└── Todo
+    └── PROJ-789: Update documentation (Normal)
+```
 
-   # Bitbucket (if bb CLI available)
-   # Or use API directly
-   ```
-
-### Step 3: Identify High-Impact Work
+### Step 4: Identify High-Impact Work
 
 Focus on tasks that:
 - Unblock other work
+- Are assigned in Linear/GitHub
 - Improve production readiness
 - Are quick wins with high value
 - Balance testing, features, and infrastructure
 
-### Step 4: Generate Task Options
+### Step 5: Generate Task Options
 
 Provide 3-5 concrete, actionable tasks.
 
@@ -109,14 +93,40 @@ Provide 3-5 concrete, actionable tasks.
 
 ## Output Format
 
-For each task:
+```
+Tasks for: my-cli
+======================
 
-1. **Task Name** - Clear, actionable title
-2. **Priority** - High/Medium/Low with justification
-3. **Impact** - What this accomplishes
-4. **Starting Point** - Key files or commands
-5. **Dependencies** - Prerequisites or blockers
-6. **Success Criteria** - How to know it's done
+From Linear:
+1. **PROJ-123: API redesign** (High, In Progress)
+   - Impact: Unblocks mobile team
+   - Start: Review current API in src/api/
+   - Success: New endpoints pass integration tests
+
+From Codebase Analysis:
+2. **Add missing test coverage for config command** (Medium)
+   - Impact: Increases confidence in releases
+   - Start: src/commands/config.ts (0% coverage)
+   - Success: >80% coverage for config module
+
+From TODO Comments:
+3. **Implement retry logic in clone setup** (Medium)
+   - Location: src/commands/clones.ts:245
+   - Impact: Reduces failed clone attempts
+   - Success: Retry with exponential backoff
+
+From Complexity Analysis:
+4. **Refactor runStats function** (Medium)
+   - Location: cmd/main.go:793 (127 lines)
+   - Impact: Improves maintainability
+   - Success: Function under 50 lines
+
+Quick Win:
+5. **Fix typo in error message** (Low)
+   - Location: src/utils/logger.ts:42
+   - Impact: Professional error messages
+   - Success: Corrected spelling
+```
 
 ---
 
@@ -124,9 +134,9 @@ For each task:
 
 | Priority | Criteria |
 |----------|----------|
-| High | Addresses critical gaps, unblocks work, improves stability |
-| Medium | Improves test coverage, adds features, enhances monitoring |
-| Low | Nice-to-have improvements, optimizations, documentation |
+| High | Assigned in Linear/GitHub, addresses critical gaps, unblocks work |
+| Medium | Improves test coverage, adds features |
+| Low | Nice-to-have improvements, documentation, minor fixes |
 
 ---
 
@@ -134,8 +144,7 @@ For each task:
 
 | Flag | Effect |
 |------|--------|
-| `--linear` | Include Linear issues (auto-enabled if repo has `linear_project` in config) |
-| `--issues` | Include GitHub/Bitbucket issues and PRs in analysis |
+| `--linear` | Include Linear issues (auto-enabled if repo has `linear_project`) |
 | `--deep` | More thorough analysis (test coverage, dependency audit) |
 
 ---
@@ -144,9 +153,6 @@ For each task:
 
 ```bash
 /find-tasks                    # Interactive selection
-/find-tasks pulumi             # Fuzzy match → my-infra-pulumi
-/find-tasks my-app             # Auto-includes Linear (has linear_project in config)
-/find-tasks my-app --linear    # Explicit Linear flag
-/find-tasks frontend --issues  # Include GitHub issues
-/find-tasks api --deep         # Deep analysis
+/find-tasks cli                # Tasks for CLI package
+/find-tasks server --deep      # Deep analysis of server
 ```

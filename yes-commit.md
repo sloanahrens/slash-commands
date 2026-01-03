@@ -4,7 +4,7 @@ description: Commit changes for a repository
 
 # Commit
 
-Help commit git changes for a repository.
+Commit git changes for a repository. Shows the proposed message then proceeds to commit immediately.
 
 **Arguments**: `$ARGUMENTS` - Optional repo name (supports fuzzy match). If empty, shows selection menu.
 
@@ -21,67 +21,26 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Committing fo
 ### Step 2: Check Repository Status
 
 ```bash
-cd <repo-path> && git status
+git -C <repo-path> status
 ```
 
 If no changes, report "No changes to commit" and exit.
 
-### Step 3: Detect Pre-commit Hooks
-
-Check for hooks that will run on commit:
+### Step 3: Review Changes
 
 ```bash
-ls <repo-path>/.husky/pre-commit 2>/dev/null
-ls <repo-path>/.git/hooks/pre-commit 2>/dev/null
-cat <repo-path>/package.json | grep -q "husky\|lint-staged"
+git -C <repo-path> diff --stat
 ```
 
-If hooks exist, warn:
-```
-⚠️  Pre-commit hooks detected (husky/lint-staged)
-    Hooks will run: lint, format, tests
-    This may modify files or reject the commit.
-```
+### Step 4: Generate Commit Message
 
-### Step 4: Review Changes
+Try local model first if available (see `_shared-repo-logic.md` → "Local Model Acceleration"):
 
-```bash
-cd <repo-path> && git diff --stat
-cd <repo-path> && git diff
-```
+1. Get diff: `git -C <repo-path> diff --staged` (or `diff` if nothing staged)
+2. Use `mcp__plugin_mlx-hub_mlx-hub__mlx_infer` with local model
+3. Display with `[local]` prefix
 
-### Step 5: Generate Commit Message (Local Model First)
-
-**If local model available** (see `_local-model.md`), try it first:
-
-```bash
-# Get the diff for context
-DIFF=$(cd <repo-path> && git diff --staged 2>/dev/null || git diff)
-
-# Generate with local model
-mlx_lm.generate \
-  --model mlx-community/DeepSeek-Coder-V2-Lite-Instruct-4bit-mlx \
-  --max-tokens 100 \
-  --prompt "Write a git commit message for this diff. Use imperative mood, under 72 chars:
-
-$DIFF
-
-Commit message:"
-```
-
-**Display with label:**
-```
-[local] Proposed commit message:
----
-<message from local model>
----
-
-(y) Accept  (c) Regenerate with Claude  (e) Edit
-```
-
-**If user chooses Claude (c)**, regenerate using Claude and label `[claude]`.
-
-**If local model unavailable**, use Claude directly (no label needed).
+If local model unavailable, use Claude directly.
 
 **Message requirements:**
 - Short summary (50-72 characters)
@@ -98,31 +57,27 @@ Commit message:"
 
 Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `build`, `ci`
 
-### Step 6: Present for Approval
+### Step 5: Display and Execute
+
+Display the proposed message, then immediately execute the commit:
 
 ```
-Proposed commit message for <repo-name>:
+Committing to <repo-name>:
 ---
 <commit message>
 ---
-
-Would you like to proceed? (yes/no/edit)
 ```
 
-### Step 7: Execute Commit
-
-If approved:
 ```bash
-cd <repo-path> && git add -A && git commit -m "<message>"
+git -C <repo-path> add -A && git -C <repo-path> commit -m "<message>"
 ```
 
-If user wants edits, ask what to modify and regenerate.
+The user approves via Claude Code's tool permission dialog.
 
-### Step 8: Verify Success
+### Step 6: Verify Success
 
-Confirm commit succeeded:
 ```bash
-cd <repo-path> && git log -1 --oneline
+git -C <repo-path> log -1 --oneline
 ```
 
 If pre-commit hooks modified files, include them in an amended commit.
@@ -135,22 +90,19 @@ If pre-commit hooks modified files, include them in an amended commit.
 |----|-------|
 | Summarize nature of changes | Include Claude/Anthropic attribution |
 | Keep summary under 72 chars | Include co-author lines |
-| Use imperative mood | Commit secrets (.env, credentials) |
+| Use imperative mood | Include "Generated with" tags |
+| Focus on why | Commit secrets (.env, credentials) |
 
 ---
 
-## Example Output
+## Worktree Handling
+
+When committing in a worktree (`.trees/<name>`), after commit show:
 
 ```
-Proposed commit message for my-infra-pulumi:
----
-Add custom IAM role for Cloud Run deployments
+Committed to feature/new-auth (N commits ahead of main)
 
-Define granular permissions for deploy service account,
-replacing broad predefined roles with minimum required access.
----
-
-Would you like to proceed? (yes/no/edit)
+Next: /push <worktree>
 ```
 
 ---
@@ -167,7 +119,7 @@ Would you like to proceed? (yes/no/edit)
 ## Examples
 
 ```bash
-/yes-commit                       # Interactive selection
-/yes-commit pulumi                # Fuzzy match → my-infra-pulumi
-/yes-commit my-app --conventional # Use conventional commits format
+/yes-commit              # Interactive selection
+/yes-commit cli          # Commit for CLI package
+/yes-commit server       # Commit for server
 ```

@@ -6,53 +6,107 @@ This file contains shared patterns used by all repo-targeting slash commands.
 
 ## Configuration
 
-Commands use `config.yaml` for repository definitions. Copy `config.yaml.example` to `config.yaml` and add your repos.
+Commands use `config.yaml` in this directory. The config supports:
+
+- `base_path` - primary workspace for monorepo/packages (e.g., ~/code/my-workspace)
+- `builtin` - fixed packages within base_path
+- `worktrees_dir` - auto-discovers `.trees/*` worktrees
+- `clones_config` - reads reference repos from `clones/clone-config.json`
+- `code_path` - location of working code repos (~/code)
+- `repos` - working repos at code_path
 
 ```yaml
-base_path: ~/code/mono-claude
+base_path: ~/code/my-workspace
+
+builtin:
+  - name: my-cli
+    group: packages
+    path: packages/my-cli
+    language: typescript
+
+worktrees_dir: .trees
+clones_config: clones/clone-config.json
+
+code_path: ~/code
+
 repos:
-  - name: my-app
-    group: apps
-    aliases: [app]
-    language: typescript        # optional: typescript | go | python | rust | shell
-    work_dir: src               # optional: subdirectory for commands
-    commands:                   # optional: override default commands
-      test: npm test
-      lint: npm run lint
+  - name: my-project
+    group: projects
+    aliases: [proj, mp]
 ```
 
 ---
 
 ## Critical Rule
 
-**CRITICAL**: Always stay within `~/code/mono-claude/` - never navigate above this directory.
+**CRITICAL**: Stay within the configured paths:
+- `<base_path>` for monorepo/workspace work
+- `<code_path>` for standalone repos
+
+Never navigate above these directories.
 
 ---
 
 ## Repo Discovery
 
-Parse `config.yaml` in this commands directory for repository definitions:
+Parse repos from multiple sources in order:
 
-| Group | Description |
-|-------|-------------|
-| `devops` | DevOps/Infrastructure repos |
-| `apps` | Application repos |
+### 1. Builtin Components
+
+Read `config.yaml` → `builtin[]`:
+- These are fixed packages within your monorepo
+- Path resolved as `<base_path>/<path>`
+
+### 2. Worktrees (Dynamic)
+
+Use devbot for fast worktree discovery:
+```bash
+devbot worktrees
+```
+
+This scans `.trees/`, `worktrees/`, `.worktrees/` directories across all repos in parallel (~0.01s) and returns:
+- Name: directory name (e.g., `feature-new-auth`)
+- Path: full path to worktree
+- Branch: current branch
+- Status: dirty file count
+
+### 3. Clones (Reference Repos)
+
+Read `<base_path>/clones/clone-config.json`:
+```json
+{
+  "repositories": {
+    "some-sdk": { "url": "...", "description": "..." },
+    "other-lib": { "url": "...", "description": "..." }
+  }
+}
+```
+
+For each clone:
+- Name: key name
+- Path: `<base_path>/clones/<name>`
+- Group: `clones`
+- **Note**: These are read-only reference repos
+
+### 4. Working Repos
+
+Read `config.yaml` → `repos[]`:
+- These are working repos at `<code_path>/<name>`
+- Added via `/add-repo` or manually to config
 
 ---
 
-## Language Detection
+## Groups
 
-If `language` is not specified in config, detect from files:
-
-| File Found | Language | Default Commands |
-|------------|----------|------------------|
-| `package.json` | typescript | `npm run lint`, `npx tsc --noEmit`, `npm run build`, `npm test` |
-| `go.mod` | go | `golangci-lint run`, `go build ./...`, `go test ./...` |
-| `pyproject.toml` or `requirements.txt` | python | `ruff check .`, `mypy .`, `pytest` |
-| `Cargo.toml` | rust | `cargo clippy`, `cargo build`, `cargo test` |
-| `Makefile` only | shell | `make lint`, `make build`, `make test` |
-
-Commands can be overridden per-repo in `config.yaml`.
+| Group | Source | Location | Description |
+|-------|--------|----------|-------------|
+| `packages` | builtin | `<base_path>/packages/` | Monorepo packages |
+| `apps` | builtin | `<base_path>/apps/` | Monorepo applications |
+| `worktrees` | dynamic | `<base_path>/.trees/` | Active feature branches |
+| `clones` | clone-config.json | `<base_path>/clones/` | Reference repos |
+| `projects` | repos | `<code_path>/` | Active project work |
+| `devops` | repos | `<code_path>/` | Infrastructure repos |
+| `personal` | repos | `<code_path>/` | Personal/exploration repos |
 
 ---
 
@@ -65,26 +119,49 @@ Display grouped list and ask user to select:
 ```
 Select a repository:
 
-DevOps/Infrastructure:
-  1. my-infra-pulumi
-  2. my-terraform
+Packages:
+  1. my-cli
+  2. my-server
 
-Apps:
-  3. my-nextjs-app
-  4. my-api
+Worktrees:
+  3. feature/new-auth
+
+Clones:
+  4. some-sdk
+
+Projects:
+  5. my-project
+  6. another-project
 
 Enter number or name:
 ```
 
 **If `$ARGUMENTS` is provided:**
 
-Fuzzy match against directory names and configured aliases:
+Fuzzy match against:
+1. Directory names
+2. Configured aliases
+3. Worktree branch names
 
-| Input | Matches (example) |
-|-------|-------------------|
-| `pulumi` | my-infra-pulumi |
-| `app` | my-nextjs-app |
-| `api` | my-api |
+| Input | Matches |
+|-------|---------|
+| `cli` | my-cli |
+| `server` | my-server |
+| `sdk` | some-sdk |
+| `proj` | my-project |
+
+---
+
+## Path Resolution
+
+Once a repo is selected, resolve its full path:
+
+| Source | Path Pattern |
+|--------|--------------|
+| builtin | `<base_path>/<path>` (e.g., `~/code/my-workspace/packages/my-cli`) |
+| worktree | `<base_path>/.trees/<name>` (e.g., `~/code/my-workspace/.trees/feature-x`) |
+| clone | `<base_path>/clones/<name>` (e.g., `~/code/my-workspace/clones/some-sdk`) |
+| repo | `<code_path>/<name>` (e.g., `~/code/my-project`) |
 
 ---
 
@@ -100,27 +177,37 @@ When committing changes in any repo:
 
 ---
 
-## Standard Process Start
+## Context Loading
 
-1. **Apply dev rules** → `/dev-rules` (path safety, file creation, commit rules)
-2. Parse `config.yaml` for base path and repo definitions
-3. If `$ARGUMENTS` empty → show selection prompt
-4. If `$ARGUMENTS` provided → fuzzy match to repo
-5. Confirm selection: "Working on: <repo-name>"
-6. Read `<repo>/CLAUDE.md` for repo-specific guidance
+After selecting a repo, load relevant context:
+
+1. **For monorepo packages**: Read `<base_path>/CLAUDE.md`
+2. **For standalone repos**: Read `<repo-path>/CLAUDE.md` if it exists
+3. **For Python projects**: Note Python/uv patterns
+4. **For TypeScript projects**: Note TypeScript/npm patterns
 
 ---
 
-## Local Model Acceleration
+## Standard Process Start
 
-Commands can use local Qwen model for 5-18x speed gains. Requires `mlx-hub` plugin (installed via `/setup-plugins`).
+1. Parse `config.yaml` for base_path, code_path, and repo definitions
+2. Discover worktrees from `<base_path>/.trees/`
+3. Discover clones from `clones/clone-config.json`
+4. If `$ARGUMENTS` empty → show selection prompt
+5. If `$ARGUMENTS` provided → fuzzy match to repo
+6. Confirm selection: "Working on: <repo-name>"
+7. Read repo's CLAUDE.md (if exists) for repo-specific guidance
 
-**See workspace `CLAUDE.md` → "Automatic Local Acceleration" for full routing rules.**
+---
+
+## Local Model Acceleration (Optional)
+
+Commands can use local models for speed gains. Requires `mlx-hub` plugin.
 
 ### Quick Reference
 
-| Use Qwen For | Stay on Claude For |
-|--------------|-------------------|
+| Use Local Model For | Stay on Claude For |
+|---------------------|-------------------|
 | Commit messages | Security analysis |
 | Code explanation | Architecture decisions |
 | Simple code gen | Multi-file refactoring |
@@ -130,8 +217,8 @@ Commands can use local Qwen model for 5-18x speed gains. Requires `mlx-hub` plug
 
 Always prefix local model output:
 ```
-[qwen] Drafting commit message...
-[qwen] Generated: "feat(utils): add validation helper"
+[local] Drafting commit message...
+[local] Generated: "feat(utils): add validation helper"
 ```
 
 ### Usage
@@ -143,3 +230,42 @@ mcp__plugin_mlx-hub_mlx-hub__mlx_infer(
   max_tokens=200
 )
 ```
+
+---
+
+## Linear Integration (Optional)
+
+For repos with `linear_project` in config:
+- `mcp__plugin_linear_linear__list_issues`
+- `mcp__plugin_linear_linear__get_issue`
+- `mcp__plugin_linear_linear__create_issue`
+
+---
+
+## GitHub Integration (Optional)
+
+If you have GitHub MCP tools configured:
+- Search issues by project
+- Get assigned issues with project status
+- Find project items
+
+---
+
+## devbot CLI
+
+Fast parallel operations across repos. Use devbot for speed-critical operations:
+
+| Command | Purpose | Speed |
+|---------|---------|-------|
+| `devbot status` | Git status across all repos | ~0.03s |
+| `devbot status <repo>` | Single repo details | ~0.01s |
+| `devbot run -- <cmd>` | Parallel command execution | ~0.5s |
+| `devbot todos` | TODO/FIXME scanning | ~0.1s |
+| `devbot make` | Makefile target analysis | ~0.01s |
+| `devbot worktrees` | Worktree discovery | ~0.01s |
+| `devbot detect <path>` | Stack detection | instant |
+| `devbot config` | Config file discovery | ~0.01s |
+| `devbot stats <path>` | File/directory code metrics | ~0.01s |
+
+Install: Run `/install-devbot` or `cd ~/code/slash-commands/devbot && make install`
+
