@@ -280,5 +280,5 @@ Fast parallel operations across ~/code/ repos. Use devbot for speed-critical ope
 | `devbot config` | Config file discovery | ~0.01s |
 | `devbot stats <path>` | File/directory code metrics | ~0.01s |
 
-Install: `go install github.com/sloanahrens/devbot-go/cmd/devbot@latest`
+Install: Run `/install-devbot` or `cd ~/code/slash-commands/devbot && make install`
 
