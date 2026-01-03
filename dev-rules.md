@@ -15,17 +15,6 @@ Continue whatever you were doing, but remember these workspace rules:
 - **Stay within workspace** - never navigate above your base_path or code_path
 - **Respect worktree isolation** - `.trees/` worktrees are separate git environments
 
----
-
-## Workspace Structure
-
-| Directory | Purpose |
-|-----------|---------|
-| `packages/` | TypeScript packages |
-| `apps/` | Applications |
-| `clones/` | Read-only reference repos |
-| `.trees/` | Git worktrees for feature branches |
-| `docs/` | Documentation and plans |
 
 ---
 
@@ -69,23 +58,13 @@ Continue whatever you were doing, but remember these workspace rules:
 - Run `uv sync` before testing
 - FastMCP with sub-server composition
 
----
-
-## MCP Tool Usage (Optional)
-
-If you have MCP integrations configured:
-
-| Prefix | Service |
-|--------|---------|
-| `mcp__plugin_linear_linear__*` | Linear issues |
-| `mcp__Notion__*` | Notion workspace |
 
 ---
 
 ## General
 
 - Read the repo's `CLAUDE.md` before making changes
-- Read workspace `CLAUDE.md` for context
+- Read workspace `CLAUDE.md` or global `~/.claude/CLAUDE.md` for context
 - Run tests after making changes
 - Keep changes focused and minimal
 - Consider clone repos as read-only references
