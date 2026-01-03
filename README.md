@@ -11,28 +11,35 @@ Portable slash commands for managing multi-repo workspaces with Claude Code.
 - Optional Linear and GitHub MCP integration
 - Optional local model acceleration via MLX
 
-## Quick Start
+## Installation
 
-1. Clone this repo:
-   ```bash
-   git clone https://github.com/sloanahrens/slash-commands.git ~/code/slash-commands
-   ```
+### Option 1: Clone directly to commands folder
 
-2. Create symlinks to `~/.claude/commands`:
-   ```bash
-   /setup-symlinks
-   ```
+```bash
+git clone https://github.com/sloanahrens/slash-commands.git ~/.claude/commands
+cd ~/.claude/commands/devbot && make install
+```
 
-3. Install devbot (Go CLI for parallel operations):
-   ```bash
-   /install-devbot
-   ```
+### Option 2: Clone anywhere and create symlinks
 
-4. Create your config:
-   ```bash
-   cp config.yaml.example config.yaml
-   # Edit config.yaml for your workspace
-   ```
+```bash
+# Clone to your preferred location
+git clone https://github.com/sloanahrens/slash-commands.git ~/code/slash-commands
+
+# Create symlinks (run this command in Claude Code)
+/setup-symlinks
+
+# Install devbot
+/install-devbot
+```
+
+### Post-Installation
+
+Create your workspace config:
+```bash
+cp config.yaml.example config.yaml
+# Edit config.yaml for your workspace
+```
 
 ## Commands
 
@@ -110,20 +117,117 @@ repos:
 
 ## devbot CLI
 
-The included `devbot` Go CLI provides fast parallel operations:
+The included `devbot` Go CLI provides fast parallel operations across your workspace.
 
-| Command | Purpose | Speed |
-|---------|---------|-------|
-| `devbot status` | Git status across all repos | ~0.03s |
-| `devbot run -- <cmd>` | Parallel command execution | ~0.5s |
-| `devbot todos` | TODO/FIXME scanning | ~0.1s |
-| `devbot stats <path>` | Code metrics and complexity | ~0.01s |
-| `devbot worktrees` | Worktree discovery | ~0.01s |
-| `devbot detect <path>` | Stack detection | instant |
+### Installation
 
-Install with `/install-devbot` or:
 ```bash
-cd ~/code/slash-commands/devbot && make install
+cd devbot && make install
+# Or use: /install-devbot
+```
+
+### Commands
+
+#### status - Parallel Git Status (~0.03s for 12 repos)
+
+```bash
+devbot status           # Show dirty repos (clean count summarized)
+devbot status --all     # Show all repos
+devbot status --dirty   # Only dirty repos
+devbot status <repo>    # Single repo details
+```
+
+#### run - Parallel Command Execution
+
+```bash
+devbot run -- git pull              # Pull all repos in parallel
+devbot run -- npm install           # Install deps in all repos
+devbot run -f myapp -- make build   # Filter to repos matching "myapp"
+devbot run -q -- git fetch          # Quiet mode (suppress empty output)
+```
+
+#### todos - Parallel TODO/FIXME Scanning
+
+```bash
+devbot todos                    # All TODOs across workspace
+devbot todos --type FIXME       # Filter by marker type
+devbot todos <repo>             # Single repo
+```
+
+Scans for: TODO, FIXME, HACK, XXX, BUG in .go, .ts, .tsx, .js, .jsx, .py, .md, .yaml, .yml files.
+
+#### stats - Code Metrics and Complexity
+
+```bash
+devbot stats <path>             # Analyze file or directory
+```
+
+Reports: files, lines (code/comments/blank), functions, complexity flags.
+
+#### detect - Project Stack Detection
+
+```bash
+devbot detect               # Current directory
+devbot detect <path>        # Specific path
+# Output: Detected: go, ts, nextjs
+```
+
+#### deps - Dependency Analysis
+
+```bash
+devbot deps             # Show shared dependencies (2+ repos)
+devbot deps --all       # Show all dependencies by usage
+devbot deps <repo>      # Analyze single repo
+```
+
+#### tree - Gitignore-Aware Tree
+
+```bash
+devbot tree                 # Current directory
+devbot tree <path>          # Specific path
+devbot tree -d 5            # Depth limit (default: 3)
+```
+
+#### config - Config File Discovery
+
+```bash
+devbot config               # All config files by type
+devbot config --type go     # Filter by config type
+devbot config <repo>        # Single repo
+```
+
+#### make - Makefile Target Analysis
+
+```bash
+devbot make                     # All targets grouped by category
+devbot make --category test     # Filter by category
+devbot make <repo>              # Single repo
+```
+
+#### worktrees - Git Worktree Discovery
+
+```bash
+devbot worktrees                # All worktrees across repos
+devbot worktrees <repo>         # Single repo
+```
+
+### Architecture
+
+```
+devbot/
+├── cmd/devbot/main.go       # CLI entry point (cobra)
+└── internal/
+    ├── workspace/           # Repo discovery and parallel git status
+    ├── runner/              # Parallel command execution
+    ├── deps/                # Dependency analysis
+    ├── tree/                # Gitignore-aware directory tree
+    ├── detect/              # Project stack detection
+    ├── todos/               # Parallel TODO/FIXME scanning
+    ├── stats/               # Code metrics and complexity
+    ├── config/              # Config file discovery
+    ├── makefile/            # Makefile target parsing
+    ├── worktrees/           # Git worktree discovery
+    └── output/              # Terminal rendering
 ```
 
 ## Worktree Workflow
@@ -228,4 +332,3 @@ This repo uses conventional commits:
 - `fix:` Bug fixes
 - `docs:` Documentation updates
 - `refactor:` Code refactoring
-
