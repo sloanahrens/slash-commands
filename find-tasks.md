@@ -35,9 +35,9 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Finding tasks
 
 4. Look for TODO/FIXME comments:
    ```bash
-   grep -r "TODO\|FIXME" <repo-path> --include="*.ts" --include="*.tsx" --include="*.py" --include="*.go" | head -20
+   devbot todos <repo-name> --limit 20
    ```
-   If many TODOs found (>10), consider using local model to batch-summarize (see `_shared-repo-logic.md` → "Local Model Acceleration").
+   This scans for TODO, FIXME, HACK, XXX, BUG markers in parallel (~0.1s vs grep's ~2s).
 
 5. Check for incomplete implementation plans:
    ```bash

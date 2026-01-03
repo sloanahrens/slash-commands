@@ -23,12 +23,14 @@ Follow repo selection from `_shared-repo-logic.md`:
 
 ### Step 2: Load Context
 
+Use devbot for fast status with stack detection:
+
 ```bash
-cd <repo-path>
-pwd
-git status
-git log --oneline -3
+devbot status <repo-name>
+git -C <repo-path> log --oneline -3
 ```
+
+devbot provides branch, dirty count, ahead/behind, and detected stack in ~0.03s.
 
 ### Step 3: Display Summary
 

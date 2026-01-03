@@ -59,15 +59,16 @@ Read `config.yaml` → `builtin[]`:
 
 ### 2. Worktrees (Dynamic)
 
-Scan `<base_path>/.trees/` directory:
+Use devbot for fast worktree discovery:
 ```bash
-ls -d ~/code/trabian-ai/.trees/*/ 2>/dev/null
+devbot worktrees
 ```
 
-For each worktree, extract:
+This scans `.trees/`, `worktrees/`, `.worktrees/` directories across all repos in parallel (~0.01s) and returns:
 - Name: directory name (e.g., `feature-new-auth`)
-- Path: `<base_path>/.trees/<name>`
-- Branch: `git -C .trees/<name> branch --show-current`
+- Path: full path to worktree
+- Branch: current branch
+- Status: dirty file count
 
 ### 3. Clones (Reference Repos)
 
@@ -260,4 +261,23 @@ Use trabian's GitHub MCP for project data:
 - `mcp__trabian__github_get_assigned_issues_with_project_status`
 - `mcp__trabian__github_get_project_items`
 - `mcp__trabian__github_find_project_by_name`
+
+---
+
+## devbot CLI
+
+Fast parallel operations across ~/code/ repos. Use devbot for speed-critical operations:
+
+| Command | Purpose | Speed |
+|---------|---------|-------|
+| `devbot status` | Git status across all repos | ~0.03s |
+| `devbot status <repo>` | Single repo details | ~0.01s |
+| `devbot run -- <cmd>` | Parallel command execution | ~0.5s |
+| `devbot todos` | TODO/FIXME scanning | ~0.1s |
+| `devbot make` | Makefile target analysis | ~0.01s |
+| `devbot worktrees` | Worktree discovery | ~0.01s |
+| `devbot detect <path>` | Stack detection | instant |
+| `devbot config` | Config file discovery | ~0.01s |
+
+Install: `go install github.com/sloanahrens/devbot-go/cmd/devbot@latest`
 

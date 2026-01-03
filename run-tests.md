@@ -25,7 +25,14 @@ Check `config.yaml` for repo-specific settings:
 - `language` → explicit language setting
 - `commands` → custom command overrides
 
-If `language` not specified, detect from files (see `_shared-repo-logic.md`).
+If `language` not specified, use devbot for fast detection:
+
+```bash
+devbot detect <repo-path>
+# Output: Detected: go, ts, nextjs
+```
+
+This checks root + common subdirs (go-api/, nextapp/, packages/*, apps/*) in parallel.
 
 ### Step 3: Run Quality Checks
 
