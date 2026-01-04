@@ -5,7 +5,7 @@ Global Claude Code configuration. Each repo also has its own CLAUDE.md - read th
 ## Setup
 
 ```bash
-git clone git@bitbucket.org:sloanahrens/app-builder-commands.git ~/code/slash-commands
+git clone https://github.com/sloanahrens/slash-commands.git ~/code/mono-claude/slash-commands
 /setup-workspace  # Handles config, devbot, symlinks, plugins
 ```
 
@@ -15,7 +15,20 @@ git clone git@bitbucket.org:sloanahrens/app-builder-commands.git ~/code/slash-co
 - **Read repo CLAUDE.md first** - each has specific guidance
 - **Use exact repo names** from config.yaml
 - **Use devbot** - prefer over manual git/file operations
-- **Simple bash only** - no `&&`, `$()`, `;`, or `git -C`
+- **Simple bash only** - no `&&`, `$()`, `;`, or `git -C` (blocked by hookify)
+
+## Tool Selection Guide
+
+**STOP before running bash.** Use the right tool:
+
+| Need | Tool | Example |
+|------|------|---------|
+| Git status/diff/branch | `devbot` | `devbot diff slash-commands --full` |
+| Read file content | `Read` tool | Read tool on any file path |
+| Search files | `Grep`/`Glob` | Grep for pattern, Glob for filenames |
+| File operations | `Read`/`Edit`/`Write` | Never use cat/sed/awk |
+
+**Never improvise bash commands.** If devbot doesn't have a command for it, use Claude Code's built-in tools (Read, Grep, Glob, Edit, Write).
 
 ## Bash Patterns
 
@@ -49,7 +62,7 @@ All require exact repo names. Run `/list-commands` for full list.
 
 ## Repository Registry
 
-Defined in `~/code/slash-commands/config.yaml`.
+Defined in `~/code/mono-claude/slash-commands/config.yaml`.
 
 | Repo | Stack | Notes |
 |------|-------|-------|
@@ -57,13 +70,22 @@ Defined in `~/code/slash-commands/config.yaml`.
 | `fractals-nextjs` | Next.js + Canvas | Mandelbrot visualizer |
 | `mango` | Go + Next.js + DuckDB | **CGO required** |
 | `devops-pulumi-ts` | Pulumi + TypeScript | GCP Cloud Run |
+| `devops-cloud-run` | Shell | Legacy Cloud Run scripts |
 | `slash-commands` | Go + Markdown | This workspace's tools |
+| `mlx-hub-claude-plugin` | TypeScript | MLX model inference plugin |
+| `git-monitor` | TypeScript | Git repository monitoring |
+| `vibe-code-clean` | TypeScript | Code cleanup tool |
+| `sandbox` | Go + TypeScript | Experimental pnpm workspace |
+| `machine-learning` | Python | ML experiments |
+| `physics-stuff` | Mixed | Physics simulations |
 
 ## devbot CLI
 
-**NAME commands:** `path`, `status`, `diff`, `branch`, `check`, `make`, `todos`, `last-commit`
+**NAME commands:** `path`, `status`, `diff`, `branch`, `check`, `make`, `todos`, `last-commit`, `config`, `deps`, `remote`, `worktrees`
 
-**PATH commands:** `tree`, `stats` (use `devbot path` first)
+**PATH commands:** `tree`, `stats`, `detect` (use `devbot path` first)
+
+**Other:** `run` (parallel command across repos), `find-repo` (GitHub org/repo lookup)
 
 ```bash
 devbot path fractals-nextjs   # Get path

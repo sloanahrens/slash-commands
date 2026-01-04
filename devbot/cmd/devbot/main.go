@@ -1041,7 +1041,13 @@ func runDiff(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
-	result := diff.GetDiff(*targetRepo)
+	// Get diff (with or without full content)
+	var result diff.DiffResult
+	if diffFull {
+		result = diff.GetDiffFull(*targetRepo)
+	} else {
+		result = diff.GetDiff(*targetRepo)
+	}
 	elapsed := time.Since(start)
 
 	// Check if there are any changes
@@ -1085,6 +1091,9 @@ func runDiff(cmd *cobra.Command, args []string) {
 				stats = fmt.Sprintf(" (+%d, -%d)", c.Additions, c.Deletions)
 			}
 			fmt.Printf("    %s  %s%s\n", c.Status, c.Path, stats)
+			if diffFull && c.Content != "" {
+				printDiffContent(c.Content)
+			}
 		}
 	}
 
@@ -1097,10 +1106,22 @@ func runDiff(cmd *cobra.Command, args []string) {
 				stats = fmt.Sprintf(" (+%d, -%d)", c.Additions, c.Deletions)
 			}
 			fmt.Printf("    %s  %s%s\n", c.Status, c.Path, stats)
+			if diffFull && c.Content != "" {
+				printDiffContent(c.Content)
+			}
 		}
 	}
 
 	fmt.Printf("\n(%.2fs)\n", elapsed.Seconds())
+}
+
+// printDiffContent prints diff content with proper indentation
+func printDiffContent(content string) {
+	fmt.Println()
+	lines := strings.Split(content, "\n")
+	for _, line := range lines {
+		fmt.Printf("      %s\n", line)
+	}
 }
 
 func runCheckCmd(cmd *cobra.Command, args []string) {

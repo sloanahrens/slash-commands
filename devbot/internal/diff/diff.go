@@ -2,6 +2,7 @@ package diff
 
 import (
 	"bytes"
+	"os"
 	"os/exec"
 	"strconv"
 	"strings"
@@ -15,6 +16,7 @@ type FileChange struct {
 	Path      string
 	Additions int
 	Deletions int
+	Content   string // Full diff content (when requested)
 }
 
 // DiffResult contains diff information for a repository
@@ -184,4 +186,68 @@ func gitCommand(dir string, args ...string) string {
 	}
 
 	return strings.TrimSpace(out.String())
+}
+
+// GetDiffFull retrieves diff with full content including untracked file content
+func GetDiffFull(repo workspace.RepoInfo) DiffResult {
+	result := GetDiff(repo)
+
+	// Add content for staged changes
+	for i := range result.Staged {
+		result.Staged[i].Content = gitCommand(repo.Path, "diff", "--cached", "--", result.Staged[i].Path)
+	}
+
+	// Add content for unstaged changes
+	for i := range result.Unstaged {
+		if result.Unstaged[i].Status == "?" {
+			// Untracked file - read file content directly
+			content, err := readFile(repo.Path, result.Unstaged[i].Path)
+			if err == nil {
+				result.Unstaged[i].Content = formatAsNewFile(result.Unstaged[i].Path, content)
+				// Count lines as additions
+				lines := strings.Count(content, "\n")
+				if len(content) > 0 && !strings.HasSuffix(content, "\n") {
+					lines++
+				}
+				result.Unstaged[i].Additions = lines
+			}
+		} else {
+			// Tracked file - use git diff
+			result.Unstaged[i].Content = gitCommand(repo.Path, "diff", "--", result.Unstaged[i].Path)
+		}
+	}
+
+	return result
+}
+
+// readFile reads a file relative to the repo path
+func readFile(repoPath, relPath string) (string, error) {
+	fullPath := repoPath + "/" + relPath
+	data, err := os.ReadFile(fullPath)
+	if err != nil {
+		return "", err
+	}
+	return string(data), nil
+}
+
+// formatAsNewFile formats content as a new file diff
+func formatAsNewFile(path, content string) string {
+	var buf bytes.Buffer
+	buf.WriteString("--- /dev/null\n")
+	buf.WriteString("+++ b/" + path + "\n")
+
+	lines := strings.Split(content, "\n")
+	// Remove trailing empty line from split
+	if len(lines) > 0 && lines[len(lines)-1] == "" {
+		lines = lines[:len(lines)-1]
+	}
+
+	if len(lines) > 0 {
+		buf.WriteString("@@ -0,0 +1," + strconv.Itoa(len(lines)) + " @@\n")
+		for _, line := range lines {
+			buf.WriteString("+" + line + "\n")
+		}
+	}
+
+	return buf.String()
 }
