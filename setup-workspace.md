@@ -64,7 +64,7 @@ If new config created, prompt user to edit it with their repos.
 ```bash
 if ! command -v devbot >/dev/null 2>&1; then
   echo "Installing devbot..."
-  cd ~/code/mono-claude/slash-commands/devbot && make install
+  make -C ~/code/mono-claude/slash-commands/devbot install
 fi
 ```
 

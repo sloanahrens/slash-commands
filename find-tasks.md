@@ -22,17 +22,18 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Finding tasks
 
 **First, get the repo path (REQUIRED):**
 ```bash
-REPO_PATH=$(devbot path <repo-name>)
+devbot path <repo-name>
+# Output: /path/to/repo (use this literal path below)
 ```
 
 1. Read repo documentation:
-   - `$REPO_PATH/CLAUDE.md` - Repo-specific guidance
-   - `$REPO_PATH/docs/overview.md` - If exists
-   - `$REPO_PATH/README.md` - Project overview
+   - `/path/to/repo/CLAUDE.md` - Repo-specific guidance
+   - `/path/to/repo/docs/overview.md` - If exists
+   - `/path/to/repo/README.md` - Project overview
 
 2. Check recent commits:
    ```bash
-   git -C "$REPO_PATH" log --oneline -10
+   git -C /path/to/repo log --oneline -10
    ```
 
 3. Examine test coverage gaps (if test scripts exist)
@@ -45,7 +46,7 @@ REPO_PATH=$(devbot path <repo-name>)
 
 5. Check for complexity hotspots:
    ```bash
-   devbot stats "$REPO_PATH"   # Takes PATH (use variable from above!)
+   devbot stats /path/to/repo   # Takes literal PATH
    ```
 
    Flag any complexity issues as potential refactoring tasks:
@@ -55,7 +56,7 @@ REPO_PATH=$(devbot path <repo-name>)
 
 6. Check for incomplete implementation plans:
    ```bash
-   ls "$REPO_PATH"/docs/plans/*.md 2>/dev/null
+   ls /path/to/repo/docs/plans/*.md
    ```
 
 **NEVER construct paths manually - always use `devbot path` first.**

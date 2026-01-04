@@ -22,15 +22,16 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Switching to:
 
 **First, get the repo path (REQUIRED for stats/tree commands):**
 ```bash
-REPO_PATH=$(devbot path <repo-name>)
+devbot path <repo-name>
+# Output: /path/to/repo (use this literal path below)
 ```
 
 Then use devbot for fast context loading (~0.05s total):
 
 ```bash
-devbot status <repo-name>    # Branch, dirty count, ahead/behind - takes NAME
-devbot branch <repo-name>    # Tracking info, commits to push - takes NAME
-devbot stats "$REPO_PATH"    # Codebase metrics - takes PATH (use variable!)
+devbot status <repo-name>     # Branch, dirty count, ahead/behind - takes NAME
+devbot branch <repo-name>     # Tracking info, commits to push - takes NAME
+devbot stats /path/to/repo    # Codebase metrics - takes literal PATH
 ```
 
 **NEVER construct paths manually - always use `devbot path` first.**

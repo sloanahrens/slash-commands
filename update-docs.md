@@ -160,42 +160,42 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Updating docs
 **First, get the repo path (REQUIRED):**
 
 ```bash
-REPO_PATH=$(devbot path <repo-name>)
+devbot path <repo-name>
+# Output: /path/to/repo (use this literal path below)
 ```
 
 Then use devbot for fast parallel analysis (~0.03s total):
 
 ```bash
-devbot tree "$REPO_PATH"     # Directory structure (respects .gitignore)
+devbot tree /path/to/repo    # Directory structure (respects .gitignore)
 devbot config <repo-name>    # Config files (package.json, go.mod, etc.)
-devbot stats "$REPO_PATH"    # Code metrics and complexity
+devbot stats /path/to/repo   # Code metrics and complexity
 ```
 
 Also check existing docs:
 ```bash
-ls -la "$REPO_PATH"/README.md "$REPO_PATH"/CLAUDE.md "$REPO_PATH"/docs/ 2>/dev/null
+ls -la /path/to/repo/README.md /path/to/repo/CLAUDE.md /path/to/repo/docs/
 ```
 
-**NEVER construct paths manually like `~/code/<repo-name>` - always use `devbot path` first.**
+**NEVER use compound commands or construct paths manually - always run `devbot path` first, then use the literal output.**
 
 ### Step 3: Gather Build/Test State
 
-Use `$REPO_PATH` from Step 2 throughout:
+Use the literal path from Step 2 (or use `devbot check <repo-name>` for automated checks):
 
 **For TypeScript packages:**
 ```bash
-cd "$REPO_PATH" && npm test 2>&1 | tail -10      # Test counts
-cd "$REPO_PATH" && npm run build 2>&1 | tail -5  # Build status
+devbot check <repo-name>                     # Runs lint, typecheck, build, test
 ```
 
 **For Python projects:**
 ```bash
-cd "$REPO_PATH" && uv run pytest 2>&1 | tail -10
+devbot check <repo-name>                     # Runs lint, typecheck, test
 ```
 
-**Common:**
+**For recent changes:**
 ```bash
-git -C "$REPO_PATH" log --oneline -5         # Recent changes
+git -C /path/to/repo log --oneline -5        # Use literal path
 ```
 
 Use stats output to update CLAUDE.md metrics section if present:

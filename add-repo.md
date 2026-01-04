@@ -85,12 +85,12 @@ Proceed? (yes/edit/cancel)
 
 **For reference clones:**
 ```bash
-cd <base_path>/clones && git clone <url>
+git clone <url> <base_path>/clones/<repo-name>
 ```
 
 **For working repos:**
 ```bash
-cd <code_path> && git clone <url>
+git clone <url> <code_path>/<repo-name>
 ```
 
 If clone fails (e.g., SSH access required), report error:

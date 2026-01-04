@@ -40,15 +40,16 @@ Per `_shared-repo-logic.md` → "Context Loading":
 **Use devbot for speed:**
 ```bash
 # First get the path (REQUIRED for tree/stats commands)
-REPO_PATH=$(devbot path <repo>)
+devbot path <repo>
+# Output: /path/to/repo (use this literal path below)
 
 # Then use repo name OR path as appropriate
-devbot status <repo>       # Git status (~0.02s) - takes repo NAME
-devbot stats "$REPO_PATH"  # Complexity metrics (~0.01s) - takes PATH
-devbot tree "$REPO_PATH"   # Directory structure - takes PATH
+devbot status <repo>          # Git status (~0.02s) - takes NAME
+devbot stats /path/to/repo    # Complexity metrics - takes literal PATH
+devbot tree /path/to/repo     # Directory structure - takes literal PATH
 ```
 
-**NEVER construct paths manually - always use `devbot path` first.**
+**NEVER use compound commands or construct paths manually.**
 
 ### Step 4: Check Related Issues (Optional)
 

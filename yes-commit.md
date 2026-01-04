@@ -118,7 +118,8 @@ Committing to <repo-name>:
 ```
 
 ```bash
-git -C <repo-path> add -A && git -C <repo-path> commit -m "<message>"
+git -C <repo-path> add -A
+git -C <repo-path> commit -m "<message>"
 ```
 
 The user approves via Claude Code's tool permission dialog.

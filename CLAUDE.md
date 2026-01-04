@@ -10,9 +10,9 @@ Slash commands and devbot CLI for multi-repo workspace management.
 ## Build & Test
 
 ```bash
-cd devbot && make ci      # Full CI: fmt, vet, test, lint, build
-cd devbot && make test    # Just tests
-cd devbot && make install # Install devbot to PATH
+make -C devbot ci         # Full CI: fmt, vet, test, lint, build
+make -C devbot test       # Just tests
+make -C devbot install    # Install devbot to PATH
 ```
 
 ## Key Patterns
@@ -35,12 +35,13 @@ All repo-targeting commands follow `_shared-repo-logic.md`:
 | `devbot path`, `status`, `diff`, `branch`, `check`, `make`, `config`, `todos` | `devbot tree`, `devbot stats` |
 
 ```bash
-# Correct pattern
-REPO_PATH=$(devbot path my-repo)
-devbot tree "$REPO_PATH"
+# Correct - two separate commands
+devbot path my-repo                              # Returns: /path/to/my-repo
+devbot tree /path/to/my-repo                     # Use literal path from above
 
-# Wrong - never construct paths
-devbot tree ~/code/my-repo  # Path may be wrong!
+# Wrong - compound commands or manual paths
+REPO_PATH=$(devbot path my-repo) && devbot tree "$REPO_PATH"  # ❌
+devbot tree ~/code/my-repo                                     # ❌
 ```
 
 ### Dual-Model Evaluation

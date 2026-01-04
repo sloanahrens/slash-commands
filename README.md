@@ -93,11 +93,13 @@ devbot config <repo>       # Show config files
 **Commands taking filesystem PATH:**
 ```bash
 # ALWAYS get path first, then use it:
-REPO_PATH=$(devbot path my-project)
-devbot tree "$REPO_PATH"   # Directory structure
-devbot stats "$REPO_PATH"  # Code metrics
+devbot path my-project
+# Output: /Users/sloan/code/mono-claude/my-project
 
-# NEVER: devbot stats ~/code/my-project  ❌ (path may be wrong!)
+devbot tree /Users/sloan/code/mono-claude/my-project   # Use literal path
+devbot stats /Users/sloan/code/mono-claude/my-project  # Use literal path
+
+# NEVER use compound commands or guess paths
 ```
 
 ## Worktree Workflow

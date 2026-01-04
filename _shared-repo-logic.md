@@ -127,19 +127,19 @@ Fast operations across repos:
 **ALWAYS get the path first, then use it:**
 
 ```bash
-# CORRECT - two-step process
-REPO_PATH=$(devbot path fractals-nextjs)
-devbot tree "$REPO_PATH"
-devbot stats "$REPO_PATH"
+# CORRECT - two separate commands
+devbot path fractals-nextjs
+# Output: /Users/sloan/code/mono-claude/fractals-nextjs
+devbot tree /Users/sloan/code/mono-claude/fractals-nextjs  # Use literal path
 
-# WRONG - DO NOT construct paths manually
-devbot tree ~/code/fractals-nextjs        # ❌ Path may be wrong!
-devbot stats ~/code/my-repo               # ❌ Never guess paths!
+# WRONG - compound commands or manual paths
+REPO_PATH=$(devbot path repo) && devbot tree "$REPO_PATH"  # ❌ Compound
+devbot tree ~/code/fractals-nextjs                          # ❌ Guessed path
 ```
 
 All repo-name commands require exact names from config.yaml.
 
-Install: `/setup-workspace` (or rebuild with `cd devbot && make install`)
+Install: `/setup-workspace` (or `make -C ~/code/mono-claude/slash-commands/devbot install`)
 
 ---
 
