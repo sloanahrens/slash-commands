@@ -5,13 +5,9 @@ import (
 	"path/filepath"
 )
 
-// DefaultWorkspace returns the default workspace path
+// DefaultWorkspace returns the workspace path from config.yaml, or falls back to ~/code
 func DefaultWorkspace() string {
-	home, err := os.UserHomeDir()
-	if err != nil {
-		return ""
-	}
-	return filepath.Join(home, "code")
+	return GetWorkspacePath()
 }
 
 // Discover finds all git repositories in the workspace directory.

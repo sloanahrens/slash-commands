@@ -241,7 +241,7 @@ func runStatus(cmd *cobra.Command, args []string) {
 		showAllRepos = false
 	}
 
-	output.RenderStatus(statuses, elapsed, showAllRepos)
+	output.RenderStatus(statuses, elapsed, showAllRepos, workspacePath)
 }
 
 func runRun(cmd *cobra.Command, args []string) {

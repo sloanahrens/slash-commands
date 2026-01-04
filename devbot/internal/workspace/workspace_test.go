@@ -12,10 +12,14 @@ func TestDefaultWorkspace(t *testing.T) {
 		t.Error("DefaultWorkspace returned empty string")
 	}
 
+	// DefaultWorkspace now reads from config.yaml if available
+	// It should return a valid path (either from config or fallback to ~/code)
 	home, _ := os.UserHomeDir()
-	expected := filepath.Join(home, "code")
-	if ws != expected {
-		t.Errorf("DefaultWorkspace = %q, want %q", ws, expected)
+	if !filepath.IsAbs(ws) {
+		t.Errorf("DefaultWorkspace should return absolute path, got %q", ws)
+	}
+	if !filepath.HasPrefix(ws, home) {
+		t.Errorf("DefaultWorkspace path %q should be under home directory %q", ws, home)
 	}
 }
 

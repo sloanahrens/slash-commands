@@ -2,6 +2,7 @@ package output
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"strings"
 	"time"
@@ -10,7 +11,7 @@ import (
 )
 
 // RenderStatus prints a formatted table of repository statuses
-func RenderStatus(statuses []workspace.RepoStatus, elapsed time.Duration, showAll bool) {
+func RenderStatus(statuses []workspace.RepoStatus, elapsed time.Duration, showAll bool, workspacePath string) {
 	// Sort by name
 	sort.Slice(statuses, func(i, j int) bool {
 		return statuses[i].Name < statuses[j].Name
@@ -31,8 +32,12 @@ func RenderStatus(statuses []workspace.RepoStatus, elapsed time.Duration, showAl
 		toShow = dirty
 	}
 
-	// Header
-	fmt.Printf("\n  ~/code%s\n", formatElapsed(elapsed))
+	// Header - show workspace path (abbreviate home to ~)
+	displayPath := workspacePath
+	if home, err := os.UserHomeDir(); err == nil {
+		displayPath = strings.Replace(workspacePath, home, "~", 1)
+	}
+	fmt.Printf("\n  %s%s\n", displayPath, formatElapsed(elapsed))
 	fmt.Println(strings.Repeat("─", 70))
 
 	if len(toShow) == 0 {

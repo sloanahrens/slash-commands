@@ -33,7 +33,7 @@ func TestRenderStatus(t *testing.T) {
 	}
 
 	output := captureOutput(func() {
-		RenderStatus(statuses, 100*time.Millisecond, true)
+		RenderStatus(statuses, 100*time.Millisecond, true, "/Users/test/code")
 	})
 
 	if !strings.Contains(output, "repo-a") {
@@ -42,8 +42,8 @@ func TestRenderStatus(t *testing.T) {
 	if !strings.Contains(output, "repo-b") {
 		t.Error("Output should contain repo-b")
 	}
-	if !strings.Contains(output, "~/code") {
-		t.Error("Output should contain ~/code header")
+	if !strings.Contains(output, "/Users/test/code") {
+		t.Error("Output should contain workspace path header")
 	}
 }
 
@@ -54,7 +54,7 @@ func TestRenderStatusDirtyOnly(t *testing.T) {
 	}
 
 	output := captureOutput(func() {
-		RenderStatus(statuses, 50*time.Millisecond, false)
+		RenderStatus(statuses, 50*time.Millisecond, false, "/Users/test/code")
 	})
 
 	if strings.Contains(output, "clean-repo") {
@@ -75,7 +75,7 @@ func TestRenderStatusAllClean(t *testing.T) {
 	}
 
 	output := captureOutput(func() {
-		RenderStatus(statuses, 30*time.Millisecond, false)
+		RenderStatus(statuses, 30*time.Millisecond, false, "/Users/test/code")
 	})
 
 	if !strings.Contains(output, "All repositories clean") {
@@ -91,7 +91,7 @@ func TestRenderStatusSortsAlphabetically(t *testing.T) {
 	}
 
 	output := captureOutput(func() {
-		RenderStatus(statuses, 20*time.Millisecond, true)
+		RenderStatus(statuses, 20*time.Millisecond, true, "/Users/test/code")
 	})
 
 	alphaIdx := strings.Index(output, "alpha")
@@ -109,7 +109,7 @@ func TestRenderStatusTruncatesLongName(t *testing.T) {
 	}
 
 	output := captureOutput(func() {
-		RenderStatus(statuses, 10*time.Millisecond, true)
+		RenderStatus(statuses, 10*time.Millisecond, true, "/Users/test/code")
 	})
 
 	if !strings.Contains(output, "...") {
@@ -123,7 +123,7 @@ func TestRenderStatusShowsStack(t *testing.T) {
 	}
 
 	output := captureOutput(func() {
-		RenderStatus(statuses, 10*time.Millisecond, true)
+		RenderStatus(statuses, 10*time.Millisecond, true, "/Users/test/code")
 	})
 
 	if !strings.Contains(output, "go+ts") {
@@ -137,7 +137,7 @@ func TestRenderStatusNoStack(t *testing.T) {
 	}
 
 	output := captureOutput(func() {
-		RenderStatus(statuses, 10*time.Millisecond, true)
+		RenderStatus(statuses, 10*time.Millisecond, true, "/Users/test/code")
 	})
 
 	if !strings.Contains(output, "?") {
@@ -151,7 +151,7 @@ func TestRenderStatusAhead(t *testing.T) {
 	}
 
 	output := captureOutput(func() {
-		RenderStatus(statuses, 10*time.Millisecond, true)
+		RenderStatus(statuses, 10*time.Millisecond, true, "/Users/test/code")
 	})
 
 	if !strings.Contains(output, "3 ahead") {
@@ -165,7 +165,7 @@ func TestRenderStatusBehind(t *testing.T) {
 	}
 
 	output := captureOutput(func() {
-		RenderStatus(statuses, 10*time.Millisecond, true)
+		RenderStatus(statuses, 10*time.Millisecond, true, "/Users/test/code")
 	})
 
 	if !strings.Contains(output, "2 behind") {
@@ -179,7 +179,7 @@ func TestRenderStatusAheadAndBehind(t *testing.T) {
 	}
 
 	output := captureOutput(func() {
-		RenderStatus(statuses, 10*time.Millisecond, true)
+		RenderStatus(statuses, 10*time.Millisecond, true, "/Users/test/code")
 	})
 
 	if !strings.Contains(output, "2↑") || !strings.Contains(output, "3↓") {
@@ -193,7 +193,7 @@ func TestRenderStatusUpToDate(t *testing.T) {
 	}
 
 	output := captureOutput(func() {
-		RenderStatus(statuses, 10*time.Millisecond, true)
+		RenderStatus(statuses, 10*time.Millisecond, true, "/Users/test/code")
 	})
 
 	if !strings.Contains(output, "up-to-date") {
@@ -210,10 +210,10 @@ func TestRenderStatusDirtyFilesPlural(t *testing.T) {
 	}
 
 	singleOutput := captureOutput(func() {
-		RenderStatus(single, 10*time.Millisecond, true)
+		RenderStatus(single, 10*time.Millisecond, true, "/Users/test/code")
 	})
 	multiOutput := captureOutput(func() {
-		RenderStatus(multiple, 10*time.Millisecond, true)
+		RenderStatus(multiple, 10*time.Millisecond, true, "/Users/test/code")
 	})
 
 	if !strings.Contains(singleOutput, "1 file") || strings.Contains(singleOutput, "1 files") {
@@ -230,7 +230,7 @@ func TestRenderStatusTruncatesBranch(t *testing.T) {
 	}
 
 	output := captureOutput(func() {
-		RenderStatus(statuses, 10*time.Millisecond, true)
+		RenderStatus(statuses, 10*time.Millisecond, true, "/Users/test/code")
 	})
 
 	if !strings.Contains(output, "...") {
@@ -258,7 +258,7 @@ func TestFormatElapsed(t *testing.T) {
 
 func TestRenderStatusEmpty(t *testing.T) {
 	output := captureOutput(func() {
-		RenderStatus([]workspace.RepoStatus{}, 10*time.Millisecond, true)
+		RenderStatus([]workspace.RepoStatus{}, 10*time.Millisecond, true, "/Users/test/code")
 	})
 
 	if !strings.Contains(output, "All repositories clean") {
