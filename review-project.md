@@ -22,15 +22,20 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Reviewing: <r
 
 ### Step 2: Load Context
 
+**First, get the repo path (REQUIRED):**
+```bash
+REPO_PATH=$(devbot path <repo-name>)
+```
+
 1. Read repo documentation:
-   - `<repo>/CLAUDE.md`
-   - `<repo>/README.md`
-   - `<repo>/docs/overview.md` (if exists)
+   - `$REPO_PATH/CLAUDE.md`
+   - `$REPO_PATH/README.md`
+   - `$REPO_PATH/docs/overview.md` (if exists)
 
 2. Examine structure:
    ```bash
-   ls -la <repo-path>
-   devbot tree <repo-path> -d 2
+   ls -la "$REPO_PATH"
+   devbot tree "$REPO_PATH" -d 2    # Takes PATH (use variable!)
    ```
    devbot tree automatically respects .gitignore, excluding node_modules, dist, etc.
 
@@ -39,8 +44,10 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Reviewing: <r
 Run stats analysis to identify complexity hotspots:
 
 ```bash
-devbot stats <repo-path>
+devbot stats "$REPO_PATH"           # Takes PATH (use variable!)
 ```
+
+**NEVER construct paths manually - always use `devbot path` first.**
 
 **Use the output to guide review focus:**
 - Large files (>500 lines) → Check for god objects, consider splitting

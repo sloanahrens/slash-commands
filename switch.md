@@ -36,13 +36,20 @@ Follow repo selection from `_shared-repo-logic.md`:
 
 ### Step 3: Load Context
 
-Use devbot for fast context loading (~0.05s total):
+**First, get the repo path (REQUIRED for stats/tree commands):**
+```bash
+REPO_PATH=$(devbot path <repo-name>)
+```
+
+Then use devbot for fast context loading (~0.05s total):
 
 ```bash
-devbot status <repo-name>    # Branch, dirty count, ahead/behind
-devbot branch <repo-name>    # Tracking info, commits to push
-devbot stats <repo-path>     # Codebase metrics (files, lines, functions)
+devbot status <repo-name>    # Branch, dirty count, ahead/behind - takes NAME
+devbot branch <repo-name>    # Tracking info, commits to push - takes NAME
+devbot stats "$REPO_PATH"    # Codebase metrics - takes PATH (use variable!)
 ```
+
+**NEVER construct paths manually - always use `devbot path` first.**
 
 These run in parallel and provide:
 - Branch name and tracking status

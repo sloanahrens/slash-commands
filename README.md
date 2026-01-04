@@ -93,13 +93,24 @@ Repo names must exactly match the directory name under `code_path`.
 
 Fast parallel operations across your workspace. See [devbot/README.md](devbot/README.md) for full documentation.
 
+**Commands taking repo NAME:**
 ```bash
-devbot path <repo>         # Get full filesystem path for repo
+devbot path <repo>         # Get full filesystem path (USE THIS FIRST!)
 devbot status              # Parallel git status (~0.03s for 12 repos)
+devbot status <repo>       # Single repo status
 devbot check <repo>        # Auto-detected quality checks
-devbot run -- git pull     # Parallel command execution
 devbot diff <repo>         # Git diff summary
-devbot stats <path>        # Code metrics
+devbot config <repo>       # Show config files
+```
+
+**Commands taking filesystem PATH:**
+```bash
+# ALWAYS get path first, then use it:
+REPO_PATH=$(devbot path my-project)
+devbot tree "$REPO_PATH"   # Directory structure
+devbot stats "$REPO_PATH"  # Code metrics
+
+# NEVER: devbot stats ~/code/my-project  ❌ (path may be wrong!)
 ```
 
 ## Worktree Workflow

@@ -20,27 +20,32 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Finding tasks
 
 ### Step 2: Review Current State
 
+**First, get the repo path (REQUIRED):**
+```bash
+REPO_PATH=$(devbot path <repo-name>)
+```
+
 1. Read repo documentation:
-   - `<repo>/CLAUDE.md` - Repo-specific guidance
-   - `<repo>/docs/overview.md` - If exists
-   - `<repo>/README.md` - Project overview
+   - `$REPO_PATH/CLAUDE.md` - Repo-specific guidance
+   - `$REPO_PATH/docs/overview.md` - If exists
+   - `$REPO_PATH/README.md` - Project overview
 
 2. Check recent commits:
    ```bash
-   git -C <repo-path> log --oneline -10
+   git -C "$REPO_PATH" log --oneline -10
    ```
 
 3. Examine test coverage gaps (if test scripts exist)
 
 4. Look for TODO/FIXME comments:
    ```bash
-   devbot todos <repo-name>
+   devbot todos <repo-name>    # Takes repo NAME
    ```
    This scans for TODO, FIXME, HACK, XXX, BUG markers in parallel (~0.1s).
 
 5. Check for complexity hotspots:
    ```bash
-   devbot stats <repo-path>
+   devbot stats "$REPO_PATH"   # Takes PATH (use variable from above!)
    ```
 
    Flag any complexity issues as potential refactoring tasks:
@@ -50,8 +55,10 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Finding tasks
 
 6. Check for incomplete implementation plans:
    ```bash
-   ls <repo-path>/docs/plans/*.md 2>/dev/null
+   ls "$REPO_PATH"/docs/plans/*.md 2>/dev/null
    ```
+
+**NEVER construct paths manually - always use `devbot path` first.**
 
 ### Step 3: Check Linear Issues (Optional)
 

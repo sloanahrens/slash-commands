@@ -33,35 +33,45 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Updating docs
 
 ### Step 2: Inventory Documentation and Structure
 
-Use devbot for fast parallel analysis (~0.03s total):
+**First, get the repo path (REQUIRED):**
 
 ```bash
-devbot tree <repo-path>     # Directory structure (respects .gitignore)
-devbot config <repo-name>   # Config files (package.json, go.mod, etc.)
-devbot stats <repo-path>    # Code metrics and complexity
+REPO_PATH=$(devbot path <repo-name>)
+```
+
+Then use devbot for fast parallel analysis (~0.03s total):
+
+```bash
+devbot tree "$REPO_PATH"     # Directory structure (respects .gitignore)
+devbot config <repo-name>    # Config files (package.json, go.mod, etc.)
+devbot stats "$REPO_PATH"    # Code metrics and complexity
 ```
 
 Also check existing docs:
 ```bash
-ls -la <repo-path>/README.md <repo-path>/CLAUDE.md <repo-path>/docs/ 2>/dev/null
+ls -la "$REPO_PATH"/README.md "$REPO_PATH"/CLAUDE.md "$REPO_PATH"/docs/ 2>/dev/null
 ```
+
+**NEVER construct paths manually like `~/code/<repo-name>` - always use `devbot path` first.**
 
 ### Step 3: Gather Build/Test State
 
+Use `$REPO_PATH` from Step 2 throughout:
+
 **For TypeScript packages:**
 ```bash
-cd <repo-path> && npm test 2>&1 | tail -10      # Test counts
-cd <repo-path> && npm run build 2>&1 | tail -5  # Build status
+cd "$REPO_PATH" && npm test 2>&1 | tail -10      # Test counts
+cd "$REPO_PATH" && npm run build 2>&1 | tail -5  # Build status
 ```
 
 **For Python projects:**
 ```bash
-cd <repo-path> && uv run pytest 2>&1 | tail -10
+cd "$REPO_PATH" && uv run pytest 2>&1 | tail -10
 ```
 
 **Common:**
 ```bash
-git -C <repo-path> log --oneline -5         # Recent changes
+git -C "$REPO_PATH" log --oneline -5         # Recent changes
 ```
 
 Use stats output to update CLAUDE.md metrics section if present:

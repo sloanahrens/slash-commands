@@ -103,19 +103,39 @@ When committing changes:
 
 Fast operations across repos:
 
-| Command | Purpose |
-|---------|---------|
-| `devbot path <repo>` | Get full filesystem path for repo |
-| `devbot status` | Git status across all repos |
-| `devbot status <repo>` | Single repo git details |
-| `devbot diff <repo>` | Git diff summary |
-| `devbot branch <repo>` | Branch tracking info |
-| `devbot check <repo>` | Run lint/typecheck/build/test |
-| `devbot make <repo>` | Makefile target analysis |
-| `devbot tree <path>` | Directory tree |
-| `devbot stats <path>` | Code metrics |
+| Command | Input | Purpose |
+|---------|-------|---------|
+| `devbot path <repo>` | repo name | Get full filesystem path (USE THIS FIRST) |
+| `devbot status` | none | Git status across all repos |
+| `devbot status <repo>` | repo name | Single repo git details |
+| `devbot diff <repo>` | repo name | Git diff summary |
+| `devbot branch <repo>` | repo name | Branch tracking info |
+| `devbot check <repo>` | repo name | Run lint/typecheck/build/test |
+| `devbot make <repo>` | repo name | Makefile target analysis |
+| `devbot config <repo>` | repo name | Show config files |
+| `devbot tree <path>` | **filesystem path** | Directory tree |
+| `devbot stats <path>` | **filesystem path** | Code metrics |
 
-All commands require exact repo names from config.yaml.
+### CRITICAL: Path vs Name Commands
+
+**Commands that take repo NAME:** `path`, `status`, `diff`, `branch`, `check`, `make`, `config`
+
+**Commands that take filesystem PATH:** `tree`, `stats`
+
+**ALWAYS get the path first, then use it:**
+
+```bash
+# CORRECT - two-step process
+REPO_PATH=$(devbot path fractals-nextjs)
+devbot tree "$REPO_PATH"
+devbot stats "$REPO_PATH"
+
+# WRONG - DO NOT construct paths manually
+devbot tree ~/code/fractals-nextjs        # ❌ Path may be wrong!
+devbot stats ~/code/my-repo               # ❌ Never guess paths!
+```
+
+All repo-name commands require exact names from config.yaml.
 
 Install: `/install-devbot`
 
