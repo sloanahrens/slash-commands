@@ -150,6 +150,8 @@ Fuzzy match against:
 | `sdk` | some-sdk |
 | `proj` | my-project |
 
+**IMPORTANT**: After fuzzy matching, always use the **full repo name** (from config.yaml `name` field) for all devbot commands, NOT the alias that was matched. Devbot requires exact repo names.
+
 ---
 
 ## Path Resolution
@@ -259,7 +261,7 @@ Fast parallel operations across repos. Use devbot for speed-critical operations:
 | Command | Purpose | Speed |
 |---------|---------|-------|
 | `devbot status` | Git status across all repos | ~0.03s |
-| `devbot status <repo>` | Single repo details | ~0.01s |
+| `devbot status <repo>` | Single repo details (use full name, not alias) | ~0.01s |
 | `devbot run -- <cmd>` | Parallel command execution | ~0.5s |
 | `devbot todos` | TODO/FIXME scanning | ~0.1s |
 | `devbot make` | Makefile target analysis | ~0.01s |
