@@ -262,6 +262,8 @@ Fast parallel operations across repos. Use devbot for speed-critical operations:
 |---------|---------|-------|
 | `devbot status` | Git status across all repos | ~0.03s |
 | `devbot status <repo>` | Single repo details (use full name, not alias) | ~0.01s |
+| `devbot diff <repo>` | Git diff summary (staged/unstaged with stats) | ~0.02s |
+| `devbot check <repo>` | Auto-detected lint/typecheck/build/test | varies |
 | `devbot run -- <cmd>` | Parallel command execution | ~0.5s |
 | `devbot todos` | TODO/FIXME scanning | ~0.1s |
 | `devbot make` | Makefile target analysis | ~0.01s |

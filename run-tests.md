@@ -18,33 +18,30 @@ Run quality checks and test suite for a repository.
 
 Follow repo selection from `_shared-repo-logic.md`, then confirm: "Running tests for: <repo-name>"
 
-### Step 2: Detect Language & Commands
+### Step 2: Run Quality Checks
 
-Check `config.yaml` for repo-specific settings:
-- `work_dir` → subdirectory to run commands from
-- `language` → explicit language setting
-- `commands` → custom command overrides
-
-If `language` not specified, use devbot for fast detection:
+Use `devbot check` for fast, auto-detected quality checks:
 
 ```bash
-devbot detect <repo-path>
-# Output: Detected: go, ts, nextjs
+devbot check <repo-name>
 ```
 
-This checks root + common subdirs (go-api/, nextapp/, packages/*, apps/*) in parallel.
+This auto-detects the project stack (go, ts, nextjs, python, rust) and runs:
+- **lint** and **typecheck** in parallel
+- **build** and **test** sequentially
 
-### Step 3: Run Quality Checks
+The command maps stacks to appropriate tools:
+| Stack | Lint | Typecheck | Build | Test |
+|-------|------|-----------|-------|------|
+| nextjs/ts | npm run lint | npm run typecheck | npm run build | npm test |
+| go | golangci-lint | - | go build | go test |
+| python | ruff check | mypy | - | pytest |
 
-Run commands in order based on detected language (skip if command not available). See `_shared-repo-logic.md` for:
-- Language detection rules
-- Default commands per language (lint → typecheck → build → test)
+**Override with config.yaml**: If repo has a `commands` block, use those instead.
 
-If `commands` block exists in repo's config.yaml, use those instead of defaults.
+**Subdirectory projects**: If stack not detected at root, check `work_dir` setting or common subdirs (go-api/, nextapp/, packages/*).
 
-Skip any command that's not available for the project.
-
-### Step 4: Report Results
+### Step 3: Report Results
 
 ```
 | Check      | Status  | Details                    |

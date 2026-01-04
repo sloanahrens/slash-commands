@@ -18,23 +18,20 @@ Commit git changes for a repository. Shows the proposed message then proceeds to
 
 Follow repo selection from `_shared-repo-logic.md`, then confirm: "Committing for: <repo-name>"
 
-### Step 2: Check Repository Status
+### Step 2: Check Repository Status and Review Changes
 
 ```bash
-devbot status <repo-name>
+devbot diff <repo-name>
 ```
 
-This provides branch, dirty file count, and ahead/behind status in ~0.01s.
+This provides in a single call (~0.02s):
+- Branch name
+- Staged files with addition/deletion counts
+- Unstaged files with addition/deletion counts
 
-If no changes, report "No changes to commit" and exit.
+If no changes (clean), report "No changes to commit" and exit.
 
-### Step 3: Review Changes
-
-```bash
-git -C <repo-path> diff --stat
-```
-
-### Step 4: Generate Commit Message
+### Step 3: Generate Commit Message
 
 Try local model first if available (see `_shared-repo-logic.md` → "Local Model Acceleration"):
 
@@ -59,7 +56,7 @@ If local model unavailable, use Claude directly.
 
 Types: `feat`, `fix`, `docs`, `style`, `refactor`, `test`, `chore`, `build`, `ci`
 
-### Step 5: Display and Execute
+### Step 4: Display and Execute
 
 Display the proposed message, then immediately execute the commit:
 
@@ -76,7 +73,7 @@ git -C <repo-path> add -A && git -C <repo-path> commit -m "<message>"
 
 The user approves via Claude Code's tool permission dialog.
 
-### Step 6: Verify Success
+### Step 5: Verify Success
 
 ```bash
 git -C <repo-path> log -1 --oneline

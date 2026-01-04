@@ -8,9 +8,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/sloanahrens/devbot-go/internal/check"
 	"github.com/sloanahrens/devbot-go/internal/config"
 	"github.com/sloanahrens/devbot-go/internal/deps"
 	"github.com/sloanahrens/devbot-go/internal/detect"
+	"github.com/sloanahrens/devbot-go/internal/diff"
 	"github.com/sloanahrens/devbot-go/internal/makefile"
 	"github.com/sloanahrens/devbot-go/internal/output"
 	"github.com/sloanahrens/devbot-go/internal/runner"
@@ -154,6 +156,33 @@ var (
 	statsLang string
 )
 
+// Diff command
+var diffCmd = &cobra.Command{
+	Use:   "diff <repo>",
+	Short: "Show git diff summary for a repository",
+	Long:  `Shows staged and unstaged changes with file stats for a single repository.`,
+	Args:  cobra.ExactArgs(1),
+	Run:   runDiff,
+}
+
+var (
+	diffFull bool
+)
+
+// Check command
+var checkCmd = &cobra.Command{
+	Use:   "check <repo>",
+	Short: "Run lint, typecheck, build, and test for a repository",
+	Long:  `Auto-detects project stack and runs appropriate quality checks.`,
+	Args:  cobra.ExactArgs(1),
+	Run:   runCheckCmd,
+}
+
+var (
+	checkOnly string
+	checkFix  bool
+)
+
 func init() {
 	// Status flags
 	statusCmd.Flags().BoolVar(&showDirtyOnly, "dirty", false, "Only show repos with uncommitted changes")
@@ -185,6 +214,13 @@ func init() {
 	// Stats flags
 	statsCmd.Flags().StringVarP(&statsLang, "lang", "l", "", "Filter by language (go, ts, js, python, rust, java, c, cpp, ruby)")
 
+	// Diff flags
+	diffCmd.Flags().BoolVar(&diffFull, "full", false, "Show full diff content")
+
+	// Check flags
+	checkCmd.Flags().StringVar(&checkOnly, "only", "", "Only run specific checks (comma-separated: lint,typecheck,build,test)")
+	checkCmd.Flags().BoolVar(&checkFix, "fix", false, "Auto-fix issues where possible")
+
 	rootCmd.AddCommand(statusCmd)
 	rootCmd.AddCommand(runCmd)
 	rootCmd.AddCommand(depsCmd)
@@ -195,6 +231,8 @@ func init() {
 	rootCmd.AddCommand(makeCmd)
 	rootCmd.AddCommand(worktreesCmd)
 	rootCmd.AddCommand(statsCmd)
+	rootCmd.AddCommand(diffCmd)
+	rootCmd.AddCommand(checkCmd)
 }
 
 func runStatus(cmd *cobra.Command, args []string) {
@@ -916,6 +954,226 @@ func runStats(cmd *cobra.Command, args []string) {
 		}
 
 		fmt.Printf("\n(%.2fs)\n", elapsed.Seconds())
+	}
+}
+
+func runDiff(cmd *cobra.Command, args []string) {
+	start := time.Now()
+
+	workspacePath := workspace.DefaultWorkspace()
+	if workspacePath == "" {
+		fmt.Fprintln(os.Stderr, "Error: could not determine home directory")
+		os.Exit(1)
+	}
+
+	repos, err := workspace.Discover(workspacePath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error discovering repos: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Find the target repo
+	target := args[0]
+	var targetRepo *workspace.RepoInfo
+	for _, r := range repos {
+		if r.Name == target || strings.Contains(strings.ToLower(r.Name), strings.ToLower(target)) {
+			repo := r
+			targetRepo = &repo
+			break
+		}
+	}
+
+	if targetRepo == nil {
+		fmt.Fprintf(os.Stderr, "Repository '%s' not found\n", target)
+		os.Exit(1)
+	}
+
+	result := diff.GetDiff(*targetRepo)
+	elapsed := time.Since(start)
+
+	// Check if there are any changes
+	if len(result.Staged) == 0 && len(result.Unstaged) == 0 {
+		fmt.Printf("\n%s/ (clean)\n", result.Repo.Name)
+		fmt.Printf("  Branch: %s\n", result.Branch)
+		fmt.Printf("\n(%.2fs)\n", elapsed.Seconds())
+		return
+	}
+
+	// Header
+	fmt.Printf("\n%s/\n", result.Repo.Name)
+	fmt.Println(strings.Repeat("─", 60))
+	fmt.Printf("  Branch:   %s\n", result.Branch)
+
+	// Summary
+	stagedAdd, stagedDel := 0, 0
+	for _, c := range result.Staged {
+		stagedAdd += c.Additions
+		stagedDel += c.Deletions
+	}
+	unstagedAdd, unstagedDel := 0, 0
+	for _, c := range result.Unstaged {
+		unstagedAdd += c.Additions
+		unstagedDel += c.Deletions
+	}
+
+	if len(result.Staged) > 0 {
+		fmt.Printf("  Staged:   %d files (+%d, -%d)\n", len(result.Staged), stagedAdd, stagedDel)
+	}
+	if len(result.Unstaged) > 0 {
+		fmt.Printf("  Unstaged: %d files (+%d, -%d)\n", len(result.Unstaged), unstagedAdd, unstagedDel)
+	}
+
+	// Staged files
+	if len(result.Staged) > 0 {
+		fmt.Printf("\n  Staged:\n")
+		for _, c := range result.Staged {
+			stats := ""
+			if c.Additions > 0 || c.Deletions > 0 {
+				stats = fmt.Sprintf(" (+%d, -%d)", c.Additions, c.Deletions)
+			}
+			fmt.Printf("    %s  %s%s\n", c.Status, c.Path, stats)
+		}
+	}
+
+	// Unstaged files
+	if len(result.Unstaged) > 0 {
+		fmt.Printf("\n  Unstaged:\n")
+		for _, c := range result.Unstaged {
+			stats := ""
+			if c.Additions > 0 || c.Deletions > 0 {
+				stats = fmt.Sprintf(" (+%d, -%d)", c.Additions, c.Deletions)
+			}
+			fmt.Printf("    %s  %s%s\n", c.Status, c.Path, stats)
+		}
+	}
+
+	fmt.Printf("\n(%.2fs)\n", elapsed.Seconds())
+}
+
+func runCheckCmd(cmd *cobra.Command, args []string) {
+	workspacePath := workspace.DefaultWorkspace()
+	if workspacePath == "" {
+		fmt.Fprintln(os.Stderr, "Error: could not determine home directory")
+		os.Exit(1)
+	}
+
+	repos, err := workspace.Discover(workspacePath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error discovering repos: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Find the target repo
+	target := args[0]
+	var targetRepo *workspace.RepoInfo
+	for _, r := range repos {
+		if r.Name == target || strings.Contains(strings.ToLower(r.Name), strings.ToLower(target)) {
+			repo := r
+			targetRepo = &repo
+			break
+		}
+	}
+
+	if targetRepo == nil {
+		fmt.Fprintf(os.Stderr, "Repository '%s' not found\n", target)
+		os.Exit(1)
+	}
+
+	// Parse --only flag
+	var only []check.CheckType
+	if checkOnly != "" {
+		for _, c := range strings.Split(checkOnly, ",") {
+			switch strings.TrimSpace(c) {
+			case "lint":
+				only = append(only, check.CheckLint)
+			case "typecheck":
+				only = append(only, check.CheckTypecheck)
+			case "build":
+				only = append(only, check.CheckBuild)
+			case "test":
+				only = append(only, check.CheckTest)
+			}
+		}
+	}
+
+	// Run checks
+	result := check.Run(*targetRepo, only, checkFix)
+
+	// Display results
+	fmt.Printf("\n%s/ (%s)\n", result.Repo.Name, result.StackSummary())
+	fmt.Println(strings.Repeat("─", 60))
+
+	if len(result.Checks) == 0 {
+		fmt.Println("  No checks available for this stack")
+		return
+	}
+
+	// Group checks by sub-app
+	type subAppChecks struct {
+		path   string
+		checks []check.CheckResult
+	}
+	var grouped []subAppChecks
+	seen := make(map[string]int)
+
+	for _, c := range result.Checks {
+		idx, ok := seen[c.SubDir]
+		if !ok {
+			idx = len(grouped)
+			seen[c.SubDir] = idx
+			grouped = append(grouped, subAppChecks{path: c.SubDir})
+		}
+		grouped[idx].checks = append(grouped[idx].checks, c)
+	}
+
+	// Display each sub-app's results
+	for _, sg := range grouped {
+		if sg.path != "" {
+			fmt.Printf("\n  %s/\n", sg.path)
+		}
+
+		for _, c := range sg.checks {
+			status := c.Status
+			switch status {
+			case "pass":
+				status = "✓ PASS"
+			case "fail":
+				status = "✗ FAIL"
+			case "skip":
+				status = "- SKIP"
+			}
+
+			duration := ""
+			if c.Duration > 0 {
+				duration = fmt.Sprintf("%.1fs", c.Duration.Seconds())
+			}
+
+			prefix := "  "
+			if sg.path != "" {
+				prefix = "    "
+			}
+			fmt.Printf("%s%-12s %-8s %s\n", prefix, c.Type, status, duration)
+
+			// Show error output for failed checks
+			if c.Status == "fail" && c.Output != "" {
+				lines := strings.Split(c.Output, "\n")
+				maxLines := 10
+				if len(lines) > maxLines {
+					lines = lines[:maxLines]
+					lines = append(lines, fmt.Sprintf("... (%d more lines)", len(strings.Split(c.Output, "\n"))-maxLines))
+				}
+				for _, line := range lines {
+					fmt.Printf("%s  %s\n", prefix, line)
+				}
+			}
+		}
+	}
+
+	fmt.Printf("\n  %s\n", strings.Repeat("─", 40))
+	fmt.Printf("  Total: %s (%.1fs)\n", result.Summary(), result.Duration.Seconds())
+
+	if !result.Passed() {
+		os.Exit(1)
 	}
 }
 

@@ -137,6 +137,27 @@ devbot status --dirty   # Only dirty repos
 devbot status <repo>    # Single repo details
 ```
 
+#### diff - Git Diff Summary (~0.02s)
+
+```bash
+devbot diff <repo>      # Staged/unstaged files with line counts
+```
+
+Shows branch, staged files, unstaged files with +/- counts in a single call.
+
+#### check - Auto-Detected Quality Checks
+
+```bash
+devbot check <repo>              # Run all checks (lint, typecheck, build, test)
+devbot check <repo> --only=lint  # Run specific checks
+devbot check <repo> --fix        # Auto-fix where possible
+```
+
+Auto-detects stack (go, ts, nextjs, python, rust) and runs appropriate commands:
+- Lint and typecheck run in parallel
+- Build and test run sequentially
+- Exits with code 1 on first failure
+
 #### run - Parallel Command Execution
 
 ```bash
