@@ -26,6 +26,11 @@ type RepoConfig struct {
 
 var cachedConfig *WorkspaceConfig
 
+// ResetConfigCache clears the cached config (for testing)
+func ResetConfigCache() {
+	cachedConfig = nil
+}
+
 // LoadConfig finds and loads the workspace config.yaml
 // Search order:
 // 1. $DEVBOT_CONFIG environment variable
