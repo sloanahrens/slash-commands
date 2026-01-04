@@ -171,7 +171,7 @@ func TestGetWorkspacePath(t *testing.T) {
 code_path: ~/projects
 base_path: ~/code
 `
-		os.WriteFile(configPath, []byte(configContent), 0644)
+		_ = os.WriteFile(configPath, []byte(configContent), 0644)
 		t.Setenv("DEVBOT_CONFIG", configPath)
 
 		path := GetWorkspacePath()
@@ -190,7 +190,7 @@ base_path: ~/code
 		configContent := `
 base_path: ~/mycode
 `
-		os.WriteFile(configPath, []byte(configContent), 0644)
+		_ = os.WriteFile(configPath, []byte(configContent), 0644)
 		t.Setenv("DEVBOT_CONFIG", configPath)
 
 		path := GetWorkspacePath()
@@ -224,7 +224,7 @@ base_path: ~/mycode
 repos:
   - name: test-repo
 `
-		os.WriteFile(configPath, []byte(configContent), 0644)
+		_ = os.WriteFile(configPath, []byte(configContent), 0644)
 		t.Setenv("DEVBOT_CONFIG", configPath)
 
 		path := GetWorkspacePath()

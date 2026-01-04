@@ -17,14 +17,14 @@ type CommitInfo struct {
 
 // BranchResult contains branch information for a repository
 type BranchResult struct {
-	Repo         workspace.RepoInfo
-	Branch       string
-	Tracking     string // e.g., "origin/main"
-	Ahead        int
-	Behind       int
-	HasUpstream  bool
-	Commits      []CommitInfo // commits ahead of upstream
-	Error        error
+	Repo        workspace.RepoInfo
+	Branch      string
+	Tracking    string // e.g., "origin/main"
+	Ahead       int
+	Behind      int
+	HasUpstream bool
+	Commits     []CommitInfo // commits ahead of upstream
+	Error       error
 }
 
 // GetBranch retrieves branch and tracking information for a repository

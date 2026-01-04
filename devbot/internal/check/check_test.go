@@ -57,7 +57,7 @@ func TestDetermineChecks(t *testing.T) {
 
 			// Handle nil comparison for empty results
 			if tt.want == nil {
-				if got != nil && len(got) != 0 {
+				if len(got) != 0 {
 					t.Errorf("determineChecks(%v, %v) = %v, want nil or empty", tt.stack, tt.only, got)
 				}
 				return
@@ -109,7 +109,7 @@ func TestDetectStackAt(t *testing.T) {
 
 			// Handle nil comparison for empty results
 			if tt.wantNil {
-				if got != nil && len(got) != 0 {
+				if len(got) != 0 {
 					t.Errorf("detectStackAt() = %v, want nil or empty", got)
 				}
 				return
@@ -233,7 +233,7 @@ func TestResultStackSummary(t *testing.T) {
 func TestDiscoverSubApps(t *testing.T) {
 	t.Run("single root app", func(t *testing.T) {
 		tmpDir := t.TempDir()
-		os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte("module test"), 0644)
+		_ = os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte("module test"), 0644)
 
 		apps := discoverSubApps(tmpDir)
 
@@ -253,15 +253,15 @@ func TestDiscoverSubApps(t *testing.T) {
 
 		// Create go-api subdir
 		apiDir := filepath.Join(tmpDir, "go-api")
-		os.MkdirAll(apiDir, 0755)
-		os.WriteFile(filepath.Join(apiDir, "go.mod"), []byte("module api"), 0644)
+		_ = os.MkdirAll(apiDir, 0755)
+		_ = os.WriteFile(filepath.Join(apiDir, "go.mod"), []byte("module api"), 0644)
 
 		// Create nextapp subdir
 		webDir := filepath.Join(tmpDir, "nextapp")
-		os.MkdirAll(webDir, 0755)
-		os.WriteFile(filepath.Join(webDir, "package.json"), []byte("{}"), 0644)
-		os.WriteFile(filepath.Join(webDir, "tsconfig.json"), []byte("{}"), 0644)
-		os.WriteFile(filepath.Join(webDir, "next.config.js"), []byte(""), 0644)
+		_ = os.MkdirAll(webDir, 0755)
+		_ = os.WriteFile(filepath.Join(webDir, "package.json"), []byte("{}"), 0644)
+		_ = os.WriteFile(filepath.Join(webDir, "tsconfig.json"), []byte("{}"), 0644)
+		_ = os.WriteFile(filepath.Join(webDir, "next.config.js"), []byte(""), 0644)
 
 		apps := discoverSubApps(tmpDir)
 
@@ -293,10 +293,10 @@ func TestDiscoverSubApps(t *testing.T) {
 		// Create apps/app1 and apps/app2
 		app1 := filepath.Join(tmpDir, "apps", "app1")
 		app2 := filepath.Join(tmpDir, "apps", "app2")
-		os.MkdirAll(app1, 0755)
-		os.MkdirAll(app2, 0755)
-		os.WriteFile(filepath.Join(app1, "package.json"), []byte("{}"), 0644)
-		os.WriteFile(filepath.Join(app2, "package.json"), []byte("{}"), 0644)
+		_ = os.MkdirAll(app1, 0755)
+		_ = os.MkdirAll(app2, 0755)
+		_ = os.WriteFile(filepath.Join(app1, "package.json"), []byte("{}"), 0644)
+		_ = os.WriteFile(filepath.Join(app2, "package.json"), []byte("{}"), 0644)
 
 		apps := discoverSubApps(tmpDir)
 
@@ -310,9 +310,9 @@ func TestDiscoverSubApps(t *testing.T) {
 
 		// Create packages/pkg1
 		pkg1 := filepath.Join(tmpDir, "packages", "pkg1")
-		os.MkdirAll(pkg1, 0755)
-		os.WriteFile(filepath.Join(pkg1, "package.json"), []byte("{}"), 0644)
-		os.WriteFile(filepath.Join(pkg1, "tsconfig.json"), []byte("{}"), 0644)
+		_ = os.MkdirAll(pkg1, 0755)
+		_ = os.WriteFile(filepath.Join(pkg1, "package.json"), []byte("{}"), 0644)
+		_ = os.WriteFile(filepath.Join(pkg1, "tsconfig.json"), []byte("{}"), 0644)
 
 		apps := discoverSubApps(tmpDir)
 
@@ -335,12 +335,12 @@ func TestDiscoverSubApps(t *testing.T) {
 		tmpDir := t.TempDir()
 
 		// Root has go.mod
-		os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte("module root"), 0644)
+		_ = os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte("module root"), 0644)
 
 		// api subdir also has go.mod (should be skipped due to overlap)
 		apiDir := filepath.Join(tmpDir, "api")
-		os.MkdirAll(apiDir, 0755)
-		os.WriteFile(filepath.Join(apiDir, "go.mod"), []byte("module api"), 0644)
+		_ = os.MkdirAll(apiDir, 0755)
+		_ = os.WriteFile(filepath.Join(apiDir, "go.mod"), []byte("module api"), 0644)
 
 		apps := discoverSubApps(tmpDir)
 

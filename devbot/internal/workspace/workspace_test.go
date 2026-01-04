@@ -4,6 +4,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"testing"
 )
 
@@ -19,7 +20,7 @@ func TestDefaultWorkspace(t *testing.T) {
 	if !filepath.IsAbs(ws) {
 		t.Errorf("DefaultWorkspace should return absolute path, got %q", ws)
 	}
-	if !filepath.HasPrefix(ws, home) {
+	if !strings.HasPrefix(ws, home) {
 		t.Errorf("DefaultWorkspace path %q should be under home directory %q", ws, home)
 	}
 }
@@ -193,8 +194,8 @@ func TestGetRepoStatus(t *testing.T) {
 		setupGitRepo(t, tmpDir)
 
 		// Create untracked files
-		os.WriteFile(filepath.Join(tmpDir, "new1.txt"), []byte("new"), 0644)
-		os.WriteFile(filepath.Join(tmpDir, "new2.txt"), []byte("new"), 0644)
+		_ = os.WriteFile(filepath.Join(tmpDir, "new1.txt"), []byte("new"), 0644)
+		_ = os.WriteFile(filepath.Join(tmpDir, "new2.txt"), []byte("new"), 0644)
 
 		repo := RepoInfo{Name: "test-repo", Path: tmpDir}
 		status := getRepoStatus(repo)
@@ -209,7 +210,7 @@ func TestGetRepoStatus(t *testing.T) {
 		setupGitRepo(t, tmpDir)
 
 		// Modify tracked file
-		os.WriteFile(filepath.Join(tmpDir, "README.md"), []byte("# Modified"), 0644)
+		_ = os.WriteFile(filepath.Join(tmpDir, "README.md"), []byte("# Modified"), 0644)
 
 		repo := RepoInfo{Name: "test-repo", Path: tmpDir}
 		status := getRepoStatus(repo)
@@ -227,14 +228,14 @@ func TestGetStatus(t *testing.T) {
 		// Create two repos
 		repo1Path := filepath.Join(tmpDir, "repo1")
 		repo2Path := filepath.Join(tmpDir, "repo2")
-		os.MkdirAll(repo1Path, 0755)
-		os.MkdirAll(repo2Path, 0755)
+		_ = os.MkdirAll(repo1Path, 0755)
+		_ = os.MkdirAll(repo2Path, 0755)
 
 		setupGitRepo(t, repo1Path)
 		setupGitRepo(t, repo2Path)
 
 		// Make repo2 dirty
-		os.WriteFile(filepath.Join(repo2Path, "dirty.txt"), []byte("dirty"), 0644)
+		_ = os.WriteFile(filepath.Join(repo2Path, "dirty.txt"), []byte("dirty"), 0644)
 
 		repos := []RepoInfo{
 			{Name: "repo1", Path: repo1Path},

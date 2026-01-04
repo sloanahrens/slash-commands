@@ -25,10 +25,10 @@ type RemoteResult struct {
 
 // FindResult contains the result of searching for a repo by GitHub identifier
 type FindResult struct {
-	Found   bool
-	Repo    workspace.RepoInfo
-	Remote  RemoteInfo
-	Error   error
+	Found  bool
+	Repo   workspace.RepoInfo
+	Remote RemoteInfo
+	Error  error
 }
 
 // GitHub URL patterns
@@ -139,9 +139,7 @@ func normalizeGitHubIdentifier(input string) string {
 		input = strings.TrimPrefix(input, "github.com/")
 
 		// Handle git@github.com:org/repo format
-		if strings.HasPrefix(input, "git@github.com:") {
-			input = strings.TrimPrefix(input, "git@github.com:")
-		}
+		input = strings.TrimPrefix(input, "git@github.com:")
 
 		// Extract org/repo from path
 		parts := strings.Split(input, "/")
