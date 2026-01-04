@@ -4,7 +4,7 @@ description: Test Makefile targets for a repository
 
 # Make Test Command
 
-Run all Makefile targets for a repository in clean-build order.
+Run Makefile targets for a repository. Skips clean by default for faster incremental builds.
 
 **Arguments**: `$ARGUMENTS` - Repo name (exact match). See `_shared-repo-logic.md`.
 
@@ -48,7 +48,7 @@ Makefile for <repo-name>: 13 targets
 
 ### Step 4: Execute All Targets (Default Behavior)
 
-**Run all targets automatically in clean-build order.** No prompting unless `--interactive` flag is passed.
+**Run targets automatically in build order (skip clean by default).** No prompting unless `--interactive` flag is passed.
 
 **Execution order:**
 
@@ -106,7 +106,7 @@ Makefile Test Results for <repo-name>
 
 | Target     | Status  | Time    | Tests   | Coverage | Notes                    |
 |------------|---------|---------|---------|----------|--------------------------|
-| clean      | PASS    |   0.3s  |    -    |    -     | Build artifacts removed  |
+| clean      | SKIP    |      -  |    -    |    -     | Skipped (pass 'clean' to run) |
 | install    | PASS    |  12.3s  |    -    |    -     | Dependencies installed   |
 | db-up      | PASS    |   3.2s  |    -    |    -     | PostgreSQL ready         |
 | build      | PASS    |   5.2s  |    -    |    -     | Build successful         |
@@ -115,11 +115,11 @@ Makefile Test Results for <repo-name>
 | test       | PASS    |   8.7s  |   36    |   78%    | All tests passed         |
 | dev        | PASS    |   5.0s  |    -    |    -     | Server started (smoke)   |
 |------------|---------|---------|---------|----------|--------------------------|
-| TOTAL      | 8/8     |  38.9s  |   36    |   78%    | All targets passed       |
+| TOTAL      | 7/7     |  38.6s  |   36    |   78%    | All targets passed       |
 
 Slowest targets:
-  1. install    12.3s  (31%)
-  2. test        8.7s  (22%)
+  1. install    12.3s  (32%)
+  2. test        8.7s  (23%)
   3. build       5.2s  (13%)
 
 Issues Found:
@@ -159,17 +159,18 @@ Missing metrics:
 
 Parse flags from `$ARGUMENTS`:
 
-| Flag | Effect |
-|------|--------|
+| Argument/Flag | Effect |
+|---------------|--------|
+| `clean` | Run clean/destructive targets first (skipped by default) |
 | `--dry-run` | Analyze only, don't execute |
 | `--interactive` | Prompt for target selection instead of running all |
 | `--quick` | Only test quick targets (lint, typecheck, format) |
-| `--skip-clean` | Skip destructive targets, start from install |
 | `--skip-docker` | Explicitly skip Docker targets (don't prompt to start Docker) |
 
 Examples:
 ```bash
-/make-test my-app                   # Run all targets in clean-build order
+/make-test my-app                   # Run targets (skip clean for speed)
+/make-test my-app clean             # Run ALL targets including clean
 /make-test my-app --dry-run         # Just analyze Makefile
 /make-test frontend --quick         # Only lint/typecheck
 /make-test api --skip-docker        # Skip Docker targets (no Docker running)
@@ -209,8 +210,9 @@ Ask: "Would you like me to apply any of these improvements?"
 ## Examples
 
 ```bash
-/make-test                          # Select repo, run all targets
-/make-test my-app                   # Run all targets for my-nextjs-app
+/make-test                          # Select repo, run targets (skip clean)
+/make-test my-app                   # Run targets for my-app (skip clean)
+/make-test my-app clean             # Run ALL targets including clean
 /make-test infra --dry-run          # Analyze without running
 /make-test api --quick              # Only lint/typecheck
 /make-test frontend --interactive   # Choose which targets to run
