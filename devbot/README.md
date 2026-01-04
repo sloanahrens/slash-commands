@@ -8,7 +8,7 @@ Part of [slash-commands](../README.md) - Claude Code slash commands for multi-re
 
 ```bash
 make install
-# Or from parent: /install-devbot
+# Or run /setup-workspace (includes devbot installation)
 ```
 
 ## Commands
@@ -202,7 +202,7 @@ make ci          # Run all checks
 
 ## Codebase Metrics
 
-- **Files:** 31 Go source files
-- **Lines:** 7,564 total (5,956 code, 412 comments, 1,196 blank)
-- **Functions:** 247 (average 9 lines)
-- **Test coverage:** 10 packages with tests
+- **Files:** 37 Go source files
+- **Lines:** 9,315 total (7,378 code, 482 comments, 1,455 blank)
+- **Functions:** 285 (average 10 lines)
+- **Test coverage:** 87-98% across packages

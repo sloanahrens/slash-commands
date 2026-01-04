@@ -128,18 +128,9 @@ Optional local MLX model for faster processing. Requires mlx-hub plugin.
 
 ## Recommended Plugins
 
-Run `/setup-workspace` (includes plugins) or `/setup-plugins` standalone:
+Run `/setup-workspace` (includes plugins) or `/setup-plugins` standalone.
 
-```bash
-claude plugin marketplace add obra/superpowers-marketplace
-claude plugin install superpowers@superpowers-marketplace
-claude plugin install episodic-memory@superpowers-marketplace
-
-claude plugin marketplace add anthropics/claude-plugins-official
-claude plugin install code-review@claude-plugins-official
-claude plugin install commit-commands@claude-plugins-official
-claude plugin install pr-review-toolkit@claude-plugins-official
-```
+Key plugins: `superpowers`, `episodic-memory`, `pr-review-toolkit`, `mlx-hub` (local model)
 
 ## Files
 

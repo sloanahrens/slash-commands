@@ -45,12 +45,12 @@ devbot tree ~/code/my-repo  # Path may be wrong!
 
 ### Dual-Model Evaluation
 
-Commands like `yes-commit`, `find-tasks`, `update-docs` use local Qwen model:
+Commands like `yes-commit`, `find-tasks`, `update-docs` can use local Qwen model:
 
 1. Local model generates first (fast)
 2. Claude generates independently
 3. Evaluate local against criteria
-4. Select winner with `[local]` or `[claude]` marker
+4. Use local if it passes; append `[local]` to commit messages only
 
 Requires: mlx-hub plugin + Apple Silicon. Falls back to Claude-only if unavailable.
 
