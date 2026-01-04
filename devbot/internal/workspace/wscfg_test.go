@@ -158,3 +158,80 @@ repos:
 		})
 	}
 }
+
+func TestGetWorkspacePath(t *testing.T) {
+	home, _ := os.UserHomeDir()
+
+	t.Run("with code_path in config", func(t *testing.T) {
+		ResetConfigCache()
+		tmpDir := t.TempDir()
+		configPath := filepath.Join(tmpDir, "config.yaml")
+
+		configContent := `
+code_path: ~/projects
+base_path: ~/code
+`
+		os.WriteFile(configPath, []byte(configContent), 0644)
+		t.Setenv("DEVBOT_CONFIG", configPath)
+
+		path := GetWorkspacePath()
+
+		want := filepath.Join(home, "projects")
+		if path != want {
+			t.Errorf("GetWorkspacePath() = %q, want %q", path, want)
+		}
+	})
+
+	t.Run("with base_path only", func(t *testing.T) {
+		ResetConfigCache()
+		tmpDir := t.TempDir()
+		configPath := filepath.Join(tmpDir, "config.yaml")
+
+		configContent := `
+base_path: ~/mycode
+`
+		os.WriteFile(configPath, []byte(configContent), 0644)
+		t.Setenv("DEVBOT_CONFIG", configPath)
+
+		path := GetWorkspacePath()
+
+		want := filepath.Join(home, "mycode")
+		if path != want {
+			t.Errorf("GetWorkspacePath() = %q, want %q", path, want)
+		}
+	})
+
+	t.Run("no config defaults to ~/code", func(t *testing.T) {
+		ResetConfigCache()
+		tmpDir := t.TempDir()
+		t.Setenv("DEVBOT_CONFIG", "/nonexistent/path/config.yaml")
+		t.Setenv("HOME", tmpDir)
+
+		path := GetWorkspacePath()
+
+		want := filepath.Join(tmpDir, "code")
+		if path != want {
+			t.Errorf("GetWorkspacePath() = %q, want %q", path, want)
+		}
+	})
+
+	t.Run("empty paths in config defaults to ~/code", func(t *testing.T) {
+		ResetConfigCache()
+		tmpDir := t.TempDir()
+		configPath := filepath.Join(tmpDir, "config.yaml")
+
+		configContent := `
+repos:
+  - name: test-repo
+`
+		os.WriteFile(configPath, []byte(configContent), 0644)
+		t.Setenv("DEVBOT_CONFIG", configPath)
+
+		path := GetWorkspacePath()
+
+		want := filepath.Join(home, "code")
+		if path != want {
+			t.Errorf("GetWorkspacePath() = %q, want %q", path, want)
+		}
+	})
+}
