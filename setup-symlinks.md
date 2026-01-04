@@ -17,8 +17,13 @@ Create or verify symlinks in ~/.claude/commands pointing to slash-commands.
 
 2. Create symlinks for each command file:
    ```bash
-   for file in ~/code/slash-commands/*.md ~/code/slash-commands/*.yaml; do
+   # Use the slash-commands directory from config
+   SLASH_COMMANDS_DIR="$HOME/code/mono-claude/slash-commands"
+
+   for file in "$SLASH_COMMANDS_DIR"/*.md "$SLASH_COMMANDS_DIR"/*.yaml; do
      name=$(basename "$file")
+     # Skip files we don't want to symlink
+     [[ "$name" == "config.yaml.example" ]] && continue
      target="$HOME/.claude/commands/$name"
      if [ -L "$target" ]; then
        echo "✓ $name (exists)"

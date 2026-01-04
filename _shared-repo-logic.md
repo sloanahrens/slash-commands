@@ -181,8 +181,8 @@ When committing changes in any repo:
 
 After selecting a repo, load relevant context:
 
-1. **For monorepo packages**: Read `<base_path>/CLAUDE.md`
-2. **For standalone repos**: Read `<repo-path>/CLAUDE.md` if it exists
+1. **Global config**: Read `~/.claude/CLAUDE.md` (if exists) for user-wide settings
+2. **Repo-specific**: Read `<repo-path>/CLAUDE.md` if it exists
 3. **For Python projects**: Note Python/uv patterns
 4. **For TypeScript projects**: Note TypeScript/npm patterns
 
@@ -196,7 +196,8 @@ After selecting a repo, load relevant context:
 4. If `$ARGUMENTS` empty → show selection prompt
 5. If `$ARGUMENTS` provided → fuzzy match to repo
 6. Confirm selection: "Working on: <repo-name>"
-7. Read repo's CLAUDE.md (if exists) for repo-specific guidance
+7. Read global `~/.claude/CLAUDE.md` (if exists) for user-wide settings
+8. Read repo's CLAUDE.md (if exists) for repo-specific guidance
 
 ---
 

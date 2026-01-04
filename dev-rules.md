@@ -64,7 +64,7 @@ Continue whatever you were doing, but remember these workspace rules:
 ## General
 
 - Read the repo's `CLAUDE.md` before making changes
-- Read workspace `CLAUDE.md` or global `~/.claude/CLAUDE.md` for context
+- Read global `~/.claude/CLAUDE.md` for user-wide settings
 - Run tests after making changes
 - Keep changes focused and minimal
 - Consider clone repos as read-only references

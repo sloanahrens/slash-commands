@@ -33,7 +33,7 @@ Follow "Standard Process Start" from `_shared-repo-logic.md`.
 ### Step 3: Load Context
 
 Per `_shared-repo-logic.md` → "Context Loading":
-1. Read workspace `CLAUDE.md`
+1. Read global `~/.claude/CLAUDE.md` (if exists)
 2. Read repo's `CLAUDE.md` (if exists)
 3. Get git status and recent commits
 
