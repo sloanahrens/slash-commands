@@ -66,7 +66,6 @@ Defined in `~/code/mono-claude/slash-commands/config.yaml`.
 
 | Repo | Stack | Notes |
 |------|-------|-------|
-| `atap-automation2` | Next.js + Playwright | **NO SANDBOX** - workdir: `nextapp/` |
 | `fractals-nextjs` | Next.js + Canvas | Mandelbrot visualizer |
 | `mango` | Go + Next.js + DuckDB | **CGO required** |
 | `devops-pulumi-ts` | Pulumi + TypeScript | GCP Cloud Run |
@@ -74,7 +73,6 @@ Defined in `~/code/mono-claude/slash-commands/config.yaml`.
 | `slash-commands` | Go + Markdown | This workspace's tools |
 | `mlx-hub-claude-plugin` | TypeScript | MLX model inference plugin |
 | `git-monitor` | TypeScript | Git repository monitoring |
-| `vibe-code-clean` | TypeScript | Code cleanup tool |
 | `sandbox` | Go + TypeScript | Experimental pnpm workspace |
 | `machine-learning` | Python | ML experiments |
 | `physics-stuff` | Mixed | Physics simulations |
