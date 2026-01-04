@@ -4,7 +4,7 @@ description: Test Makefile targets for a repository
 
 # Make Test Command
 
-Parse and interactively test Makefile targets for a repository.
+Run all Makefile targets for a repository in clean-build order.
 
 **Arguments**: `$ARGUMENTS` - Optional repo name (supports fuzzy match). If empty, shows selection menu.
 
@@ -33,91 +33,60 @@ This parses in ~0.01s and returns:
 
 If no Makefile found, report error and exit.
 
-### Step 3: Analyze Targets
+### Step 3: Display Target Summary
 
-devbot categorizes targets by type:
-
-| Category | Detection | Examples |
-|----------|-----------|----------|
-| **Setup** | Contains `setup`, `install`, `init` | `make setup`, `make install` |
-| **Development** | Contains `dev`, `run`, `start`, `serve` | `make dev`, `make run` |
-| **Database** | Contains `db`, `migrate`, `docker` | `make db-up`, `make migrate` |
-| **Testing** | Contains `test`, `lint`, `check` | `make test`, `make lint` |
-| **Build** | Contains `build`, `compile`, `dist` | `make build`, `make clean` |
-| **Other** | Everything else | `make help`, custom targets |
-
-Present analysis:
+Show a brief summary of discovered targets:
 
 ```
-Makefile Analysis for <repo-name>
-=================================
-
-Found X targets in Y categories:
-
-Setup (run first):
-  - setup: First time setup (install, DB, migrations)
-  - install: Install dependencies only
-
-Development:
-  - dev: Start API server on port 4000
-  - dev-app: Start test app on port 5173
-
-Database:
-  - db-up: Start PostgreSQL container
-  - db-down: Stop PostgreSQL container
-
-Testing:
-  - test: Run unit tests
-  - lint: Run linter
-
-Build:
-  - build: Build all packages
-  - clean: Remove build artifacts
+Makefile for <repo-name>: 13 targets
+  clean: clean
+  setup: install
+  build: build
+  test:  lint, typecheck, check
+  dev:   dev, start (smoke test)
 ```
 
-### Step 4: Interactive Testing
+### Step 4: Execute All Targets (Default Behavior)
 
-Ask user which targets to test:
+**Run all targets automatically in clean-build order.** No prompting unless `--interactive` flag is passed.
 
-```
-Which targets would you like to test?
+**Execution order:**
 
-1. All targets (in logical order)
-2. Setup targets only
-3. Test/Lint targets only
-4. Select specific targets
-5. Skip testing (just analyze)
-
-Enter choice:
-```
-
-**For option 1 (All targets):**
-- Run in logical order: setup → db → build → test → dev (skip dev, it blocks)
-- Skip targets that would block (dev, run, start, serve, watch)
-- Ask before running destructive targets (clean, reset, down)
-
-**For option 4 (Select specific):**
-- Show numbered list of all targets
-- Allow comma-separated selection: "1,3,5" or "test,lint,build"
-
-### Step 5: Execute Tests
-
-For each selected target:
-
-1. **Announce**: "Testing: make <target>"
-2. **Check dependencies**: Warn if target depends on others not yet run
-3. **Execute**: Run `make <target>` with timeout (default 60s, 5s for quick targets)
-4. **Capture output**: Show abbreviated output (last 20 lines on success, full on failure)
-5. **Report result**: PASS / FAIL / TIMEOUT / SKIPPED
+1. **Clean/Destructive first** - Start fresh: `clean`, `reset`, `docker-down`, etc.
+2. **Setup/Install** - Restore dependencies: `install`, `setup`, `init`
+3. **Database/Docker** - Infrastructure: `docker-build`, `db-up`, `migrate`
+4. **Build** - Compile: `build`, `compile`, `dist`
+5. **Test/Lint** - Verify: `lint`, `typecheck`, `format`, `check`, `test`
+6. **Dev/Blocking** - Smoke test: `dev`, `run`, `start`, `serve` (with timeout)
 
 **Special handling:**
 
 | Target Type | Behavior |
 |-------------|----------|
-| Blocking (`dev`, `run`, `start`) | Skip with note, or run with 5s timeout to verify it starts |
-| Destructive (`clean`, `reset`, `down`) | Ask confirmation before running |
-| Docker-dependent (`db-up`, `docker-*`) | Check if Docker is running first |
+| Blocking (`dev`, `run`, `start`, `serve`) | Run with 5s timeout to verify startup, then kill |
+| Docker-dependent (`db-up`, `docker-*`) | Check if Docker is running first; if not, stop and ask user to start it, then continue when ready |
 | Long-running (`build`, `test`) | Use extended timeout (5 min) |
+| Format (`format`, `fmt`) | Run but don't fail pipeline (may modify files) |
+
+**Docker check:** Before running any Docker-dependent target, run `docker info` to verify Docker is running. If it fails:
+1. Display: "Docker is not running. Please start Docker Desktop and press Enter to continue."
+2. Wait for user confirmation
+3. Re-check Docker status before proceeding
+
+### Step 5: Execute Tests
+
+For each target:
+
+1. **Announce**: "Testing: make <target>"
+2. **Execute**: Run with appropriate timeout
+3. **Capture output**: Show last 20 lines on success, full output on failure
+4. **Report result**: PASS / FAIL / TIMEOUT / SKIPPED
+
+**Timeouts by category:**
+- Quick (lint, typecheck, format): 60s
+- Build/test: 5 min
+- Blocking (dev, start): 5s (smoke test only)
+- Docker: 30s
 
 ### Step 6: Report Results
 
@@ -127,22 +96,19 @@ Makefile Test Results for <repo-name>
 
 | Target     | Status  | Time   | Notes                    |
 |------------|---------|--------|--------------------------|
+| clean      | PASS    | 0.3s   | Build artifacts removed  |
 | install    | PASS    | 12.3s  | Dependencies installed   |
 | db-up      | PASS    | 3.2s   | PostgreSQL ready         |
-| migrate    | PASS    | 1.1s   | Migrations applied       |
-| lint       | PASS    | 2.4s   | No issues found          |
-| test       | PASS    | 8.7s   | 36 tests passed          |
 | build      | PASS    | 5.2s   | Build successful         |
-| dev        | SKIPPED | -      | Blocking target          |
+| lint       | PASS    | 2.4s   | No issues found          |
+| typecheck  | PASS    | 1.8s   | Types valid              |
+| test       | PASS    | 8.7s   | 36 tests passed          |
+| dev        | PASS    | 5.0s   | Server started (smoke)   |
 |------------|---------|--------|--------------------------|
-| TOTAL      | 6/7     | 32.9s  | 1 skipped                |
+| TOTAL      | 8/8     | 38.9s  | All targets passed       |
 
 Issues Found:
   (none)
-
-Recommendations:
-  - All tested targets working correctly
-  - Consider adding: make check (runs lint + typecheck + test)
 ```
 
 ---
@@ -154,15 +120,18 @@ Parse flags from `$ARGUMENTS`:
 | Flag | Effect |
 |------|--------|
 | `--dry-run` | Analyze only, don't execute |
-| `--all` | Test all targets without prompting |
-| `--quick` | Only test quick targets (lint, typecheck) |
-| `--force` | Run destructive targets without confirmation |
+| `--interactive` | Prompt for target selection instead of running all |
+| `--quick` | Only test quick targets (lint, typecheck, format) |
+| `--skip-clean` | Skip destructive targets, start from install |
+| `--skip-docker` | Explicitly skip Docker targets (don't prompt to start Docker) |
 
 Examples:
 ```bash
+/make-test my-app                   # Run all targets in clean-build order
 /make-test my-app --dry-run         # Just analyze Makefile
-/make-test infra --all              # Test everything
 /make-test frontend --quick         # Only lint/typecheck
+/make-test api --skip-docker        # Skip Docker targets (no Docker running)
+/make-test infra --interactive      # Prompt for target selection
 ```
 
 ---
@@ -198,8 +167,9 @@ Ask: "Would you like me to apply any of these improvements?"
 ## Examples
 
 ```bash
-/make-test                          # Interactive selection
-/make-test my-app                   # Fuzzy match to my-nextjs-app
+/make-test                          # Select repo, run all targets
+/make-test my-app                   # Run all targets for my-nextjs-app
 /make-test infra --dry-run          # Analyze without running
-/make-test api --quick              # Only quick targets
+/make-test api --quick              # Only lint/typecheck
+/make-test frontend --interactive   # Choose which targets to run
 ```
