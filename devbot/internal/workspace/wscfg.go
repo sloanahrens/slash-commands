@@ -10,6 +10,9 @@ import (
 
 // WorkspaceConfig holds the parsed config.yaml
 type WorkspaceConfig struct {
+	// New unified path (preferred)
+	Workspace string `yaml:"workspace"`
+	// Legacy paths (for backwards compatibility)
 	BasePath string       `yaml:"base_path"`
 	CodePath string       `yaml:"code_path"`
 	Repos    []RepoConfig `yaml:"repos"`
@@ -56,6 +59,7 @@ func LoadConfig() (*WorkspaceConfig, error) {
 	}
 
 	// Expand ~ in paths
+	cfg.Workspace = expandHome(cfg.Workspace)
 	cfg.BasePath = expandHome(cfg.BasePath)
 	cfg.CodePath = expandHome(cfg.CodePath)
 
@@ -105,6 +109,7 @@ func expandHome(path string) string {
 }
 
 // GetWorkspacePath returns the workspace path from config, or the default
+// Priority: workspace > code_path > base_path > ~/code
 func GetWorkspacePath() string {
 	cfg, err := LoadConfig()
 	if err != nil || cfg == nil {
@@ -116,10 +121,15 @@ func GetWorkspacePath() string {
 		return filepath.Join(home, "code")
 	}
 
-	// Prefer code_path, fall back to base_path
+	// Prefer new unified 'workspace' key
+	if cfg.Workspace != "" {
+		return cfg.Workspace
+	}
+	// Legacy: code_path
 	if cfg.CodePath != "" {
 		return cfg.CodePath
 	}
+	// Legacy: base_path
 	if cfg.BasePath != "" {
 		return cfg.BasePath
 	}

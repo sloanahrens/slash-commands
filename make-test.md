@@ -52,12 +52,13 @@ Makefile for <repo-name>: 13 targets
 
 **Execution order:**
 
-1. **Clean/Destructive first** - Start fresh: `clean`, `reset`, `docker-down`, etc.
-2. **Setup/Install** - Restore dependencies: `install`, `setup`, `init`
-3. **Database/Docker** - Infrastructure: `docker-build`, `db-up`, `migrate`
-4. **Build** - Compile: `build`, `compile`, `dist`
-5. **Test/Lint** - Verify: `lint`, `typecheck`, `format`, `check`, `test`
-6. **Dev/Blocking** - Smoke test: `dev`, `run`, `start`, `serve` (with timeout)
+1. **Setup/Install** - Restore dependencies: `install`, `setup`, `init`
+2. **Database/Docker** - Infrastructure: `docker-build`, `db-up`, `migrate`
+3. **Build** - Compile: `build`, `compile`, `dist`
+4. **Test/Lint** - Verify: `lint`, `typecheck`, `format`, `check`, `test`
+5. **Dev/Blocking** - Smoke test: `dev`, `run`, `start`, `serve` (with timeout)
+
+**Note:** Clean targets (`clean`, `reset`, `docker-down`, etc.) are **skipped by default** for faster incremental builds. Pass `clean` argument to run them first.
 
 **Special handling:**
 

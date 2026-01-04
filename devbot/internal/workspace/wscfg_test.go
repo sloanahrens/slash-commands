@@ -195,7 +195,47 @@ repos:
 func TestGetWorkspacePath(t *testing.T) {
 	home, _ := os.UserHomeDir()
 
-	t.Run("with code_path in config", func(t *testing.T) {
+	t.Run("with workspace in config (new unified key)", func(t *testing.T) {
+		ResetConfigCache()
+		tmpDir := t.TempDir()
+		configPath := filepath.Join(tmpDir, "config.yaml")
+
+		configContent := `
+workspace: ~/my-workspace
+`
+		_ = os.WriteFile(configPath, []byte(configContent), 0644)
+		t.Setenv("DEVBOT_CONFIG", configPath)
+
+		path := GetWorkspacePath()
+
+		want := filepath.Join(home, "my-workspace")
+		if path != want {
+			t.Errorf("GetWorkspacePath() = %q, want %q", path, want)
+		}
+	})
+
+	t.Run("workspace takes priority over legacy paths", func(t *testing.T) {
+		ResetConfigCache()
+		tmpDir := t.TempDir()
+		configPath := filepath.Join(tmpDir, "config.yaml")
+
+		configContent := `
+workspace: ~/preferred
+code_path: ~/projects
+base_path: ~/code
+`
+		_ = os.WriteFile(configPath, []byte(configContent), 0644)
+		t.Setenv("DEVBOT_CONFIG", configPath)
+
+		path := GetWorkspacePath()
+
+		want := filepath.Join(home, "preferred")
+		if path != want {
+			t.Errorf("GetWorkspacePath() = %q, want %q (workspace should take priority)", path, want)
+		}
+	})
+
+	t.Run("with code_path in config (legacy)", func(t *testing.T) {
 		ResetConfigCache()
 		tmpDir := t.TempDir()
 		configPath := filepath.Join(tmpDir, "config.yaml")
@@ -215,7 +255,7 @@ base_path: ~/code
 		}
 	})
 
-	t.Run("with base_path only", func(t *testing.T) {
+	t.Run("with base_path only (legacy)", func(t *testing.T) {
 		ResetConfigCache()
 		tmpDir := t.TempDir()
 		configPath := filepath.Join(tmpDir, "config.yaml")

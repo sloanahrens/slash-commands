@@ -9,8 +9,7 @@ This file contains shared patterns used by all repo-targeting slash commands.
 Commands use `config.yaml` in this directory:
 
 ```yaml
-base_path: ~/code/mono-claude
-code_path: ~/code/mono-claude
+workspace: ~/code/mono-claude
 
 repos:
   - name: my-project      # Must match directory name exactly
@@ -20,10 +19,13 @@ repos:
 ```
 
 **Fields:**
+- `workspace` - Root directory containing all repos
 - `name` - Directory name (exact match required)
 - `group` - Organization category (apps, devops, tools, experimental)
 - `language` - Primary language (typescript, python, go, etc.)
 - `work_dir` - Optional subdirectory for nested projects
+
+**Setup:** Run `/setup-workspace` to auto-generate config from your directory.
 
 ---
 
@@ -137,7 +139,7 @@ devbot stats ~/code/my-repo               # ❌ Never guess paths!
 
 All repo-name commands require exact names from config.yaml.
 
-Install: `/install-devbot`
+Install: `/setup-workspace` (or rebuild with `cd devbot && make install`)
 
 ---
 

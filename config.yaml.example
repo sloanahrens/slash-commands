@@ -1,63 +1,36 @@
 # Workspace Configuration
-# Copy this file to config.yaml
+# Copy this file to config.yaml and edit for your setup
 # config.yaml is gitignored and will not be committed
 
-# Primary workspace (monorepo or main project)
-base_path: ~/code/my-workspace
+# Workspace root - all repos live here
+workspace: ~/code/my-workspace
 
-# Built-in components (fixed paths within base_path)
-# These are packages/apps that are always present in your monorepo
-builtin:
-  - name: my-cli
-    group: packages
-    path: packages/my-cli
-    language: typescript
-    commands:
-      test: npm test
-      lint: npm run lint
-      build: npm run build
-
-  - name: my-server
-    group: apps
-    path: apps/my-server
-    language: python
-    commands:
-      test: uv run pytest
-      lint: uv run ruff check .
-      typecheck: uv run mypy .
-
-# Dynamic directories (auto-discovered)
-# worktrees_dir: scans for git worktrees (feature branches)
-# clones_config: reads clone-config.json for reference repos
-worktrees_dir: .trees
-clones_config: clones/clone-config.json
-
-# All working code repos location
-code_path: ~/code
-
-# Working repos at code_path
-# Added via /add-repo or manually
+# Working repositories
+# Added via /add-repo or /setup-workspace, or manually
 repos:
-  # Example: active project
-  # - name: my-project
-  #   group: projects
+  # Example: Next.js application
+  # - name: my-app
+  #   group: apps
   #   language: typescript
-  #   linear_project: my-project-board  # Optional: Linear integration
-  #   commands:
-  #     test: pnpm test
-  #     typecheck: pnpm -r typecheck
-  #     lint: pnpm lint
 
-  # Example: infrastructure repo
+  # Example: Go API server
+  # - name: my-api
+  #   group: apps
+  #   language: go
+  #   work_dir: cmd/api  # Optional: subdirectory for nested projects
+
+  # Example: Python project
+  # - name: ml-service
+  #   group: services
+  #   language: python
+
+  # Example: Infrastructure
   # - name: my-infra
   #   group: devops
   #   language: typescript
 
-  # Example: Go project with custom work_dir
-  # - name: my-go-app
-  #   group: personal
-  #   language: go
-  #   work_dir: cmd/app
-  #   commands:
-  #     test: go test ./internal/... -v
-  #     build: go build -o app ./cmd/app
+# Optional: Git worktrees directory (relative to workspace)
+# worktrees_dir: .trees
+
+# Optional: Reference clones config (relative to workspace)
+# clones_config: clones/clone-config.json

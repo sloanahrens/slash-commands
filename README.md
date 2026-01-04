@@ -12,31 +12,21 @@ Portable slash commands for managing multi-repo workspaces with Claude Code.
 
 ## Installation
 
-### Option 1: Clone directly to commands folder
-
 ```bash
-git clone https://github.com/sloanahrens/slash-commands.git ~/.claude/commands
-cd ~/.claude/commands/devbot && make install
-```
-
-### Option 2: Clone anywhere and create symlinks
-
-```bash
+# Clone the repo
 git clone https://github.com/sloanahrens/slash-commands.git ~/code/slash-commands
 
-# Create symlinks (run in Claude Code)
-/setup-symlinks
-
-# Install devbot
-/install-devbot
+# Run unified setup (in Claude Code)
+/setup-workspace
 ```
 
-### Post-Installation
+This single command will:
+1. Scan your workspace and generate `config.yaml`
+2. Build and install the `devbot` CLI
+3. Create symlinks in `~/.claude/commands`
+4. Install recommended plugins
 
-```bash
-cp config.yaml.example config.yaml
-# Edit config.yaml for your workspace
-```
+Each step prompts for confirmation and can be skipped.
 
 ## Commands
 
@@ -59,9 +49,8 @@ cp config.yaml.example config.yaml
 | `/quick-gen <desc>` | Quick code generation (local model) |
 | `/yes-proceed` | Accept recommendation and proceed |
 | `/dev-rules` | Load workspace development rules |
-| `/setup-plugins` | Install recommended plugins |
-| `/install-devbot` | Build and install devbot CLI |
-| `/setup-symlinks` | Create global command symlinks |
+| `/setup-workspace` | Unified setup (config, devbot, symlinks, plugins) |
+| `/setup-plugins` | Install/update plugins (standalone) |
 | `/list-commands` | List all available commands |
 | `/list-skills` | List available skills from plugins |
 
@@ -69,12 +58,10 @@ All repo commands require exact repo names from config.yaml.
 
 ## Configuration
 
-Create `config.yaml` based on your workspace:
+Run `/setup-workspace` to auto-generate `config.yaml`, or create manually:
 
 ```yaml
-# Where your repos live
-base_path: ~/code/my-workspace
-code_path: ~/code/my-workspace
+workspace: ~/code/my-workspace
 
 repos:
   - name: my-project        # Must match directory name exactly
@@ -87,7 +74,7 @@ repos:
     work_dir: cmd/api       # Optional: subdirectory for nested projects
 ```
 
-Repo names must exactly match the directory name under `code_path`.
+Repo names must exactly match the directory name under `workspace`.
 
 ## devbot CLI
 
@@ -141,7 +128,7 @@ Optional local MLX model for faster processing. Requires mlx-hub plugin.
 
 ## Recommended Plugins
 
-Run `/setup-plugins` or install manually:
+Run `/setup-workspace` (includes plugins) or `/setup-plugins` standalone:
 
 ```bash
 claude plugin marketplace add obra/superpowers-marketplace
