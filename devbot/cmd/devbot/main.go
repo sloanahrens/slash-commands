@@ -14,6 +14,7 @@ import (
 	"github.com/sloanahrens/devbot-go/internal/deps"
 	"github.com/sloanahrens/devbot-go/internal/detect"
 	"github.com/sloanahrens/devbot-go/internal/diff"
+	"github.com/sloanahrens/devbot-go/internal/lastcommit"
 	"github.com/sloanahrens/devbot-go/internal/makefile"
 	"github.com/sloanahrens/devbot-go/internal/output"
 	"github.com/sloanahrens/devbot-go/internal/remote"
@@ -221,6 +222,15 @@ var pathCmd = &cobra.Command{
 	Run:   runPath,
 }
 
+// Last-commit command
+var lastCommitCmd = &cobra.Command{
+	Use:   "last-commit <repo> [file]",
+	Short: "Show when a repo or file was last committed",
+	Long:  `Shows the relative time since the last commit to a repository or specific file.`,
+	Args:  cobra.RangeArgs(1, 2),
+	Run:   runLastCommit,
+}
+
 func init() {
 	// Status flags
 	statusCmd.Flags().BoolVar(&showDirtyOnly, "dirty", false, "Only show repos with uncommitted changes")
@@ -275,6 +285,7 @@ func init() {
 	rootCmd.AddCommand(remoteCmd)
 	rootCmd.AddCommand(findRepoCmd)
 	rootCmd.AddCommand(pathCmd)
+	rootCmd.AddCommand(lastCommitCmd)
 }
 
 func runStatus(cmd *cobra.Command, args []string) {
@@ -1417,6 +1428,47 @@ func runPath(cmd *cobra.Command, args []string) {
 		fmt.Fprintln(os.Stderr)
 	}
 	os.Exit(1)
+}
+
+func runLastCommit(cmd *cobra.Command, args []string) {
+	workspacePath := workspace.DefaultWorkspace()
+	if workspacePath == "" {
+		fmt.Fprintln(os.Stderr, "Error: could not determine home directory")
+		os.Exit(1)
+	}
+
+	repos, err := workspace.Discover(workspacePath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error discovering repos: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Find the target repo
+	target := args[0]
+	var targetRepo *workspace.RepoInfo
+	for _, r := range repos {
+		if r.Name == target || strings.Contains(strings.ToLower(r.Name), strings.ToLower(target)) {
+			repo := r
+			targetRepo = &repo
+			break
+		}
+	}
+
+	if targetRepo == nil {
+		fmt.Fprintf(os.Stderr, "Repository '%s' not found\n", target)
+		os.Exit(1)
+	}
+
+	// Optional file argument
+	file := ""
+	if len(args) > 1 {
+		file = args[1]
+	}
+
+	result := lastcommit.GetLastCommit(*targetRepo, file)
+
+	// Output just the relative time (simple output for scripting)
+	fmt.Println(result.RelativeAge)
 }
 
 func main() {

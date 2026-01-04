@@ -1,192 +1,124 @@
 # devbot
 
-Fast parallel development workspace tools written in Go.
-
-Part of [slash-commands](../README.md) - Claude Code slash commands for multi-repo workspaces.
+Fast parallel development workspace tools. Part of [slash-commands](../README.md).
 
 ## Installation
 
 ```bash
-make install
-# Or run /setup-workspace (includes devbot installation)
+make install                    # Or run /setup-workspace in Claude Code
 ```
 
 ## Commands
 
-### path - Get Repository Path
+### NAME Commands (take repo name)
 
+#### path - Get Repository Path
 ```bash
-devbot path <repo>         # Get full filesystem path for exact repo name
+devbot path <repo>              # Returns full path including work_dir
 ```
 
-Returns the full path including `work_dir` if configured. Requires exact repo name from config.yaml.
-
+#### status - Parallel Git Status
 ```bash
-$ devbot path fractals-nextjs
-/Users/sloan/code/mono-claude/fractals-nextjs
-
-$ devbot path fractals
-Repository 'fractals' not found. Did you mean:
-  fractals-nextjs
+devbot status                   # Dirty repos (~0.03s for 12 repos)
+devbot status --all             # All repos
+devbot status <repo>            # Single repo
 ```
 
-### status - Parallel Git Status
-
+#### diff - Git Diff Summary
 ```bash
-devbot status              # Show dirty repos (clean count summarized)
-devbot status --all        # Show all repos
-devbot status --dirty      # Only dirty repos
-devbot status <repo>       # Single repo details
+devbot diff <repo>              # Staged/unstaged with line counts
+devbot diff <repo> --full       # Include diff content
 ```
 
-~0.03s for 12 repos.
-
-### diff - Git Diff Summary
-
+#### branch - Branch Info
 ```bash
-devbot diff <repo>         # Staged/unstaged files with line counts
-devbot diff <repo> --full  # Include full diff content
+devbot branch <repo>            # Branch, tracking, ahead/behind
 ```
 
-Shows branch, staged files, unstaged files with +/- counts.
-
-### branch - Branch and Tracking Info
-
+#### remote - Remote Info
 ```bash
-devbot branch <repo>       # Branch, tracking, ahead/behind, commits to push
+devbot remote <repo>            # Remote URLs and GitHub identifiers
 ```
 
-### remote - Git Remote Info
-
+#### find-repo - Find by GitHub ID
 ```bash
-devbot remote <repo>       # Remote URLs and GitHub identifiers
+devbot find-repo owner/repo
+devbot find-repo https://github.com/owner/repo/pull/123
 ```
 
-### find-repo - Find Repo by GitHub ID
-
+#### check - Quality Checks
 ```bash
-devbot find-repo owner/repo                              # By identifier
-devbot find-repo https://github.com/owner/repo/pull/123  # By URL
+devbot check <repo>             # lint, typecheck, build, test
+devbot check <repo> --only=lint # Specific checks
+devbot check <repo> --fix       # Auto-fix
 ```
 
-### check - Auto-Detected Quality Checks
+Auto-detects stack (go, ts, nextjs, python, rust).
 
+#### last-commit - Commit Recency
 ```bash
-devbot check <repo>              # Run all checks (lint, typecheck, build, test)
-devbot check <repo> --only=lint  # Run specific checks (comma-separated)
-devbot check <repo> --fix        # Auto-fix where possible
+devbot last-commit <repo>       # When was repo last committed
+devbot last-commit <repo> FILE  # When was specific file last committed
 ```
 
-Auto-detects stack (go, ts, nextjs, python, rust) and runs appropriate commands:
-- Lint and typecheck run in parallel
-- Build and test run sequentially
-- Exits with code 1 on first failure
-
-### run - Parallel Command Execution
-
+#### todos - TODO/FIXME Scanning
 ```bash
-devbot run -- git pull             # Pull all repos in parallel
-devbot run -- npm install          # Install deps in all repos
-devbot run -f myapp -- make build  # Filter to repos matching "myapp"
-devbot run -q -- git fetch         # Quiet mode (suppress empty output)
+devbot todos                    # All TODOs
+devbot todos --type FIXME       # Filter by marker
+devbot todos --count            # Counts only
+devbot todos <repo>             # Single repo
 ```
 
-### todos - Parallel TODO/FIXME Scanning
-
+#### config - Config File Discovery
 ```bash
-devbot todos                # All TODOs across workspace
-devbot todos --type FIXME   # Filter by marker type (TODO, FIXME, HACK, XXX, BUG)
-devbot todos --count        # Show counts only
-devbot todos <repo>         # Single repo
+devbot config                   # All config files
+devbot config --type go         # Filter by type
+devbot config <repo>            # Single repo
 ```
 
-Scans: `.go`, `.ts`, `.tsx`, `.js`, `.jsx`, `.py`, `.md`, `.yaml`, `.yml` files.
-
-### stats - Code Metrics and Complexity
-
+#### make - Makefile Targets
 ```bash
-devbot stats <path>         # Analyze file or directory
-devbot stats <path> -l go   # Filter by language
+devbot make                     # All targets
+devbot make <repo>              # Single repo
 ```
 
-Reports: files, lines (code/comments/blank), functions, complexity flags.
-
-### detect - Project Stack Detection
-
+#### worktrees - Git Worktrees
 ```bash
-devbot detect               # Current directory
-devbot detect <path>        # Specific path
+devbot worktrees                # All worktrees
+devbot worktrees <repo>         # Single repo
 ```
 
-Outputs detected stacks (e.g., `go`, `ts`, `nextjs`, `python`, `rust`).
-
-### deps - Dependency Analysis
-
+#### deps - Dependency Analysis
 ```bash
-devbot deps               # Show shared dependencies (2+ repos)
-devbot deps --all         # Show all dependencies by usage
-devbot deps --count       # Show counts only
-devbot deps <repo>        # Analyze single repo
+devbot deps                     # Shared dependencies (2+ repos)
+devbot deps --all               # All by usage
+devbot deps <repo>              # Single repo
 ```
 
-### tree - Gitignore-Aware Tree
-
+#### run - Parallel Command Execution
 ```bash
-devbot tree               # Current directory
-devbot tree <path>        # Specific path
-devbot tree -d 5          # Depth limit (default: 3)
-devbot tree --hidden      # Show hidden files
+devbot run -- git pull          # Run in all repos
+devbot run -f myapp -- make     # Filter repos
+devbot run -q -- git fetch      # Quiet mode
 ```
 
-### config - Config File Discovery
+### PATH Commands (take filesystem path)
 
+#### tree - Gitignore-Aware Tree
 ```bash
-devbot config              # All config files by type
-devbot config --type go    # Filter by type (node, go, python, infra, iac, ci, config)
-devbot config --has node   # Show only repos with this config type
-devbot config <repo>       # Single repo
+devbot tree <path>              # Directory tree
+devbot tree -d 5                # Depth limit
 ```
 
-### make - Makefile Target Analysis
-
+#### stats - Code Metrics
 ```bash
-devbot make                # All targets grouped by category
-devbot make --targets      # Show all targets across all repos
-devbot make <repo>         # Single repo
+devbot stats <path>             # File/dir analysis
+devbot stats <path> -l go       # Filter by language
 ```
 
-### worktrees - Git Worktree Discovery
-
+#### detect - Stack Detection
 ```bash
-devbot worktrees           # All worktrees across repos
-devbot worktrees <repo>    # Single repo
-```
-
-## Architecture
-
-```
-devbot/
-├── cmd/devbot/main.go     # CLI entry point (cobra)
-├── internal/
-│   ├── workspace/         # Repo discovery and parallel git status
-│   ├── runner/            # Parallel command execution
-│   ├── branch/            # Branch and tracking info
-│   ├── check/             # Auto-detected quality checks
-│   ├── config/            # Config file discovery
-│   ├── deps/              # Dependency analysis
-│   ├── detect/            # Project stack detection
-│   ├── diff/              # Git diff summary
-│   ├── makefile/          # Makefile target parsing
-│   ├── output/            # Terminal rendering
-│   ├── remote/            # Git remote and GitHub ID parsing
-│   ├── stats/             # Code metrics and complexity
-│   ├── todos/             # Parallel TODO/FIXME scanning
-│   ├── tree/              # Gitignore-aware directory tree
-│   └── worktrees/         # Git worktree discovery
-├── testdata/              # Test fixtures
-├── Makefile               # Build targets
-├── go.mod
-└── go.sum
+devbot detect <path>            # Outputs: go, ts, nextjs, etc.
 ```
 
 ## Development
@@ -194,15 +126,31 @@ devbot/
 ```bash
 make build       # Build binary
 make test        # Run tests
-make test-race   # Run with race detector
-make test-cover  # Run with coverage
-make lint        # Run golangci-lint
-make ci          # Run all checks
+make ci          # Full CI: fmt, vet, test, lint, build
+make install     # Install to PATH
 ```
 
-## Codebase Metrics
+## Architecture
 
-- **Files:** 37 Go source files
-- **Lines:** 9,315 total (7,378 code, 482 comments, 1,455 blank)
-- **Functions:** 285 (average 10 lines)
-- **Test coverage:** 87-98% across packages
+```
+devbot/
+├── cmd/devbot/main.go     # CLI entry (cobra)
+├── internal/
+│   ├── workspace/         # Repo discovery, parallel git status
+│   ├── branch/            # Branch and tracking
+│   ├── check/             # Quality checks
+│   ├── config/            # Config discovery
+│   ├── deps/              # Dependency analysis
+│   ├── detect/            # Stack detection
+│   ├── diff/              # Git diff
+│   ├── lastcommit/        # Commit recency
+│   ├── makefile/          # Makefile parsing
+│   ├── output/            # Terminal rendering
+│   ├── remote/            # Git remote parsing
+│   ├── runner/            # Parallel execution
+│   ├── stats/             # Code metrics
+│   ├── todos/             # TODO scanning
+│   ├── tree/              # Directory tree
+│   └── worktrees/         # Worktree discovery
+└── Makefile
+```

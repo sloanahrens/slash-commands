@@ -2,125 +2,67 @@
 
 Portable slash commands for managing multi-repo workspaces with Claude Code.
 
-## Features
-
-- Multi-source repository discovery (builtin packages, worktrees, clones, standalone repos)
-- Git worktree support for feature branch isolation
-- Integration with [devbot](devbot/README.md) for fast parallel operations
-- Optional Linear and GitHub MCP integration
-- Optional local model acceleration via MLX
-
 ## Installation
 
 ```bash
-# Clone the repo
 git clone https://github.com/sloanahrens/slash-commands.git ~/code/slash-commands
-
-# Run unified setup (in Claude Code)
-/setup-workspace
+/setup-workspace  # In Claude Code - handles config, devbot, symlinks, plugins
 ```
-
-This single command will:
-1. Scan your workspace and generate `config.yaml`
-2. Build and install the `devbot` CLI
-3. Create symlinks in `~/.claude/commands`
-4. Install recommended plugins
-
-Each step prompts for confirmation and can be skipped.
 
 ## Commands
 
 | Command | Description |
 |---------|-------------|
-| `/super <repo>` | Start brainstorming session with context |
+| `/super <repo>` | Brainstorming session with context |
 | `/find-tasks <repo>` | Find tasks from code, Linear, GitHub |
-| `/run-tests <repo>` | Run lint, type-check, build, and tests |
+| `/run-tests <repo>` | Lint, type-check, build, and tests |
 | `/make-test <repo>` | Test Makefile targets interactively |
 | `/yes-commit <repo>` | Draft and commit changes |
 | `/push <repo>` | Push commits to origin |
 | `/update-docs <repo>` | Update documentation |
 | `/review-project <repo>` | Technical review with analysis |
 | `/resolve-pr <url>` | Resolve GitHub PR review feedback |
-| `/add-repo <url>` | Clone repo (reference or working) |
-| `/status [repo]` | Show repository status |
+| `/add-repo <url>` | Clone repo |
+| `/status [repo]` | Repository status |
 | `/sync [repo]` | Pull latest changes |
-| `/switch <repo>` | Context switch with suggestions |
-| `/quick-explain <code>` | Quick code explanation (local model) |
-| `/quick-gen <desc>` | Quick code generation (local model) |
-| `/yes-proceed` | Accept recommendation and proceed |
-| `/dev-rules` | Load workspace development rules |
-| `/setup-workspace` | Unified setup (config, devbot, symlinks, plugins) |
-| `/setup-plugins` | Install/update plugins (standalone) |
-| `/list-commands` | List all available commands |
-| `/list-skills` | List available skills from plugins |
+| `/switch <repo>` | Context switch |
+| `/quick-explain <code>` | Code explanation (local model) |
+| `/quick-gen <desc>` | Code generation (local model) |
+| `/setup-workspace` | Unified setup |
+| `/list-commands` | List all commands |
 
 All repo commands require exact repo names from config.yaml.
 
 ## Configuration
 
-Run `/setup-workspace` to auto-generate `config.yaml`, or create manually:
-
 ```yaml
 workspace: ~/code/my-workspace
 
 repos:
-  - name: my-project        # Must match directory name exactly
+  - name: my-project        # Must match directory name
     group: apps
     language: typescript
-
-  - name: my-api
-    group: apps
-    language: go
-    work_dir: cmd/api       # Optional: subdirectory for nested projects
+    work_dir: cmd/api       # Optional: subdirectory
 ```
-
-Repo names must exactly match the directory name under `workspace`.
 
 ## devbot CLI
 
-Fast parallel operations across your workspace. See [devbot/README.md](devbot/README.md) for full documentation.
+Fast parallel operations. See [devbot/README.md](devbot/README.md) for full documentation.
 
-**Commands taking repo NAME:**
-```bash
-devbot path <repo>         # Get full filesystem path (USE THIS FIRST!)
-devbot status              # Parallel git status (~0.03s for 12 repos)
-devbot status <repo>       # Single repo status
-devbot check <repo>        # Auto-detected quality checks
-devbot diff <repo>         # Git diff summary
-devbot config <repo>       # Show config files
-```
-
-**Commands taking filesystem PATH:**
-```bash
-# ALWAYS get path first, then use it:
-devbot path my-project
-# Output: /Users/sloan/code/mono-claude/my-project
-
-devbot tree /Users/sloan/code/mono-claude/my-project   # Use literal path
-devbot stats /Users/sloan/code/mono-claude/my-project  # Use literal path
-
-# NEVER use compound commands or guess paths
-```
-
-## Worktree Workflow
+**Critical:** Commands take either repo NAME or filesystem PATH:
 
 ```bash
-git worktree add .trees/feature-name -b feature/feature-name
-/switch feature-name
-/run-tests feature-name
-/yes-commit feature-name
-/push feature-name
+# NAME commands
+devbot path <repo>              # Get path (USE THIS FIRST)
+devbot status [repo]            # Git status (~0.03s for 12 repos)
+devbot check <repo>             # Auto-detected quality checks
+devbot last-commit <repo> [file] # When was repo/file last committed
+
+# PATH commands - always get path first
+devbot path my-project          # → /path/to/my-project
+devbot tree /path/to/my-project # Use literal path
+devbot stats /path/to/my-project
 ```
-
-## Local Model Acceleration
-
-Optional local MLX model for faster processing. Requires mlx-hub plugin.
-
-| Command | Local Model Use |
-|---------|-----------------|
-| `/yes-commit` | Draft commit messages |
-| `/quick-explain` | Code explanations |
-| `/quick-gen` | Simple code generation |
 
 ## Requirements
 
@@ -128,17 +70,11 @@ Optional local MLX model for faster processing. Requires mlx-hub plugin.
 - Git
 - Go 1.23+ (for devbot)
 
-## Recommended Plugins
-
-Run `/setup-workspace` (includes plugins) or `/setup-plugins` standalone.
-
-Key plugins: `superpowers`, `episodic-memory`, `pr-review-toolkit`, `mlx-hub` (local model)
-
 ## Files
 
 | File | Purpose |
 |------|---------|
-| `config.yaml` | Your workspace config (gitignored) |
-| `config.yaml.example` | Template for config |
-| `_shared-repo-logic.md` | Multi-source repo discovery logic |
-| [`devbot/`](devbot/README.md) | Go CLI for parallel operations |
+| `config.yaml` | Workspace config (gitignored) |
+| `config.yaml.example` | Template |
+| `_shared-repo-logic.md` | Shared command patterns |
+| [`devbot/`](devbot/README.md) | Go CLI source |
