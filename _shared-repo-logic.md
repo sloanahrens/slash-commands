@@ -6,177 +6,90 @@ This file contains shared patterns used by all repo-targeting slash commands.
 
 ## Configuration
 
-**CRITICAL**: Always read the actual `config.yaml` to get real path values before using them:
-```bash
-cat ~/.claude/commands/config.yaml
-```
+Commands use `config.yaml` in this directory:
 
-Commands use `config.yaml` in this directory. The config supports:
-
-- `base_path` - primary workspace for monorepo/packages
-- `builtin` - fixed packages within base_path
-- `worktrees_dir` - auto-discovers `.trees/*` worktrees
-- `clones_config` - reads reference repos from `clones/clone-config.json`
-- `code_path` - location of working code repos
-- `repos` - working repos at code_path
-
-**Example config (DO NOT use these values - read actual config.yaml):**
 ```yaml
-# EXAMPLE ONLY - your actual paths will differ!
-base_path: ~/code/my-workspace
-
-builtin:
-  - name: my-cli
-    group: packages
-    path: packages/my-cli
-    language: typescript
-
-worktrees_dir: .trees
-clones_config: clones/clone-config.json
-
-code_path: ~/code
+base_path: ~/code/mono-claude
+code_path: ~/code/mono-claude
 
 repos:
-  - name: my-project
-    group: projects
-    aliases: [proj, mp]
+  - name: my-project      # Must match directory name exactly
+    group: apps
+    language: typescript
+    work_dir: nextapp     # Optional: subdirectory for actual code
 ```
 
----
-
-## Critical Rule
-
-**CRITICAL**: Stay within the configured paths:
-- `<base_path>` for monorepo/workspace work
-- `<code_path>` for standalone repos
-
-Never navigate above these directories.
+**Fields:**
+- `name` - Directory name (exact match required)
+- `group` - Organization category (apps, devops, tools, experimental)
+- `language` - Primary language (typescript, python, go, etc.)
+- `work_dir` - Optional subdirectory for nested projects
 
 ---
 
-## Repo Discovery
+## Repo Resolution
 
-Parse repos from multiple sources in order:
+### When user provides `@directory/`
 
-### 1. Builtin Components
+The `@` prefix means Claude Code passed a directory context:
 
-Read `config.yaml` → `builtin[]`:
-- These are fixed packages within your monorepo
-- Path resolved as `<base_path>/<path>`
+1. Extract directory name from path (e.g., `@fractals-nextjs/` → `fractals-nextjs`)
+2. Use `devbot path <name>` to get full path
+3. If not found, show suggestion and ask user
 
-### 2. Worktrees (Dynamic)
+### When user provides plain name
 
-Use devbot for fast worktree discovery:
+1. Use `devbot path <name>` to get full path
+2. If found → use that path
+3. If not found → show suggestion, ask user to confirm
+
+### Getting the full path
+
+**ALWAYS use devbot to get paths:**
+
 ```bash
-devbot worktrees
+devbot path fractals-nextjs
+# Output: /Users/sloan/code/mono-claude/fractals-nextjs
 ```
 
-This scans `.trees/`, `worktrees/`, `.worktrees/` directories across all repos in parallel (~0.01s) and returns:
-- Name: directory name (e.g., `feature-new-auth`)
-- Path: full path to worktree
-- Branch: current branch
-- Status: dirty file count
+**NEVER construct paths manually.** Do not assume `~/code/<name>` or any other pattern.
 
-### 3. Clones (Reference Repos)
+### When name not found
 
-Read `<base_path>/clones/clone-config.json`:
-```json
-{
-  "repositories": {
-    "some-sdk": { "url": "...", "description": "..." },
-    "other-lib": { "url": "...", "description": "..." }
-  }
-}
+devbot suggests similar names:
+
+```bash
+devbot path fractals
+# Output: Repository 'fractals' not found. Did you mean:
+#   fractals-nextjs
 ```
 
-For each clone:
-- Name: key name
-- Path: `<base_path>/clones/<name>`
-- Group: `clones`
-- **Note**: These are read-only reference repos
-
-### 4. Working Repos
-
-Read `config.yaml` → `repos[]`:
-- These are working repos at `<code_path>/<name>`
-- Added via `/add-repo` or manually to config
+Show this to the user and ask them to confirm or provide the correct name.
 
 ---
 
-## Groups
+## Standard Process
 
-| Group | Source | Location | Description |
-|-------|--------|----------|-------------|
-| `packages` | builtin | `<base_path>/packages/` | Monorepo packages |
-| `apps` | builtin | `<base_path>/apps/` | Monorepo applications |
-| `worktrees` | dynamic | `<base_path>/.trees/` | Active feature branches |
-| `clones` | clone-config.json | `<base_path>/clones/` | Reference repos |
-| `projects` | repos | `<code_path>/` | Active project work |
-| `devops` | repos | `<code_path>/` | Infrastructure repos |
-| `personal` | repos | `<code_path>/` | Personal/exploration repos |
+1. Extract repo name from `$ARGUMENTS`
+2. Run `devbot path <name>` to get full path
+3. If not found, show suggestion and ask user
+4. Confirm: "Working on: <repo-name>"
+5. Load context (see below)
 
 ---
 
-## Repo Selection
+## Context Loading
 
-**If `$ARGUMENTS` is empty:**
+After resolving the repo path:
 
-Display grouped list and ask user to select:
-
-```
-Select a repository:
-
-Packages:
-  1. my-cli
-  2. my-server
-
-Worktrees:
-  3. feature/new-auth
-
-Clones:
-  4. some-sdk
-
-Projects:
-  5. my-project
-  6. another-project
-
-Enter number or name:
-```
-
-**If `$ARGUMENTS` is provided:**
-
-Fuzzy match against:
-1. Directory names
-2. Configured aliases
-3. Worktree branch names
-
-| Input | Matches |
-|-------|---------|
-| `cli` | my-cli |
-| `server` | my-server |
-| `sdk` | some-sdk |
-| `proj` | my-project |
-
-**IMPORTANT**: After fuzzy matching, always use the **full repo name** (from config.yaml `name` field) for all devbot commands, NOT the alias that was matched. Devbot requires exact repo names.
-
----
-
-## Path Resolution
-
-Once a repo is selected, resolve its full path:
-
-| Source | Path Pattern |
-|--------|--------------|
-| builtin | `<base_path>/<path>` (e.g., `~/code/my-workspace/packages/my-cli`) |
-| worktree | `<base_path>/.trees/<name>` (e.g., `~/code/my-workspace/.trees/feature-x`) |
-| clone | `<base_path>/clones/<name>` (e.g., `~/code/my-workspace/clones/some-sdk`) |
-| repo | `<code_path>/<name>` (e.g., `~/code/my-project`) |
+1. Read `~/.claude/CLAUDE.md` (global settings)
+2. Read `<repo-path>/CLAUDE.md` (repo-specific guidance)
 
 ---
 
 ## Commit Rules
 
-When committing changes in any repo:
+When committing changes:
 
 - **NO** Claude/Anthropic attribution
 - **NO** co-author lines
@@ -186,54 +99,37 @@ When committing changes in any repo:
 
 ---
 
-## Context Loading
+## devbot CLI
 
-After selecting a repo, load relevant context:
+Fast operations across repos:
 
-1. **Global config**: Read `~/.claude/CLAUDE.md` (if exists) for user-wide settings
-2. **Repo-specific**: Read `<repo-path>/CLAUDE.md` if it exists
-3. **For Python projects**: Note Python/uv patterns
-4. **For TypeScript projects**: Note TypeScript/npm patterns
+| Command | Purpose |
+|---------|---------|
+| `devbot path <repo>` | Get full filesystem path for repo |
+| `devbot status` | Git status across all repos |
+| `devbot status <repo>` | Single repo git details |
+| `devbot diff <repo>` | Git diff summary |
+| `devbot branch <repo>` | Branch tracking info |
+| `devbot check <repo>` | Run lint/typecheck/build/test |
+| `devbot make <repo>` | Makefile target analysis |
+| `devbot tree <path>` | Directory tree |
+| `devbot stats <path>` | Code metrics |
 
----
+All commands require exact repo names from config.yaml.
 
-## Standard Process Start
-
-1. **Read `~/.claude/commands/config.yaml`** to get actual `base_path` and `code_path` values
-   - DO NOT assume paths or use example values from documentation
-2. Parse `config.yaml` repos list
-3. Discover worktrees from `<base_path>/.trees/`
-4. Discover clones from `clones/clone-config.json`
-5. If `$ARGUMENTS` empty → show selection prompt
-6. If `$ARGUMENTS` provided → fuzzy match to repo
-7. Confirm selection: "Working on: <repo-name>"
-8. Read global `~/.claude/CLAUDE.md` (if exists) for user-wide settings
-9. Read repo's CLAUDE.md (if exists) for repo-specific guidance
+Install: `/install-devbot`
 
 ---
 
 ## Local Model Acceleration (Optional)
 
-Commands can use local models for speed gains. Requires `mlx-hub` plugin.
-
-### Quick Reference
+For simple tasks, use local models via mlx-hub plugin:
 
 | Use Local Model For | Stay on Claude For |
 |---------------------|-------------------|
 | Commit messages | Security analysis |
 | Code explanation | Architecture decisions |
 | Simple code gen | Multi-file refactoring |
-| Type fixes | Complex debugging |
-
-### Output Format
-
-Always prefix local model output:
-```
-[local] Drafting commit message...
-[local] Generated: "feat(utils): add validation helper"
-```
-
-### Usage
 
 ```python
 mcp__plugin_mlx-hub_mlx-hub__mlx_infer(
@@ -243,48 +139,4 @@ mcp__plugin_mlx-hub_mlx-hub__mlx_infer(
 )
 ```
 
----
-
-## Linear Integration (Optional)
-
-For repos with `linear_project` in config:
-- `mcp__plugin_linear_linear__list_issues`
-- `mcp__plugin_linear_linear__get_issue`
-- `mcp__plugin_linear_linear__create_issue`
-
----
-
-## GitHub Integration (Optional)
-
-If you have GitHub MCP tools configured:
-- Search issues by project
-- Get assigned issues with project status
-- Find project items
-
----
-
-## devbot CLI
-
-Fast parallel operations across repos. Use devbot for speed-critical operations:
-
-| Command | Purpose | Speed |
-|---------|---------|-------|
-| `devbot status` | Git status across all repos | ~0.03s |
-| `devbot status <repo>` | Single repo details (use full name, not alias) | ~0.01s |
-| `devbot diff <repo>` | Git diff summary (staged/unstaged with stats) | ~0.02s |
-| `devbot branch <repo>` | Branch tracking, ahead/behind, commits to push | ~0.02s |
-| `devbot remote <repo>` | Remote URLs and GitHub identifiers | ~0.01s |
-| `devbot find-repo <gh-id>` | Find local repo by GitHub org/repo | ~0.03s |
-| `devbot check <repo>` | Auto-detected lint/typecheck/build/test | varies |
-| `devbot run -- <cmd>` | Parallel command execution | ~0.5s |
-| `devbot todos` | TODO/FIXME scanning | ~0.1s |
-| `devbot make` | Makefile target analysis | ~0.01s |
-| `devbot worktrees` | Worktree discovery | ~0.01s |
-| `devbot detect <path>` | Stack detection | instant |
-| `devbot config` | Config file discovery | ~0.01s |
-| `devbot stats <path>` | File/directory code metrics | ~0.01s |
-| `devbot deps [repo]` | Dependency analysis (shared deps) | ~0.01s |
-| `devbot tree <path>` | Directory tree (respects .gitignore) | ~0.01s |
-
-Install: Run `/install-devbot` or `cd ~/code/slash-commands/devbot && make install`
-
+Always prefix output: `[local] Generated: "..."`

@@ -17,11 +17,10 @@ type WorkspaceConfig struct {
 
 // RepoConfig represents a repository entry in config.yaml
 type RepoConfig struct {
-	Name     string   `yaml:"name"`
-	Group    string   `yaml:"group"`
-	Aliases  []string `yaml:"aliases"`
-	Language string   `yaml:"language"`
-	WorkDir  string   `yaml:"work_dir"`
+	Name     string `yaml:"name"`
+	Group    string `yaml:"group"`
+	Language string `yaml:"language"`
+	WorkDir  string `yaml:"work_dir"`
 }
 
 var cachedConfig *WorkspaceConfig
@@ -131,34 +130,42 @@ func GetWorkspacePath() string {
 }
 
 // FindRepoByName finds a repo by name or alias (with fuzzy matching)
+// Deprecated: Use FindRepoByNameExact instead
 func FindRepoByName(name string) *RepoConfig {
+	return FindRepoByNameExact(name)
+}
+
+// FindRepoByNameExact finds a repo by exact name match only
+func FindRepoByNameExact(name string) *RepoConfig {
 	cfg, err := LoadConfig()
 	if err != nil || cfg == nil {
 		return nil
 	}
 
-	name = strings.ToLower(name)
-
-	// Exact match on name or alias first
 	for i := range cfg.Repos {
-		r := &cfg.Repos[i]
-		if strings.ToLower(r.Name) == name {
-			return r
-		}
-		for _, alias := range r.Aliases {
-			if strings.ToLower(alias) == name {
-				return r
-			}
-		}
-	}
-
-	// Fuzzy match: check if name is contained in repo name
-	for i := range cfg.Repos {
-		r := &cfg.Repos[i]
-		if strings.Contains(strings.ToLower(r.Name), name) {
-			return r
+		if cfg.Repos[i].Name == name {
+			return &cfg.Repos[i]
 		}
 	}
 
 	return nil
+}
+
+// SuggestRepoNames returns repo names that contain the given substring
+func SuggestRepoNames(partial string) []string {
+	cfg, err := LoadConfig()
+	if err != nil || cfg == nil {
+		return nil
+	}
+
+	partial = strings.ToLower(partial)
+	var suggestions []string
+
+	for _, r := range cfg.Repos {
+		if strings.Contains(strings.ToLower(r.Name), partial) {
+			suggestions = append(suggestions, r.Name)
+		}
+	}
+
+	return suggestions
 }

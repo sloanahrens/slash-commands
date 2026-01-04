@@ -6,7 +6,7 @@ description: Pull latest changes for repositories
 
 Pull latest changes from remote for one or all repositories.
 
-**Arguments**: `$ARGUMENTS` - Optional repo name (fuzzy match). If empty, syncs all repos.
+**Arguments**: `$ARGUMENTS` - Repo name (exact match). If empty, syncs all repos.
 
 **Shared logic**: See `_shared-repo-logic.md` for repo discovery and selection.
 

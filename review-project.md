@@ -6,7 +6,7 @@ description: Conduct technical review for a repository
 
 Conduct a technical review of a repository and update its documentation.
 
-**Arguments**: `$ARGUMENTS` - Optional repo name (supports fuzzy match). If empty, shows selection menu.
+**Arguments**: `$ARGUMENTS` - Repo name (exact match). See `_shared-repo-logic.md`.
 
 **Shared logic**: See `_shared-repo-logic.md` for repo discovery and selection.
 

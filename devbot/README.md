@@ -13,6 +13,23 @@ make install
 
 ## Commands
 
+### path - Get Repository Path
+
+```bash
+devbot path <repo>         # Get full filesystem path for exact repo name
+```
+
+Returns the full path including `work_dir` if configured. Requires exact repo name from config.yaml.
+
+```bash
+$ devbot path fractals-nextjs
+/Users/sloan/code/mono-claude/fractals-nextjs
+
+$ devbot path fractals
+Repository 'fractals' not found. Did you mean:
+  fractals-nextjs
+```
+
 ### status - Parallel Git Status
 
 ```bash

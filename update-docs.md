@@ -6,7 +6,7 @@ description: Update documentation for a repository
 
 Update project documentation for a repository, maintaining consistency across files.
 
-**Arguments**: `$ARGUMENTS` - Optional repo name (supports fuzzy match). If empty, shows selection menu.
+**Arguments**: `$ARGUMENTS` - Repo name (exact match). See `_shared-repo-logic.md`.
 
 **Shared logic**: See `_shared-repo-logic.md` for repo discovery and selection.
 

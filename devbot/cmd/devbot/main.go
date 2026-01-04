@@ -212,6 +212,15 @@ var findRepoCmd = &cobra.Command{
 	Run:   runFindRepo,
 }
 
+// Path command
+var pathCmd = &cobra.Command{
+	Use:   "path <repo>",
+	Short: "Get full path for a repository",
+	Long:  `Returns the full filesystem path for a repository by exact name match.`,
+	Args:  cobra.ExactArgs(1),
+	Run:   runPath,
+}
+
 func init() {
 	// Status flags
 	statusCmd.Flags().BoolVar(&showDirtyOnly, "dirty", false, "Only show repos with uncommitted changes")
@@ -265,6 +274,7 @@ func init() {
 	rootCmd.AddCommand(branchCmd)
 	rootCmd.AddCommand(remoteCmd)
 	rootCmd.AddCommand(findRepoCmd)
+	rootCmd.AddCommand(pathCmd)
 }
 
 func runStatus(cmd *cobra.Command, args []string) {
@@ -1365,6 +1375,48 @@ func runFindRepo(cmd *cobra.Command, args []string) {
 	fmt.Printf("  Remote: %s (%s)\n", result.Remote.Name, result.Remote.URL)
 
 	fmt.Printf("\n(%.2fs)\n", elapsed.Seconds())
+}
+
+func runPath(cmd *cobra.Command, args []string) {
+	name := args[0]
+
+	workspacePath := workspace.DefaultWorkspace()
+	if workspacePath == "" {
+		fmt.Fprintln(os.Stderr, "Error: could not determine workspace path")
+		os.Exit(1)
+	}
+
+	// Try exact match in config
+	repo := workspace.FindRepoByNameExact(name)
+	if repo != nil {
+		// Found in config - construct path
+		fullPath := filepath.Join(workspacePath, repo.Name)
+		if repo.WorkDir != "" {
+			fullPath = filepath.Join(fullPath, repo.WorkDir)
+		}
+		fmt.Println(fullPath)
+		return
+	}
+
+	// Not found - check if directory exists anyway (for repos not in config)
+	directPath := filepath.Join(workspacePath, name)
+	if info, err := os.Stat(directPath); err == nil && info.IsDir() {
+		fmt.Println(directPath)
+		return
+	}
+
+	// Not found - suggest similar names
+	suggestions := workspace.SuggestRepoNames(name)
+	fmt.Fprintf(os.Stderr, "Repository '%s' not found.", name)
+	if len(suggestions) > 0 {
+		fmt.Fprintf(os.Stderr, " Did you mean:\n")
+		for _, s := range suggestions {
+			fmt.Fprintf(os.Stderr, "  %s\n", s)
+		}
+	} else {
+		fmt.Fprintln(os.Stderr)
+	}
+	os.Exit(1)
 }
 
 func main() {

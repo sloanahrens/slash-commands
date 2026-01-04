@@ -5,7 +5,6 @@ Portable slash commands for managing multi-repo workspaces with Claude Code.
 ## Features
 
 - Multi-source repository discovery (builtin packages, worktrees, clones, standalone repos)
-- Fuzzy matching for quick repo access
 - Git worktree support for feature branch isolation
 - Integration with [devbot](devbot/README.md) for fast parallel operations
 - Optional Linear and GitHub MCP integration
@@ -66,45 +65,36 @@ cp config.yaml.example config.yaml
 | `/list-commands` | List all available commands |
 | `/list-skills` | List available skills from plugins |
 
-All repo commands support fuzzy matching (e.g., `/run-tests cli`).
+All repo commands require exact repo names from config.yaml.
 
 ## Configuration
 
 Create `config.yaml` based on your workspace:
 
 ```yaml
+# Where your repos live
 base_path: ~/code/my-workspace
-
-builtin:
-  - name: my-cli
-    group: packages
-    path: packages/my-cli
-    language: typescript
-
-worktrees_dir: .trees
-clones_config: clones/clone-config.json
-code_path: ~/code
+code_path: ~/code/my-workspace
 
 repos:
-  - name: my-project
-    group: projects
-    aliases: [proj]
+  - name: my-project        # Must match directory name exactly
+    group: apps
+    language: typescript
+
+  - name: my-api
+    group: apps
+    language: go
+    work_dir: cmd/api       # Optional: subdirectory for nested projects
 ```
 
-## Repository Types
-
-| Type | Location | Description |
-|------|----------|-------------|
-| **Builtin** | `<base_path>/<path>` | Fixed packages in your monorepo |
-| **Worktrees** | `<base_path>/.trees/` | Git worktrees for feature branches |
-| **Clones** | `<base_path>/clones/` | Read-only reference repos |
-| **Repos** | `<code_path>/<name>` | Standalone working repos |
+Repo names must exactly match the directory name under `code_path`.
 
 ## devbot CLI
 
 Fast parallel operations across your workspace. See [devbot/README.md](devbot/README.md) for full documentation.
 
 ```bash
+devbot path <repo>         # Get full filesystem path for repo
 devbot status              # Parallel git status (~0.03s for 12 repos)
 devbot check <repo>        # Auto-detected quality checks
 devbot run -- git pull     # Parallel command execution

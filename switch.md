@@ -6,7 +6,7 @@ description: Switch context to a repository
 
 Quickly switch context to a repository with status summary and suggestions.
 
-**Arguments**: `$ARGUMENTS` - Repo name (required, supports fuzzy match).
+**Arguments**: `$ARGUMENTS` - Repo name (required, exact match).
 
 **Shared logic**: See `_shared-repo-logic.md` for repo discovery and selection.
 

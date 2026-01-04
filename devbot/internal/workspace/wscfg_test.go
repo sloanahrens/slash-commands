@@ -47,8 +47,6 @@ code_path: ~/projects
 repos:
   - name: test-repo
     group: tools
-    aliases:
-      - test
     language: go
 `
 		if err := os.WriteFile(configPath, []byte(configContent), 0644); err != nil {
@@ -112,12 +110,7 @@ func TestFindRepoByName(t *testing.T) {
 	configContent := `
 repos:
   - name: devops-pulumi-ts
-    aliases:
-      - pulumi
-      - gcp
   - name: atap-automation2
-    aliases:
-      - atap
   - name: fractals-nextjs
 `
 	if err := os.WriteFile(configPath, []byte(configContent), 0644); err != nil {
@@ -125,6 +118,7 @@ repos:
 	}
 	t.Setenv("DEVBOT_CONFIG", configPath)
 
+	// FindRepoByName now requires exact match only
 	tests := []struct {
 		name     string
 		input    string
@@ -132,12 +126,10 @@ repos:
 		wantNil  bool
 	}{
 		{"exact name", "devops-pulumi-ts", "devops-pulumi-ts", false},
-		{"alias", "pulumi", "devops-pulumi-ts", false},
-		{"another alias", "gcp", "devops-pulumi-ts", false},
-		{"case insensitive", "PULUMI", "devops-pulumi-ts", false},
-		{"fuzzy match", "pulumi-ts", "devops-pulumi-ts", false},
-		{"no match", "nonexistent", "", true},
-		{"partial match", "fractals", "fractals-nextjs", false},
+		{"exact name 2", "fractals-nextjs", "fractals-nextjs", false},
+		{"partial name fails", "pulumi", "", true},
+		{"partial name fails 2", "fractals", "", true},
+		{"nonexistent", "nonexistent", "", true},
 	}
 
 	for _, tt := range tests {
@@ -154,6 +146,47 @@ repos:
 				if got.Name != tt.wantName {
 					t.Errorf("FindRepoByName(%q).Name = %q, want %q", tt.input, got.Name, tt.wantName)
 				}
+			}
+		})
+	}
+}
+
+func TestSuggestRepoNames(t *testing.T) {
+	ResetConfigCache()
+	tmpDir := t.TempDir()
+	configPath := filepath.Join(tmpDir, "config.yaml")
+
+	configContent := `
+repos:
+  - name: devops-pulumi-ts
+  - name: atap-automation2
+  - name: fractals-nextjs
+`
+	if err := os.WriteFile(configPath, []byte(configContent), 0644); err != nil {
+		t.Fatalf("Failed to write config file: %v", err)
+	}
+	t.Setenv("DEVBOT_CONFIG", configPath)
+
+	tests := []struct {
+		name    string
+		input   string
+		want    []string
+		wantLen int
+	}{
+		{"pulumi suggests devops-pulumi-ts", "pulumi", []string{"devops-pulumi-ts"}, 1},
+		{"fractals suggests fractals-nextjs", "fractals", []string{"fractals-nextjs"}, 1},
+		{"atap suggests atap-automation2", "atap", []string{"atap-automation2"}, 1},
+		{"nonexistent returns empty", "nonexistent", nil, 0},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := SuggestRepoNames(tt.input)
+			if len(got) != tt.wantLen {
+				t.Errorf("SuggestRepoNames(%q) returned %d results, want %d", tt.input, len(got), tt.wantLen)
+			}
+			if tt.wantLen > 0 && got[0] != tt.want[0] {
+				t.Errorf("SuggestRepoNames(%q)[0] = %q, want %q", tt.input, got[0], tt.want[0])
 			}
 		})
 	}

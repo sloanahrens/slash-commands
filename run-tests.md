@@ -6,7 +6,7 @@ description: Run quality checks and tests for a repository
 
 Run quality checks and test suite for a repository.
 
-**Arguments**: `$ARGUMENTS` - Optional repo name (supports fuzzy match). If empty, shows selection menu.
+**Arguments**: `$ARGUMENTS` - Repo name (exact match). See `_shared-repo-logic.md`.
 
 **Shared logic**: See `_shared-repo-logic.md` for repo discovery, selection, and commit rules.
 

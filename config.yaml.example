@@ -41,7 +41,6 @@ repos:
   # Example: active project
   # - name: my-project
   #   group: projects
-  #   aliases: [proj, mp]
   #   language: typescript
   #   linear_project: my-project-board  # Optional: Linear integration
   #   commands:
@@ -52,7 +51,6 @@ repos:
   # Example: infrastructure repo
   # - name: my-infra
   #   group: devops
-  #   aliases: [infra, pulumi]
   #   language: typescript
 
   # Example: Go project with custom work_dir

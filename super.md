@@ -37,6 +37,13 @@ Per `_shared-repo-logic.md` → "Context Loading":
 2. Read repo's `CLAUDE.md` (if exists)
 3. Get git status and recent commits
 
+**Use devbot for speed:**
+```bash
+devbot path <repo>      # Get full path (~0.01s)
+devbot status <repo>    # Git status (~0.02s)
+devbot stats <path>     # Complexity metrics (~0.01s)
+```
+
 ### Step 4: Check Related Issues (Optional)
 
 If brainstorming about a specific feature/bug and Linear integration is configured:
