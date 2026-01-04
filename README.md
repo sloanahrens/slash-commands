@@ -78,3 +78,16 @@ devbot stats /path/to/my-project
 | `config.yaml.example` | Template |
 | `_shared-repo-logic.md` | Shared command patterns |
 | [`devbot/`](devbot/README.md) | Go CLI source |
+| [`docs/`](docs/) | Global config references (copy to `~/.claude/`) |
+
+## Global Config Setup
+
+Copy files from `docs/` to `~/.claude/`:
+
+```bash
+cp docs/CLAUDE.md ~/.claude/
+cp docs/settings.json ~/.claude/
+cp docs/hookify.*.md ~/.claude/
+```
+
+These provide global Claude Code configuration, permissions, and hookify rules.
