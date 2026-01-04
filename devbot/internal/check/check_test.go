@@ -350,3 +350,83 @@ func TestDiscoverSubApps(t *testing.T) {
 		}
 	})
 }
+
+func TestNpmScriptExists(t *testing.T) {
+	t.Run("script exists", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		pkgJSON := `{"scripts": {"lint": "eslint .", "test": "vitest"}}`
+		_ = os.WriteFile(filepath.Join(tmpDir, "package.json"), []byte(pkgJSON), 0644)
+
+		if !npmScriptExists(tmpDir, "lint") {
+			t.Error("npmScriptExists(lint) = false, want true")
+		}
+		if !npmScriptExists(tmpDir, "test") {
+			t.Error("npmScriptExists(test) = false, want true")
+		}
+	})
+
+	t.Run("script does not exist", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		pkgJSON := `{"scripts": {"test": "vitest"}}`
+		_ = os.WriteFile(filepath.Join(tmpDir, "package.json"), []byte(pkgJSON), 0644)
+
+		if npmScriptExists(tmpDir, "lint") {
+			t.Error("npmScriptExists(lint) = true, want false")
+		}
+	})
+
+	t.Run("no scripts section", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		pkgJSON := `{"name": "test-pkg"}`
+		_ = os.WriteFile(filepath.Join(tmpDir, "package.json"), []byte(pkgJSON), 0644)
+
+		if npmScriptExists(tmpDir, "lint") {
+			t.Error("npmScriptExists(lint) = true, want false (no scripts)")
+		}
+	})
+
+	t.Run("no package.json", func(t *testing.T) {
+		tmpDir := t.TempDir()
+
+		if npmScriptExists(tmpDir, "lint") {
+			t.Error("npmScriptExists(lint) = true, want false (no package.json)")
+		}
+	})
+
+	t.Run("invalid json", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		_ = os.WriteFile(filepath.Join(tmpDir, "package.json"), []byte("not json"), 0644)
+
+		if npmScriptExists(tmpDir, "lint") {
+			t.Error("npmScriptExists(lint) = true, want false (invalid json)")
+		}
+	})
+}
+
+func TestIsNpmRunCommand(t *testing.T) {
+	tests := []struct {
+		name    string
+		cmdArgs []string
+		want    string
+	}{
+		{"npm run lint", []string{"npm", "run", "lint"}, "lint"},
+		{"npm run build", []string{"npm", "run", "build"}, "build"},
+		{"npm run typecheck", []string{"npm", "run", "typecheck"}, "typecheck"},
+		{"npm test", []string{"npm", "test"}, "test"},
+		{"npm test with args", []string{"npm", "test", "--", "--passWithNoTests"}, "test"},
+		{"npx command", []string{"npx", "tsc", "--noEmit"}, ""},
+		{"go command", []string{"go", "test", "./..."}, ""},
+		{"empty", []string{}, ""},
+		{"single element", []string{"npm"}, ""},
+		{"npm without run or test", []string{"npm", "install"}, ""},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := isNpmRunCommand(tt.cmdArgs)
+			if got != tt.want {
+				t.Errorf("isNpmRunCommand(%v) = %q, want %q", tt.cmdArgs, got, tt.want)
+			}
+		})
+	}
+}

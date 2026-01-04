@@ -2,6 +2,7 @@ package check
 
 import (
 	"bytes"
+	"encoding/json"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -319,6 +320,16 @@ func runCheck(workDir string, stack []string, checkType CheckType, fix bool) Che
 		return result
 	}
 
+	// For npm commands, check if the script exists in package.json before running
+	// This prevents false failures when sub-packages don't define certain scripts
+	if scriptName := isNpmRunCommand(cmdArgs); scriptName != "" {
+		if !npmScriptExists(workDir, scriptName) {
+			result.Status = "skip"
+			result.Output = "script not defined in package.json"
+			return result
+		}
+	}
+
 	// Modify command for fix mode
 	if fix && checkType == CheckLint {
 		cmdArgs = modifyForFix(cmdArgs, stack)
@@ -373,6 +384,40 @@ func modifyForFix(args []string, stack []string) []string {
 func fileExists(path string) bool {
 	_, err := os.Stat(path)
 	return err == nil
+}
+
+// npmScriptExists checks if a script exists in the package.json at the given directory
+func npmScriptExists(dir string, scriptName string) bool {
+	pkgPath := filepath.Join(dir, "package.json")
+	data, err := os.ReadFile(pkgPath)
+	if err != nil {
+		return false
+	}
+
+	var pkg struct {
+		Scripts map[string]string `json:"scripts"`
+	}
+	if err := json.Unmarshal(data, &pkg); err != nil {
+		return false
+	}
+
+	_, exists := pkg.Scripts[scriptName]
+	return exists
+}
+
+// isNpmRunCommand checks if a command is "npm run <script>" or "npm test"
+// Returns the script name if it is, empty string otherwise
+func isNpmRunCommand(cmdArgs []string) string {
+	if len(cmdArgs) < 2 || cmdArgs[0] != "npm" {
+		return ""
+	}
+	if cmdArgs[1] == "test" {
+		return "test"
+	}
+	if cmdArgs[1] == "run" && len(cmdArgs) >= 3 {
+		return cmdArgs[2]
+	}
+	return ""
 }
 
 func appendUnique(slice []string, item string) []string {
