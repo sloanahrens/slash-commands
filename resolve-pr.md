@@ -180,6 +180,25 @@ The skill will guide you to:
 4. **Implement in order** - Blocking issues → simple fixes → complex fixes
 5. **Test each** - Verify no regressions after each change
 
+## Step 8: Use PR Review Toolkit Agents (As Needed)
+
+For specific types of feedback, invoke specialized `pr-review-toolkit` agents:
+
+| Feedback Type | Agent to Invoke |
+|---------------|-----------------|
+| Error handling concerns | `silent-failure-hunter` - analyzes catch blocks, fallbacks |
+| Test coverage gaps | `pr-test-analyzer` - identifies critical missing tests |
+| Type design issues | `type-design-analyzer` - evaluates type invariants |
+| Comment accuracy | `comment-analyzer` - verifies documentation |
+| Code quality | `code-reviewer` - general quality analysis |
+
+Example invocation:
+```
+"Launch silent-failure-hunter agent to analyze error handling in src/api/"
+```
+
+After implementing fixes, use `code-simplifier` agent to polish the code while preserving functionality.
+
 ## Error Handling
 
 **URL parsing errors:**

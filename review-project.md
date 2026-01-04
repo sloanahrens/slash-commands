@@ -55,26 +55,38 @@ devbot stats <repo-path>
 - Complexity flags: 2 large files, 3 long functions
 ```
 
-### Step 4: Run Available Checks
+### Step 4: Deep Codebase Exploration (Optional)
 
-**For TypeScript packages:**
-```bash
-cd <repo-path> && npm run lint
-cd <repo-path> && npm run build
-cd <repo-path> && npm test
+For thorough reviews, use `feature-dev:code-explorer` agents to analyze architecture:
+
+```
+Launch 2-3 code-explorer agents in parallel:
+- "Trace the main entry points and call chains"
+- "Map the architecture layers and patterns"
+- "Analyze data flow and dependencies"
 ```
 
-**For Python projects:**
+Each agent returns:
+- Entry points with file:line references
+- Step-by-step execution flow
+- Key components and responsibilities
+- Architecture insights
+
+This provides deeper understanding than static analysis alone.
+
+### Step 5: Run Available Checks
+
+Use `devbot check` for auto-detected quality checks:
+
 ```bash
-cd <repo-path> && uv run ruff check .
-cd <repo-path> && uv run mypy .
-cd <repo-path> && uv run pytest
+devbot check <repo-name>
 ```
 
-**For other repos:**
-Check `package.json` or `pyproject.toml` for available commands.
+This runs lint, typecheck, build, and test in the appropriate order for the detected stack.
 
-### Step 5: Review Key Areas
+**Manual override**: If specific commands needed, check `package.json` or `pyproject.toml`.
+
+### Step 6: Review Key Areas
 
 Consider using local model for initial draft sections (see `_shared-repo-logic.md` → "Local Model Acceleration").
 
@@ -96,7 +108,7 @@ Use the `pr-review-toolkit:code-reviewer` agent to analyze systematically.
 - Security patterns (secrets, auth)
 - Production readiness
 
-### Step 6: Update Documentation
+### Step 7: Update Documentation
 
 **Primary: Update `<repo>/CLAUDE.md`**
 

@@ -6,7 +6,7 @@ description: Install all recommended plugins for the workspace
 
 Idempotently install all recommended Claude Code plugins for this workspace.
 
-**Arguments**: `$ARGUMENTS` - Optional flags: `--check` (only show status), `--update` (update existing)
+**Arguments**: `$ARGUMENTS` - Optional flag: `--check` (only show status, don't install/update)
 
 ---
 
@@ -30,6 +30,11 @@ Idempotently install all recommended Claude Code plugins for this workspace.
 |--------|-------------|
 | `mlx-hub` | Local MLX model inference for speed (Apple Silicon only) |
 
+> ⚠️ **Dev Setup Note**: `mlx-hub` is symlinked from `~/code/mono-claude/mlx-hub-claude-plugin`
+> to `~/.claude/plugins/mlx-hub`. Since it points to our local dev repo, it should **never be
+> reinstalled** - just verify the symlink exists. If missing, the repo needs to be cloned and
+> symlinked manually, not installed via `claude plugin add`.
+
 ### Official Anthropic
 
 | Plugin | Description |
@@ -37,14 +42,29 @@ Idempotently install all recommended Claude Code plugins for this workspace.
 | `frontend-design` | Avoid generic React/Tailwind aesthetics |
 | `feature-dev` | Code architect, explorer, reviewer agents |
 | `code-review` | Code review workflow |
-| `commit-commands` | Git commit helpers (/commit, /commit-push-pr) |
-| `pr-review-toolkit` | PR review workflow |
+| `commit-commands` | Git commit helpers (/commit, /commit-push-pr, /clean_gone) |
+| `pr-review-toolkit` | PR review: comment-analyzer, test-analyzer, silent-failure-hunter, type-design-analyzer, code-reviewer, code-simplifier |
 | `hookify` | Create custom hooks for Claude Code |
 | `plugin-dev` | Plugin development tools |
 | `agent-sdk-dev` | Agent SDK development helpers |
 | `security-guidance` | Security best practices |
+| `explanatory-output-style` | Educational explanations during work |
+| `learning-output-style` | Interactive learning with code contributions |
+
+### Language Servers (Official Anthropic)
+
+| Plugin | Description |
+|--------|-------------|
 | `typescript-lsp` | TypeScript language server |
 | `gopls-lsp` | Go language server |
+| `pyright-lsp` | Python language server |
+| `rust-analyzer-lsp` | Rust language server |
+| `swift-lsp` | Swift language server |
+| `clangd-lsp` | C/C++ language server |
+| `jdtls-lsp` | Java language server |
+| `php-lsp` | PHP language server |
+| `lua-lsp` | Lua language server |
+| `csharp-lsp` | C# language server |
 
 ---
 
@@ -78,11 +98,14 @@ cat ~/.claude/plugins/installed_plugins.json
 
 Build list of what's already installed vs what needs installing.
 
-### Step 3: Install Missing Plugins
+### Step 3: Install Missing & Update Existing
 
-**If `--check` flag passed:** Only report status, don't install.
+**If `--check` flag passed:** Only report status, don't install or update.
 
-For each missing plugin, run:
+For each plugin in the registry:
+
+1. **If not installed** → Install it
+2. **If already installed** → Run `claude plugin update` to check for updates
 
 ```bash
 # Superpowers Marketplace
@@ -94,9 +117,6 @@ claude plugin install superpowers-developing-for-claude-code@superpowers-marketp
 claude plugin install superpowers-lab@superpowers-marketplace
 claude plugin install superpowers-chrome@superpowers-marketplace
 
-# Local Model Acceleration (GitHub-hosted)
-claude plugin add https://github.com/sloanahrens/mlx-hub-claude-plugin
-
 # Official Anthropic
 claude plugin install frontend-design@claude-plugins-official
 claude plugin install feature-dev@claude-plugins-official
@@ -107,19 +127,33 @@ claude plugin install hookify@claude-plugins-official
 claude plugin install plugin-dev@claude-plugins-official
 claude plugin install agent-sdk-dev@claude-plugins-official
 claude plugin install security-guidance@claude-plugins-official
+claude plugin install explanatory-output-style@claude-plugins-official
+claude plugin install learning-output-style@claude-plugins-official
+
+# Language Servers (install as needed)
 claude plugin install typescript-lsp@claude-plugins-official
 claude plugin install gopls-lsp@claude-plugins-official
+claude plugin install pyright-lsp@claude-plugins-official      # Python
+claude plugin install rust-analyzer-lsp@claude-plugins-official # Rust
+# Additional LSPs: swift-lsp, clangd-lsp, jdtls-lsp, php-lsp, lua-lsp, csharp-lsp
 ```
 
-### Step 4: Update Existing (Optional)
-
-**If `--update` flag passed:**
+**For already-installed plugins**, check for updates:
 
 ```bash
-claude plugin update <plugin-name>
+claude plugin update <plugin-name>@<marketplace>
 ```
 
-For each installed plugin.
+### Step 4: Handle mlx-hub (Local Dev Plugin)
+
+**Do NOT reinstall mlx-hub.** It's symlinked to our local dev repo.
+
+1. Check if symlink exists: `ls -la ~/.claude/plugins/ | grep mlx-hub`
+2. If symlink exists → Report as "OK (local dev)"
+3. If symlink missing → Warn user to set up manually:
+   ```bash
+   ln -s ~/code/mono-claude/mlx-hub-claude-plugin ~/.claude/plugins/mlx-hub
+   ```
 
 ### Step 5: Report Results
 
@@ -132,17 +166,20 @@ Installed (new):
   - episodic-memory@superpowers-marketplace (v1.0.15)
   ...
 
-Already installed:
+Already up to date:
   - elements-of-style@superpowers-marketplace (v1.0.0)
   ...
 
 Updated:
-  - <plugin> (v1.0.0 -> v1.0.1)
+  - feature-dev (v1.0.0 → v1.0.1)
   ...
 
-Total: X plugins installed
+Local dev plugins:
+  - mlx-hub (symlinked to ~/code/mono-claude/mlx-hub-claude-plugin) ✓
 
-NOTE: Restart Claude Code to activate new plugins.
+Total: X plugins installed, Y updated
+
+NOTE: Restart Claude Code to activate new/updated plugins.
 ```
 
 ---
@@ -153,15 +190,27 @@ NOTE: Restart Claude Code to activate new plugins.
 |-----------|---------------------|
 | Next.js apps | `frontend-design`, `typescript-lsp` |
 | Go projects | `gopls-lsp` |
-| All repos | `superpowers`, `episodic-memory`, `mlx-hub` |
+| Python projects | `pyright-lsp` |
+| Rust projects | `rust-analyzer-lsp` |
+| All repos | `superpowers`, `episodic-memory`, `mlx-hub`, `pr-review-toolkit` |
+| Feature dev | `feature-dev` (code-explorer, code-architect agents) |
 | Plugin dev | `superpowers-developing-for-claude-code`, `plugin-dev` |
+
+## Plugin Integration with Slash Commands
+
+| Slash Command | Integrates With |
+|---------------|-----------------|
+| `/run-tests` | `pr-review-toolkit:code-reviewer` (after tests pass) |
+| `/review-project` | `feature-dev:code-explorer` (codebase analysis) |
+| `/resolve-pr` | `pr-review-toolkit` agents (understand/fix issues) |
+| `/update-docs` | `pr-review-toolkit:comment-analyzer` (verify accuracy) |
+| `/push` | `pr-review-toolkit:code-reviewer` (suggested before PRs) |
 
 ---
 
 ## Examples
 
 ```bash
-/setup-plugins              # Install all missing plugins
-/setup-plugins --check      # Only show what would be installed
-/setup-plugins --update     # Install missing + update existing
+/setup-plugins              # Install missing + update existing plugins
+/setup-plugins --check      # Only show status (dry run)
 ```

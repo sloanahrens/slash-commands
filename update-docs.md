@@ -100,6 +100,22 @@ Verify documentation consistency across:
 - Repo CLAUDE.md ↔ README.md
 - Commands documented ↔ commands that exist
 
+### Step 6: Verify Documentation Accuracy (Optional)
+
+After updating documentation, use `pr-review-toolkit:comment-analyzer` to verify accuracy:
+
+```
+"Launch comment-analyzer agent to verify documentation in CLAUDE.md and README.md"
+```
+
+The agent checks:
+- Comment accuracy vs actual code behavior
+- Documentation completeness
+- Potential comment rot or technical debt
+- Misleading or outdated descriptions
+
+Address any high-confidence issues before finalizing.
+
 ---
 
 ## Anti-Patterns

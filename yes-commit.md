@@ -31,15 +31,63 @@ This provides in a single call (~0.02s):
 
 If no changes (clean), report "No changes to commit" and exit.
 
-### Step 3: Generate Commit Message
+### Step 3: Generate Commit Message (Dual-Model Evaluation)
 
-Try local model first if available (see `_shared-repo-logic.md` → "Local Model Acceleration"):
+**This step uses dual-model evaluation to build confidence in local model commit messages.**
 
-1. Get diff: `git -C <repo-path> diff --staged` (or `diff` if nothing staged)
-2. Use `mcp__plugin_mlx-hub_mlx-hub__mlx_infer` with local model
-3. Display with `[local]` prefix
+#### 3a. Get the diff
 
-If local model unavailable, use Claude directly.
+```bash
+git -C <repo-path> diff --staged   # If files are staged
+git -C <repo-path> diff            # If nothing staged yet
+```
+
+#### 3b. Generate local model message
+
+Use `mcp__plugin_mlx-hub_mlx-hub__mlx_infer` with local model:
+
+```python
+mcp__plugin_mlx-hub_mlx-hub__mlx_infer(
+  model_id="mlx-community/Qwen2.5-Coder-14B-Instruct-4bit",
+  prompt="Write a git commit message for these changes. Keep it under 72 chars, imperative mood, no attribution.\n\nChanges:\n{diff_summary}\n\nJust output the commit message, nothing else.",
+  max_tokens=100
+)
+```
+
+Store result as `local_message`.
+
+#### 3c. Generate Claude message
+
+Using the same diff, generate a commit message following the requirements below. Store as `claude_message`.
+
+#### 3d. Compare and select
+
+Display both for evaluation:
+
+```
+Commit message comparison:
+─────────────────────────────────────
+[local]  {local_message}
+[claude] {claude_message}
+─────────────────────────────────────
+```
+
+**Selection criteria** (evaluate local_message):
+- ✓ Correct length (≤72 chars)
+- ✓ Imperative mood
+- ✓ Captures the essence of changes
+- ✓ No attribution or co-author lines
+- ✓ Grammatically correct
+
+**If local message passes all criteria:**
+- Use `local_message`
+- Append ` [local]` suffix to the message
+
+**If local message fails any criteria:**
+- Use `claude_message`
+- No suffix added
+
+Report which was selected: `Selected: [local]` or `Selected: [claude]`
 
 **Message requirements:**
 - Short summary (50-72 characters)

@@ -62,6 +62,32 @@ Or if new branch:
 ✓ Pushed <branch-name> to origin (new branch, upstream set)
 ```
 
+### Step 5: Suggest Next Steps
+
+**For feature branches (not main/master):**
+
+Suggest creating a PR with code review:
+```
+Next steps:
+  - Create PR: gh pr create --web
+  - Or run: /pr-review-toolkit:review-pr (before creating PR)
+```
+
+The `pr-review-toolkit:code-reviewer` agent can analyze changes before creating a PR to catch issues early.
+
+---
+
+## Options
+
+| Flag | Effect |
+|------|--------|
+| `--review` | Run code-reviewer agent before pushing |
+
+Example:
+```bash
+/push my-feature --review   # Review changes then push
+```
+
 ---
 
 ## Examples

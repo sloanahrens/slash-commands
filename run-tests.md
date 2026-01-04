@@ -54,6 +54,25 @@ The command maps stacks to appropriate tools:
 | TOTAL      | PASS    | All quality gates passed   |
 ```
 
+### Step 4: Code Review (Optional)
+
+**If all checks pass** and `--review` flag is passed (or user requests it):
+
+Invoke `pr-review-toolkit:code-reviewer` to review recent changes:
+
+```
+"Launch code-reviewer agent to review unstaged changes for code quality"
+```
+
+This provides:
+- Project guideline (CLAUDE.md) compliance
+- Bug detection with confidence scoring
+- Code quality issues
+
+Report findings with severity levels and specific file:line references.
+
+**Skip if**: No unstaged changes, or checks failed.
+
 ---
 
 ## Options
@@ -65,6 +84,7 @@ Parse flags from `$ARGUMENTS`:
 | `--only=<checks>` | Run only specified checks (comma-separated) |
 | `--fix` | Auto-fix issues where possible (lint, format) |
 | `--watch` | Run tests in watch mode (if supported) |
+| `--review` | Run code-reviewer agent after tests pass |
 
 **Check names:** `lint`, `typecheck`, `build`, `test`
 
@@ -97,4 +117,5 @@ Examples:
 /run-tests pulumi                   # Fuzzy match → my-infra-pulumi
 /run-tests my-app --only=test       # Just run tests
 /run-tests frontend --fix           # Auto-fix lint issues
+/run-tests cli --review             # Run tests then code review
 ```
