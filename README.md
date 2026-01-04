@@ -145,6 +145,31 @@ devbot diff <repo>      # Staged/unstaged files with line counts
 
 Shows branch, staged files, unstaged files with +/- counts in a single call.
 
+#### branch - Branch and Tracking Info (~0.02s)
+
+```bash
+devbot branch <repo>    # Branch, tracking, ahead/behind, commits to push
+```
+
+Shows current branch, upstream tracking status, commits ahead/behind, and list of commits to push.
+
+#### remote - Git Remote Info (~0.01s)
+
+```bash
+devbot remote <repo>    # Remote URLs and GitHub identifiers
+```
+
+Shows all configured remotes with URLs and parsed GitHub org/repo identifiers.
+
+#### find-repo - Find Repo by GitHub ID (~0.03s)
+
+```bash
+devbot find-repo owner/repo    # Find local repo by GitHub identifier
+devbot find-repo https://github.com/owner/repo/pull/123   # Works with full URLs
+```
+
+Searches all configured repos to find one matching the GitHub remote.
+
 #### check - Auto-Detected Quality Checks
 
 ```bash
@@ -240,15 +265,19 @@ devbot/
 └── internal/
     ├── workspace/           # Repo discovery and parallel git status
     ├── runner/              # Parallel command execution
-    ├── deps/                # Dependency analysis
-    ├── tree/                # Gitignore-aware directory tree
-    ├── detect/              # Project stack detection
-    ├── todos/               # Parallel TODO/FIXME scanning
-    ├── stats/               # Code metrics and complexity
+    ├── branch/              # Branch and tracking info
+    ├── check/               # Auto-detected quality checks
     ├── config/              # Config file discovery
+    ├── deps/                # Dependency analysis
+    ├── detect/              # Project stack detection
+    ├── diff/                # Git diff summary
     ├── makefile/            # Makefile target parsing
-    ├── worktrees/           # Git worktree discovery
-    └── output/              # Terminal rendering
+    ├── output/              # Terminal rendering
+    ├── remote/              # Git remote and GitHub ID parsing
+    ├── stats/               # Code metrics and complexity
+    ├── todos/               # Parallel TODO/FIXME scanning
+    ├── tree/                # Gitignore-aware directory tree
+    └── worktrees/           # Git worktree discovery
 ```
 
 ## Worktree Workflow

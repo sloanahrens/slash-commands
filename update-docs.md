@@ -31,14 +31,22 @@ Update project documentation for a repository, maintaining consistency across fi
 
 Follow repo selection from `_shared-repo-logic.md`, then confirm: "Updating docs for: <repo-name>"
 
-### Step 2: Inventory Documentation
+### Step 2: Inventory Documentation and Structure
+
+Use devbot for fast parallel analysis (~0.03s total):
 
 ```bash
-# Check repo-level docs
+devbot tree <repo-path>     # Directory structure (respects .gitignore)
+devbot config <repo-name>   # Config files (package.json, go.mod, etc.)
+devbot stats <repo-path>    # Code metrics and complexity
+```
+
+Also check existing docs:
+```bash
 ls -la <repo-path>/README.md <repo-path>/CLAUDE.md <repo-path>/docs/ 2>/dev/null
 ```
 
-### Step 3: Gather Current State
+### Step 3: Gather Build/Test State
 
 **For TypeScript packages:**
 ```bash
@@ -53,7 +61,6 @@ cd <repo-path> && uv run pytest 2>&1 | tail -10
 
 **Common:**
 ```bash
-devbot stats <repo-path>                    # Code metrics
 git -C <repo-path> log --oneline -5         # Recent changes
 ```
 

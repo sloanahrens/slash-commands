@@ -46,34 +46,30 @@ gh auth status
 
 ## Step 3: Find Local Repository
 
-The local directory name may differ from the GitHub repository name.
+Use devbot to quickly find the local repository matching the GitHub remote:
 
-**Algorithm:**
-1. Run `pwd` to confirm location (should be ~/code or similar workspace root)
-2. List immediate subdirectories that contain `.git` folders
-3. For each git repository, check remotes:
-   ```bash
-   git -C <directory> remote -v
-   ```
-4. Match remotes against the PR's `{owner}/{repo}` pattern
-   - Handle SSH format: `git@github.com:{owner}/{repo}.git`
-   - Handle HTTPS format: `https://github.com/{owner}/{repo}`
+```bash
+devbot find-repo {owner}/{repo}
+```
+
+This searches all configured repos in parallel (~0.03s) and returns:
+- Repository name
+- Local path
+- Remote configuration
+
+**If found:**
+- Store the returned path for use in subsequent steps
+
+**If no match found:**
+```bash
+devbot status --all    # List all known repos
+```
+- Use AskUserQuestion to ask user to specify the correct local path
 
 **Important directory safety rules:**
 - Always use `git -C <absolute-path>` instead of `cd`
-- Run `pwd` before and after major operations
 - Use absolute paths when referencing files
 - Never assume directory state - always verify
-
-**If no match found:**
-- List all repositories scanned and their remotes
-- Use AskUserQuestion to ask user to specify the correct local path
-
-**If multiple matches found:**
-- List all matching directories
-- Use AskUserQuestion to ask user which one to use
-
-**Store the matched directory path** for use in subsequent steps.
 
 ## Step 4: Fetch PR Data
 

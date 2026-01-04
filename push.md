@@ -18,44 +18,29 @@ Push local commits to remote origin for a repository.
 
 Follow repo selection from `_shared-repo-logic.md`, then confirm: "Pushing for: <repo-name>"
 
-### Step 2: Check for Uncommitted Changes
+### Step 2: Check Status and Branch Info
 
 ```bash
-devbot status <repo-name>
+devbot branch <repo-name>
 ```
 
-This provides branch, dirty file count, and ahead/behind status in ~0.01s.
+This provides in a single call (~0.02s):
+- Current branch name
+- Tracking status (has upstream or new branch)
+- Commits ahead/behind
+- List of commits to push
 
-**If uncommitted changes exist:**
+**If uncommitted changes exist** (shown in status):
 
 Invoke `/yes-commit <repo-name>` to commit changes first, then continue with push.
 
-### Step 3: Check Commits Ahead
+**If no commits ahead:**
 
-```bash
-cd <repo-path> && git status
-```
+Report "Nothing to push" and exit.
 
-If no commits ahead of remote, report "Nothing to push" and exit.
+### Step 3: Execute Push
 
-### Step 4: Get Current Branch
-
-```bash
-cd <repo-path> && git branch --show-current
-```
-
-### Step 5: Check If Branch Tracks Remote
-
-```bash
-cd <repo-path> && git rev-parse --abbrev-ref --symbolic-full-name @{u} 2>/dev/null
-```
-
-- If this succeeds → branch already tracks remote
-- If this fails → new branch, needs `-u` flag
-
-### Step 6: Execute Push
-
-**If branch tracks remote:**
+**If branch has upstream tracking:**
 ```bash
 cd <repo-path> && git push origin <branch-name>
 ```
@@ -65,7 +50,7 @@ cd <repo-path> && git push origin <branch-name>
 cd <repo-path> && git push -u origin <branch-name>
 ```
 
-### Step 7: Confirm Result
+### Step 4: Confirm Result
 
 Report push result:
 ```

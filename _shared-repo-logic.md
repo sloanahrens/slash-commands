@@ -263,6 +263,9 @@ Fast parallel operations across repos. Use devbot for speed-critical operations:
 | `devbot status` | Git status across all repos | ~0.03s |
 | `devbot status <repo>` | Single repo details (use full name, not alias) | ~0.01s |
 | `devbot diff <repo>` | Git diff summary (staged/unstaged with stats) | ~0.02s |
+| `devbot branch <repo>` | Branch tracking, ahead/behind, commits to push | ~0.02s |
+| `devbot remote <repo>` | Remote URLs and GitHub identifiers | ~0.01s |
+| `devbot find-repo <gh-id>` | Find local repo by GitHub org/repo | ~0.03s |
 | `devbot check <repo>` | Auto-detected lint/typecheck/build/test | varies |
 | `devbot run -- <cmd>` | Parallel command execution | ~0.5s |
 | `devbot todos` | TODO/FIXME scanning | ~0.1s |

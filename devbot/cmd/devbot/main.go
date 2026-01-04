@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/sloanahrens/devbot-go/internal/branch"
 	"github.com/sloanahrens/devbot-go/internal/check"
 	"github.com/sloanahrens/devbot-go/internal/config"
 	"github.com/sloanahrens/devbot-go/internal/deps"
@@ -15,6 +16,7 @@ import (
 	"github.com/sloanahrens/devbot-go/internal/diff"
 	"github.com/sloanahrens/devbot-go/internal/makefile"
 	"github.com/sloanahrens/devbot-go/internal/output"
+	"github.com/sloanahrens/devbot-go/internal/remote"
 	"github.com/sloanahrens/devbot-go/internal/runner"
 	"github.com/sloanahrens/devbot-go/internal/stats"
 	"github.com/sloanahrens/devbot-go/internal/todos"
@@ -183,6 +185,33 @@ var (
 	checkFix  bool
 )
 
+// Branch command
+var branchCmd = &cobra.Command{
+	Use:   "branch <repo>",
+	Short: "Show branch and tracking information for a repository",
+	Long:  `Shows current branch, upstream tracking, ahead/behind counts, and commits to push.`,
+	Args:  cobra.ExactArgs(1),
+	Run:   runBranch,
+}
+
+// Remote command
+var remoteCmd = &cobra.Command{
+	Use:   "remote <repo>",
+	Short: "Show git remote information for a repository",
+	Long:  `Shows remote URLs and GitHub identifiers for a repository.`,
+	Args:  cobra.ExactArgs(1),
+	Run:   runRemote,
+}
+
+// Find-repo command
+var findRepoCmd = &cobra.Command{
+	Use:   "find-repo <github-identifier>",
+	Short: "Find local repo by GitHub org/repo identifier",
+	Long:  `Searches all configured repos to find one matching the given GitHub identifier (e.g., "owner/repo" or full URL).`,
+	Args:  cobra.ExactArgs(1),
+	Run:   runFindRepo,
+}
+
 func init() {
 	// Status flags
 	statusCmd.Flags().BoolVar(&showDirtyOnly, "dirty", false, "Only show repos with uncommitted changes")
@@ -233,6 +262,9 @@ func init() {
 	rootCmd.AddCommand(statsCmd)
 	rootCmd.AddCommand(diffCmd)
 	rootCmd.AddCommand(checkCmd)
+	rootCmd.AddCommand(branchCmd)
+	rootCmd.AddCommand(remoteCmd)
+	rootCmd.AddCommand(findRepoCmd)
 }
 
 func runStatus(cmd *cobra.Command, args []string) {
@@ -1175,6 +1207,164 @@ func runCheckCmd(cmd *cobra.Command, args []string) {
 	if !result.Passed() {
 		os.Exit(1)
 	}
+}
+
+func runBranch(cmd *cobra.Command, args []string) {
+	start := time.Now()
+
+	workspacePath := workspace.DefaultWorkspace()
+	if workspacePath == "" {
+		fmt.Fprintln(os.Stderr, "Error: could not determine home directory")
+		os.Exit(1)
+	}
+
+	repos, err := workspace.Discover(workspacePath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error discovering repos: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Find the target repo
+	target := args[0]
+	var targetRepo *workspace.RepoInfo
+	for _, r := range repos {
+		if r.Name == target || strings.Contains(strings.ToLower(r.Name), strings.ToLower(target)) {
+			repo := r
+			targetRepo = &repo
+			break
+		}
+	}
+
+	if targetRepo == nil {
+		fmt.Fprintf(os.Stderr, "Repository '%s' not found\n", target)
+		os.Exit(1)
+	}
+
+	result := branch.GetBranch(*targetRepo)
+	elapsed := time.Since(start)
+
+	// Header
+	fmt.Printf("\n%s/\n", result.Repo.Name)
+	fmt.Println(strings.Repeat("─", 60))
+	fmt.Printf("  Branch:   %s\n", result.Branch)
+
+	if result.HasUpstream {
+		fmt.Printf("  Tracking: %s\n", result.Tracking)
+	} else if result.Tracking != "" {
+		fmt.Printf("  Remote:   %s\n", result.Tracking)
+	} else {
+		fmt.Printf("  Tracking: (none - new branch)\n")
+	}
+
+	// Ahead/behind
+	if result.Ahead > 0 || result.Behind > 0 {
+		fmt.Printf("  Ahead:    %d commits\n", result.Ahead)
+		fmt.Printf("  Behind:   %d commits\n", result.Behind)
+	}
+
+	// Commits to push
+	if len(result.Commits) > 0 {
+		fmt.Printf("\n  Commits to push:\n")
+		for i, c := range result.Commits {
+			if i >= 10 {
+				fmt.Printf("    ... and %d more\n", len(result.Commits)-10)
+				break
+			}
+			subject := c.Subject
+			if len(subject) > 50 {
+				subject = subject[:47] + "..."
+			}
+			fmt.Printf("    %s %s\n", c.Hash, subject)
+		}
+	}
+
+	fmt.Printf("\n(%.2fs)\n", elapsed.Seconds())
+}
+
+func runRemote(cmd *cobra.Command, args []string) {
+	start := time.Now()
+
+	workspacePath := workspace.DefaultWorkspace()
+	if workspacePath == "" {
+		fmt.Fprintln(os.Stderr, "Error: could not determine home directory")
+		os.Exit(1)
+	}
+
+	repos, err := workspace.Discover(workspacePath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error discovering repos: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Find the target repo
+	target := args[0]
+	var targetRepo *workspace.RepoInfo
+	for _, r := range repos {
+		if r.Name == target || strings.Contains(strings.ToLower(r.Name), strings.ToLower(target)) {
+			repo := r
+			targetRepo = &repo
+			break
+		}
+	}
+
+	if targetRepo == nil {
+		fmt.Fprintf(os.Stderr, "Repository '%s' not found\n", target)
+		os.Exit(1)
+	}
+
+	result := remote.GetRemotes(*targetRepo)
+	elapsed := time.Since(start)
+
+	// Header
+	fmt.Printf("\n%s/\n", result.Repo.Name)
+	fmt.Println(strings.Repeat("─", 60))
+
+	if len(result.Remotes) == 0 {
+		fmt.Println("  No remotes configured")
+	} else {
+		for _, r := range result.Remotes {
+			fmt.Printf("  %-10s %s\n", r.Name+":", r.URL)
+			if r.GitHub != "" {
+				fmt.Printf("             GitHub: %s\n", r.GitHub)
+			}
+		}
+	}
+
+	fmt.Printf("\n(%.2fs)\n", elapsed.Seconds())
+}
+
+func runFindRepo(cmd *cobra.Command, args []string) {
+	start := time.Now()
+
+	workspacePath := workspace.DefaultWorkspace()
+	if workspacePath == "" {
+		fmt.Fprintln(os.Stderr, "Error: could not determine home directory")
+		os.Exit(1)
+	}
+
+	repos, err := workspace.Discover(workspacePath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error discovering repos: %v\n", err)
+		os.Exit(1)
+	}
+
+	identifier := args[0]
+	result := remote.FindRepoByGitHub(repos, identifier)
+	elapsed := time.Since(start)
+
+	if !result.Found {
+		fmt.Printf("No local repo found for '%s'\n", identifier)
+		fmt.Printf("\n(%.2fs)\n", elapsed.Seconds())
+		os.Exit(1)
+	}
+
+	fmt.Printf("\n%s\n", result.Repo.Name)
+	fmt.Println(strings.Repeat("─", 60))
+	fmt.Printf("  Path:   %s\n", result.Repo.Path)
+	fmt.Printf("  GitHub: %s\n", result.Remote.GitHub)
+	fmt.Printf("  Remote: %s (%s)\n", result.Remote.Name, result.Remote.URL)
+
+	fmt.Printf("\n(%.2fs)\n", elapsed.Seconds())
 }
 
 func main() {

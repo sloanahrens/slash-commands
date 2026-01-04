@@ -23,16 +23,19 @@ Follow repo selection from `_shared-repo-logic.md`:
 
 ### Step 2: Load Context
 
-Use devbot for fast status with stack detection and stats:
+Use devbot for fast context loading (~0.05s total):
 
 ```bash
-devbot status <repo-name>
-devbot stats <repo-path>
-git -C <repo-path> log --oneline -3
+devbot status <repo-name>    # Branch, dirty count, ahead/behind
+devbot branch <repo-name>    # Tracking info, commits to push
+devbot stats <repo-path>     # Codebase metrics (files, lines, functions)
 ```
 
-devbot provides branch, dirty count, ahead/behind, and detected stack in ~0.03s.
-devbot stats adds codebase metrics (files, lines, functions) in ~0.01s.
+These run in parallel and provide:
+- Branch name and tracking status
+- Dirty file count
+- Commits ahead/behind remote
+- Code metrics (files, lines, functions, complexity)
 
 ### Step 3: Display Summary
 
