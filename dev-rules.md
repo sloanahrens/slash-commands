@@ -15,6 +15,19 @@ Continue whatever you were doing, but remember these workspace rules:
 - **Stay within workspace** - never navigate above your base_path or code_path
 - **Respect worktree isolation** - `.trees/` worktrees are separate git environments
 
+---
+
+## Git Operations
+
+**NEVER use `git -C`** - this flag cannot be auto-approved, requiring manual user approval every time. This wastes time.
+
+| Use This | NOT This |
+|----------|----------|
+| `devbot status <repo>` | `git -C /path status` |
+| `devbot diff <repo>` | `git -C /path diff` |
+| `devbot branch <repo>` | `git -C /path branch` |
+
+If devbot doesn't have what you need, ask the user - don't improvise.
 
 ---
 
