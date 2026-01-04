@@ -30,10 +30,9 @@ Idempotently install all recommended Claude Code plugins for this workspace.
 |--------|-------------|
 | `mlx-hub` | Local MLX model inference for speed (Apple Silicon only) |
 
-> ⚠️ **Dev Setup Note**: `mlx-hub` is symlinked from `~/code/mono-claude/mlx-hub-claude-plugin`
-> to `~/.claude/plugins/mlx-hub`. Since it points to our local dev repo, it should **never be
-> reinstalled** - just verify the symlink exists. If missing, the repo needs to be cloned and
-> symlinked manually, not installed via `claude plugin add`.
+> **Dev Setup Note**: `mlx-hub` is registered as a local marketplace pointing to
+> `~/code/mono-claude/mlx-hub-claude-plugin`. Use `claude plugin update mlx-hub@mlx-hub`
+> to sync changes from the dev repo to the plugin cache.
 
 ### Official Anthropic
 
@@ -146,13 +145,14 @@ claude plugin update <plugin-name>@<marketplace>
 
 ### Step 4: Handle mlx-hub (Local Dev Plugin)
 
-**Do NOT reinstall mlx-hub.** It's symlinked to our local dev repo.
+`mlx-hub` is registered as a local marketplace (not a remote GitHub repo).
 
-1. Check if symlink exists: `ls -la ~/.claude/plugins/ | grep mlx-hub`
-2. If symlink exists → Report as "OK (local dev)"
-3. If symlink missing → Warn user to set up manually:
+1. Check if marketplace registered: `cat ~/.claude/plugins/known_marketplaces.json | grep mlx-hub`
+2. If registered → Run `claude plugin update mlx-hub@mlx-hub` to sync latest changes
+3. If not registered → Set up manually:
    ```bash
-   ln -s ~/code/mono-claude/mlx-hub-claude-plugin ~/.claude/plugins/mlx-hub
+   claude plugin marketplace add ~/code/mono-claude/mlx-hub-claude-plugin
+   claude plugin install mlx-hub@mlx-hub
    ```
 
 ### Step 5: Report Results
@@ -175,7 +175,7 @@ Updated:
   ...
 
 Local dev plugins:
-  - mlx-hub (symlinked to ~/code/mono-claude/mlx-hub-claude-plugin) ✓
+  - mlx-hub (local marketplace → ~/code/mono-claude/mlx-hub-claude-plugin) ✓
 
 Total: X plugins installed, Y updated
 

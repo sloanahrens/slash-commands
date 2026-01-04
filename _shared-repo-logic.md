@@ -6,16 +6,23 @@ This file contains shared patterns used by all repo-targeting slash commands.
 
 ## Configuration
 
+**CRITICAL**: Always read the actual `config.yaml` to get real path values before using them:
+```bash
+cat ~/.claude/commands/config.yaml
+```
+
 Commands use `config.yaml` in this directory. The config supports:
 
-- `base_path` - primary workspace for monorepo/packages (e.g., ~/code/my-workspace)
+- `base_path` - primary workspace for monorepo/packages
 - `builtin` - fixed packages within base_path
 - `worktrees_dir` - auto-discovers `.trees/*` worktrees
 - `clones_config` - reads reference repos from `clones/clone-config.json`
-- `code_path` - location of working code repos (~/code)
+- `code_path` - location of working code repos
 - `repos` - working repos at code_path
 
+**Example config (DO NOT use these values - read actual config.yaml):**
 ```yaml
+# EXAMPLE ONLY - your actual paths will differ!
 base_path: ~/code/my-workspace
 
 builtin:
@@ -192,14 +199,16 @@ After selecting a repo, load relevant context:
 
 ## Standard Process Start
 
-1. Parse `config.yaml` for base_path, code_path, and repo definitions
-2. Discover worktrees from `<base_path>/.trees/`
-3. Discover clones from `clones/clone-config.json`
-4. If `$ARGUMENTS` empty → show selection prompt
-5. If `$ARGUMENTS` provided → fuzzy match to repo
-6. Confirm selection: "Working on: <repo-name>"
-7. Read global `~/.claude/CLAUDE.md` (if exists) for user-wide settings
-8. Read repo's CLAUDE.md (if exists) for repo-specific guidance
+1. **Read `~/.claude/commands/config.yaml`** to get actual `base_path` and `code_path` values
+   - DO NOT assume paths or use example values from documentation
+2. Parse `config.yaml` repos list
+3. Discover worktrees from `<base_path>/.trees/`
+4. Discover clones from `clones/clone-config.json`
+5. If `$ARGUMENTS` empty → show selection prompt
+6. If `$ARGUMENTS` provided → fuzzy match to repo
+7. Confirm selection: "Working on: <repo-name>"
+8. Read global `~/.claude/CLAUDE.md` (if exists) for user-wide settings
+9. Read repo's CLAUDE.md (if exists) for repo-specific guidance
 
 ---
 

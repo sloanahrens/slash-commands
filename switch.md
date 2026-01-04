@@ -14,14 +14,27 @@ Quickly switch context to a repository with status summary and suggestions.
 
 ## Process
 
-### Step 1: Resolve Repository
+### Step 1: Read Config
+
+**CRITICAL**: First read the actual `config.yaml` to get real path values:
+```bash
+cat ~/.claude/commands/config.yaml
+```
+
+Extract:
+- `base_path`: The monorepo/workspace root (e.g., `~/code/mono-claude`)
+- `code_path`: Location of working repos (e.g., `~/code/mono-claude`)
+
+**DO NOT use example values from documentation. Use the actual config values.**
+
+### Step 2: Resolve Repository
 
 Follow repo selection from `_shared-repo-logic.md`:
 1. Parse `config.yaml` for builtin, worktrees, clones, repos
 2. Fuzzy match `$ARGUMENTS` against all sources
 3. If no match, show selection menu
 
-### Step 2: Load Context
+### Step 3: Load Context
 
 Use devbot for fast context loading (~0.05s total):
 
@@ -37,7 +50,7 @@ These run in parallel and provide:
 - Commits ahead/behind remote
 - Code metrics (files, lines, functions, complexity)
 
-### Step 3: Display Summary
+### Step 4: Display Summary
 
 **For builtin packages:**
 ```
@@ -121,14 +134,14 @@ Quick actions:
   /super my-project         Start brainstorming
 ```
 
-### Step 4: Read CLAUDE.md
+### Step 5: Read CLAUDE.md
 
 Show key info from repo's CLAUDE.md (if exists):
 - Stack/language
 - Key commands
 - Any warnings or gotchas
 
-### Step 5: Suggest Commands
+### Step 6: Suggest Commands
 
 Based on repo type, suggest relevant commands:
 
