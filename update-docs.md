@@ -195,7 +195,8 @@ devbot check <repo-name>                     # Runs lint, typecheck, test
 
 **For recent changes:**
 ```bash
-git -C /path/to/repo log --oneline -5        # Use literal path
+cd /path/to/repo
+git log --oneline -5
 ```
 
 Use stats output to update CLAUDE.md metrics section if present:

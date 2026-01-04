@@ -40,8 +40,9 @@ If no changes (clean), report "No changes to commit" and exit.
 #### 3a. Get the diff
 
 ```bash
-git -C <repo-path> diff --staged   # If files are staged
-git -C <repo-path> diff            # If nothing staged yet
+cd /path/to/repo
+git diff --staged   # If files are staged
+git diff            # If nothing staged yet
 ```
 
 #### 3b. Generate local model message
@@ -118,8 +119,9 @@ Committing to <repo-name>:
 ```
 
 ```bash
-git -C <repo-path> add -A
-git -C <repo-path> commit -m "<message>"
+cd /path/to/repo
+git add -A
+git commit -m "<message>"
 ```
 
 The user approves via Claude Code's tool permission dialog.
@@ -127,7 +129,7 @@ The user approves via Claude Code's tool permission dialog.
 ### Step 5: Verify Success
 
 ```bash
-git -C <repo-path> log -1 --oneline
+git log -1 --oneline
 ```
 
 If pre-commit hooks modified files, include them in an amended commit.

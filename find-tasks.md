@@ -33,7 +33,8 @@ devbot path <repo-name>
 
 2. Check recent commits:
    ```bash
-   git -C /path/to/repo log --oneline -10
+   cd /path/to/repo
+   git log --oneline -10
    ```
 
 3. Examine test coverage gaps (if test scripts exist)

@@ -67,9 +67,9 @@ devbot status --all    # List all known repos
 - Use AskUserQuestion to ask user to specify the correct local path
 
 **Important directory safety rules:**
-- Always use `git -C <absolute-path>` instead of `cd`
+- Use `cd /absolute/path` then regular git commands
 - Use absolute paths when referencing files
-- Never assume directory state - always verify
+- Never assume directory state - always verify with `pwd`
 
 ## Step 4: Fetch PR Data
 
