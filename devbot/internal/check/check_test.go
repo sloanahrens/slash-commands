@@ -229,3 +229,124 @@ func TestResultStackSummary(t *testing.T) {
 		})
 	}
 }
+
+func TestDiscoverSubApps(t *testing.T) {
+	t.Run("single root app", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte("module test"), 0644)
+
+		apps := discoverSubApps(tmpDir)
+
+		if len(apps) != 1 {
+			t.Fatalf("discoverSubApps() = %d apps, want 1", len(apps))
+		}
+		if apps[0].Path != "" {
+			t.Errorf("apps[0].Path = %q, want empty (root)", apps[0].Path)
+		}
+		if len(apps[0].Stack) == 0 || apps[0].Stack[0] != "go" {
+			t.Errorf("apps[0].Stack = %v, want [go]", apps[0].Stack)
+		}
+	})
+
+	t.Run("monorepo with subdirs", func(t *testing.T) {
+		tmpDir := t.TempDir()
+
+		// Create go-api subdir
+		apiDir := filepath.Join(tmpDir, "go-api")
+		os.MkdirAll(apiDir, 0755)
+		os.WriteFile(filepath.Join(apiDir, "go.mod"), []byte("module api"), 0644)
+
+		// Create nextapp subdir
+		webDir := filepath.Join(tmpDir, "nextapp")
+		os.MkdirAll(webDir, 0755)
+		os.WriteFile(filepath.Join(webDir, "package.json"), []byte("{}"), 0644)
+		os.WriteFile(filepath.Join(webDir, "tsconfig.json"), []byte("{}"), 0644)
+		os.WriteFile(filepath.Join(webDir, "next.config.js"), []byte(""), 0644)
+
+		apps := discoverSubApps(tmpDir)
+
+		if len(apps) != 2 {
+			t.Fatalf("discoverSubApps() = %d apps, want 2", len(apps))
+		}
+
+		// Find each app
+		var goApp, nextApp *SubApp
+		for i := range apps {
+			if apps[i].Path == "go-api" {
+				goApp = &apps[i]
+			} else if apps[i].Path == "nextapp" {
+				nextApp = &apps[i]
+			}
+		}
+
+		if goApp == nil {
+			t.Error("Expected go-api subapp not found")
+		}
+		if nextApp == nil {
+			t.Error("Expected nextapp subapp not found")
+		}
+	})
+
+	t.Run("apps pattern", func(t *testing.T) {
+		tmpDir := t.TempDir()
+
+		// Create apps/app1 and apps/app2
+		app1 := filepath.Join(tmpDir, "apps", "app1")
+		app2 := filepath.Join(tmpDir, "apps", "app2")
+		os.MkdirAll(app1, 0755)
+		os.MkdirAll(app2, 0755)
+		os.WriteFile(filepath.Join(app1, "package.json"), []byte("{}"), 0644)
+		os.WriteFile(filepath.Join(app2, "package.json"), []byte("{}"), 0644)
+
+		apps := discoverSubApps(tmpDir)
+
+		if len(apps) < 2 {
+			t.Errorf("discoverSubApps() = %d apps, want >= 2", len(apps))
+		}
+	})
+
+	t.Run("packages pattern", func(t *testing.T) {
+		tmpDir := t.TempDir()
+
+		// Create packages/pkg1
+		pkg1 := filepath.Join(tmpDir, "packages", "pkg1")
+		os.MkdirAll(pkg1, 0755)
+		os.WriteFile(filepath.Join(pkg1, "package.json"), []byte("{}"), 0644)
+		os.WriteFile(filepath.Join(pkg1, "tsconfig.json"), []byte("{}"), 0644)
+
+		apps := discoverSubApps(tmpDir)
+
+		if len(apps) < 1 {
+			t.Errorf("discoverSubApps() = %d apps, want >= 1", len(apps))
+		}
+	})
+
+	t.Run("empty directory", func(t *testing.T) {
+		tmpDir := t.TempDir()
+
+		apps := discoverSubApps(tmpDir)
+
+		if len(apps) != 0 {
+			t.Errorf("discoverSubApps(empty) = %d apps, want 0", len(apps))
+		}
+	})
+
+	t.Run("root and subdir same stack skips subdir", func(t *testing.T) {
+		tmpDir := t.TempDir()
+
+		// Root has go.mod
+		os.WriteFile(filepath.Join(tmpDir, "go.mod"), []byte("module root"), 0644)
+
+		// api subdir also has go.mod (should be skipped due to overlap)
+		apiDir := filepath.Join(tmpDir, "api")
+		os.MkdirAll(apiDir, 0755)
+		os.WriteFile(filepath.Join(apiDir, "go.mod"), []byte("module api"), 0644)
+
+		apps := discoverSubApps(tmpDir)
+
+		// Should only find root since api overlaps with root stack
+		if len(apps) != 1 {
+			t.Errorf("discoverSubApps() = %d apps, want 1 (overlap skipped)", len(apps))
+		}
+	})
+}
