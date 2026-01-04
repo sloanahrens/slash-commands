@@ -2,6 +2,7 @@ package workspace
 
 import (
 	"os"
+	"os/exec"
 	"path/filepath"
 	"testing"
 )
@@ -144,4 +145,134 @@ func TestRepoStatus(t *testing.T) {
 	if status.Behind != 1 {
 		t.Errorf("Behind = %d, want 1", status.Behind)
 	}
+}
+
+// Git fixture helpers
+func setupGitRepo(t *testing.T, dir string) {
+	t.Helper()
+	runGit(t, dir, "init")
+	runGit(t, dir, "config", "user.email", "test@test.com")
+	runGit(t, dir, "config", "user.name", "Test User")
+
+	if err := os.WriteFile(filepath.Join(dir, "README.md"), []byte("# Test"), 0644); err != nil {
+		t.Fatalf("Failed to create file: %v", err)
+	}
+	runGit(t, dir, "add", ".")
+	runGit(t, dir, "commit", "-m", "Initial commit")
+}
+
+func runGit(t *testing.T, dir string, args ...string) string {
+	t.Helper()
+	cmd := exec.Command("git", args...)
+	cmd.Dir = dir
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("git %v failed: %v\n%s", args, err, out)
+	}
+	return string(out)
+}
+
+func TestGetRepoStatus(t *testing.T) {
+	t.Run("clean repo", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		setupGitRepo(t, tmpDir)
+
+		repo := RepoInfo{Name: "test-repo", Path: tmpDir}
+		status := getRepoStatus(repo)
+
+		if status.Branch != "main" && status.Branch != "master" {
+			t.Errorf("Branch = %q, want main or master", status.Branch)
+		}
+		if status.DirtyFiles != 0 {
+			t.Errorf("DirtyFiles = %d, want 0", status.DirtyFiles)
+		}
+	})
+
+	t.Run("dirty repo", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		setupGitRepo(t, tmpDir)
+
+		// Create untracked files
+		os.WriteFile(filepath.Join(tmpDir, "new1.txt"), []byte("new"), 0644)
+		os.WriteFile(filepath.Join(tmpDir, "new2.txt"), []byte("new"), 0644)
+
+		repo := RepoInfo{Name: "test-repo", Path: tmpDir}
+		status := getRepoStatus(repo)
+
+		if status.DirtyFiles != 2 {
+			t.Errorf("DirtyFiles = %d, want 2", status.DirtyFiles)
+		}
+	})
+
+	t.Run("modified tracked file", func(t *testing.T) {
+		tmpDir := t.TempDir()
+		setupGitRepo(t, tmpDir)
+
+		// Modify tracked file
+		os.WriteFile(filepath.Join(tmpDir, "README.md"), []byte("# Modified"), 0644)
+
+		repo := RepoInfo{Name: "test-repo", Path: tmpDir}
+		status := getRepoStatus(repo)
+
+		if status.DirtyFiles != 1 {
+			t.Errorf("DirtyFiles = %d, want 1", status.DirtyFiles)
+		}
+	})
+}
+
+func TestGetStatus(t *testing.T) {
+	t.Run("multiple repos", func(t *testing.T) {
+		tmpDir := t.TempDir()
+
+		// Create two repos
+		repo1Path := filepath.Join(tmpDir, "repo1")
+		repo2Path := filepath.Join(tmpDir, "repo2")
+		os.MkdirAll(repo1Path, 0755)
+		os.MkdirAll(repo2Path, 0755)
+
+		setupGitRepo(t, repo1Path)
+		setupGitRepo(t, repo2Path)
+
+		// Make repo2 dirty
+		os.WriteFile(filepath.Join(repo2Path, "dirty.txt"), []byte("dirty"), 0644)
+
+		repos := []RepoInfo{
+			{Name: "repo1", Path: repo1Path},
+			{Name: "repo2", Path: repo2Path},
+		}
+
+		statuses := GetStatus(repos)
+
+		if len(statuses) != 2 {
+			t.Fatalf("GetStatus returned %d statuses, want 2", len(statuses))
+		}
+
+		// Find each repo's status (order not guaranteed due to parallel execution)
+		var repo1Status, repo2Status *RepoStatus
+		for i := range statuses {
+			if statuses[i].Name == "repo1" {
+				repo1Status = &statuses[i]
+			} else if statuses[i].Name == "repo2" {
+				repo2Status = &statuses[i]
+			}
+		}
+
+		if repo1Status == nil || repo2Status == nil {
+			t.Fatal("Could not find both repos in results")
+		}
+
+		if repo1Status.DirtyFiles != 0 {
+			t.Errorf("repo1 DirtyFiles = %d, want 0", repo1Status.DirtyFiles)
+		}
+		if repo2Status.DirtyFiles != 1 {
+			t.Errorf("repo2 DirtyFiles = %d, want 1", repo2Status.DirtyFiles)
+		}
+	})
+
+	t.Run("empty repos slice", func(t *testing.T) {
+		statuses := GetStatus([]RepoInfo{})
+		if len(statuses) != 0 {
+			t.Errorf("GetStatus([]) returned %d statuses, want 0", len(statuses))
+		}
+	})
 }
