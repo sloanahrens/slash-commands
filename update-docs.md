@@ -74,9 +74,52 @@ Use stats output to update CLAUDE.md metrics section if present:
 
 For significant updates, consider using local model to draft sections (see `_shared-repo-logic.md` → "Local Model Acceleration"). Claude reviews all drafts before writing.
 
-### Step 4: Update Files
+### Step 4: Update Files (Dual-Model Evaluation)
 
-Follow `elements-of-style` principles: omit needless words, use active voice, be specific.
+Use dual-model pattern from `_shared-repo-logic.md` to build confidence in local model.
+
+#### 4a. Generate Documentation Draft (Local Model)
+
+For each section needing updates, use local model first:
+
+```python
+mcp__plugin_mlx-hub_mlx-hub__mlx_infer(
+  model_id="mlx-community/Qwen2.5-Coder-14B-Instruct-4bit",
+  prompt="""Update this documentation section based on current state.
+
+Current section:
+{existing_section}
+
+New information:
+{gathered_context}
+
+Write the updated section. Be concise, use active voice, omit needless words.
+Updated section:""",
+  max_tokens=500
+)
+```
+
+#### 4b. Claude Reviews Draft
+
+Claude independently generates the same section, then evaluates local draft:
+
+**Evaluation criteria:**
+- ✓ Factually matches gathered context (commands exist, paths correct)
+- ✓ Concise (no unnecessary words)
+- ✓ Active voice throughout
+- ✓ No hallucinated features or commands
+
+#### 4c. Select and Mark
+
+**If local passes all criteria:**
+- Use local draft
+- Note in output: `[local] Updated: {section name}`
+
+**If local fails any criteria:**
+- Use Claude version
+- Note: `[claude] Updated: {section name} (local had {issue})`
+
+#### 4d. File-Specific Guidelines
 
 **CLAUDE.md** (Priority):
 - Verify commands are current
@@ -93,6 +136,20 @@ Follow `elements-of-style` principles: omit needless words, use active voice, be
 - Update "Last Updated" date
 - Refresh architecture descriptions
 - Update test/coverage metrics
+
+#### 4e. Summary with Provenance
+
+After all sections updated, show:
+```
+Documentation updated:
+  [local] CLAUDE.md - Commands section
+  [local] CLAUDE.md - Architecture section
+  [claude] README.md - Quick start (local missed new flag)
+
+Docs updated (2/3 sections via local model). Ready to commit.
+```
+
+If >50% sections used local model, commit message gets ` [local]` suffix.
 
 ### Step 5: Check Consistency
 

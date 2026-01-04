@@ -85,9 +85,44 @@ Focus on tasks that:
 - Are quick wins with high value
 - Balance testing, features, and infrastructure
 
-### Step 5: Generate Task Options
+### Step 5: Generate Task Options (Dual-Model Evaluation)
 
-Provide 3-5 concrete, actionable tasks.
+Use dual-model pattern from `_shared-repo-logic.md` to build confidence in local model.
+
+#### 5a. Summarize Each Task with Local Model
+
+For each task identified (TODOs, complexity issues, coverage gaps):
+
+```python
+mcp__plugin_mlx-hub_mlx-hub__mlx_infer(
+  model_id="mlx-community/Qwen2.5-Coder-14B-Instruct-4bit",
+  prompt="""Write a one-line task summary. Use imperative mood, under 80 chars.
+
+Context:
+- File: {file_path}:{line}
+- TODO/Issue: "{todo_text}"
+- Surrounding code context: {context}
+
+Task summary:""",
+  max_tokens=50
+)
+```
+
+#### 5b. Claude Reviews Each Summary
+
+**Evaluation criteria:**
+- ✓ Starts with actionable verb (Add, Fix, Refactor, Implement)
+- ✓ Under 100 characters
+- ✓ Accurate file/line reference preserved
+- ✓ Priority inference reasonable given context
+
+#### 5c. Build Output with Markers
+
+Mark each task with its provenance:
+- `[local]` — local model summary passed all criteria
+- `[claude]` — Claude's version used (with reason)
+
+Provide 3-5 concrete, actionable tasks with markers.
 
 ---
 
@@ -104,29 +139,32 @@ From Linear:
    - Success: New endpoints pass integration tests
 
 From Codebase Analysis:
-2. **Add missing test coverage for config command** (Medium)
+2. [local] **Add missing test coverage for config command** (Medium)
    - Impact: Increases confidence in releases
    - Start: src/commands/config.ts (0% coverage)
    - Success: >80% coverage for config module
 
 From TODO Comments:
-3. **Implement retry logic in clone setup** (Medium)
+3. [local] **Implement retry logic in clone setup** (Medium)
    - Location: src/commands/clones.ts:245
    - Impact: Reduces failed clone attempts
    - Success: Retry with exponential backoff
 
 From Complexity Analysis:
-4. **Refactor runStats function** (Medium)
+4. [claude] **Refactor runStats into smaller focused functions** (Medium)
    - Location: cmd/main.go:793 (127 lines)
    - Impact: Improves maintainability
    - Success: Function under 50 lines
+   - (local summary lacked specificity)
 
 Quick Win:
-5. **Fix typo in error message** (Low)
+5. [local] **Fix typo in error message** (Low)
    - Location: src/utils/logger.ts:42
    - Impact: Professional error messages
    - Success: Corrected spelling
 ```
+
+Note: Linear issues don't get markers (external source, not generated).
 
 ---
 

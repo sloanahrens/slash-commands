@@ -140,3 +140,45 @@ mcp__plugin_mlx-hub_mlx-hub__mlx_infer(
 ```
 
 Always prefix output: `[local] Generated: "..."`
+
+---
+
+## Dual-Model Evaluation
+
+For text generation tasks, use this pattern to build confidence in local model:
+
+### Pattern
+
+1. **Local model generates first** (fast path, ~0.5s)
+2. **Claude generates independently** (for comparison)
+3. **Evaluate local against criteria** (task-specific)
+4. **Select winner:**
+   - If local passes all criteria → use with `[local]` marker
+   - If local fails any → use Claude's version
+
+### Criteria Templates
+
+**For prose/docs:**
+- Factually accurate (matches actual code/commands)
+- Concise (no bloat or unnecessary words)
+- Active voice throughout
+- No hallucinated features
+
+**For task summaries:**
+- Starts with actionable verb (Add, Fix, Refactor)
+- Under 100 characters
+- Accurate file/line references
+- Reasonable priority inference
+
+### Inline Markers
+
+Show provenance in output:
+```
+[local] Add retry logic for API failures
+[claude] Refactor authentication to use OAuth2 (local missed requirement)
+```
+
+### Commit Suffix
+
+If >50% of generated content used local model, append ` [local]` to commit message.
+This creates visible audit trail: `git log --oneline | grep "\[local\]"`
