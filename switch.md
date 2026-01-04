@@ -126,9 +126,13 @@ Quick actions:
   /super my-project         Start brainstorming
 ```
 
-### Step 4: Read CLAUDE.md
+### Step 4: Load Context
 
-Show key info from repo's CLAUDE.md (if exists):
+Per `_shared-repo-logic.md` → "Context Loading":
+1. Read `~/.claude/CLAUDE.md` (global settings)
+2. Read `<repo-path>/CLAUDE.md` (repo-specific guidance)
+
+Show key info from both (if they exist):
 - Stack/language
 - Key commands
 - Any warnings or gotchas

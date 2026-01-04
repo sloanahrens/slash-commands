@@ -18,7 +18,13 @@ Analyze the project and suggest 3-5 high-priority tasks for a repository.
 
 Follow repo selection from `_shared-repo-logic.md`, then confirm: "Finding tasks for: <repo-name>"
 
-### Step 2: Review Current State
+### Step 2: Load Context
+
+Per `_shared-repo-logic.md` → "Context Loading":
+1. Read `~/.claude/CLAUDE.md` (global settings)
+2. Read `<repo-path>/CLAUDE.md` (repo-specific guidance)
+
+### Step 3: Review Current State
 
 **First, get the repo path (REQUIRED):**
 ```bash
@@ -62,7 +68,7 @@ devbot path <repo-name>
 
 **NEVER construct paths manually - always use `devbot path` first.**
 
-### Step 3: Check Linear Issues (Optional)
+### Step 4: Check Linear Issues (Optional)
 
 If Linear integration is configured, use Linear MCP to find relevant issues:
 
@@ -85,7 +91,7 @@ Linear Issues:
     └── PROJ-789: Update documentation (Normal)
 ```
 
-### Step 4: Identify High-Impact Work
+### Step 5: Identify High-Impact Work
 
 Focus on tasks that:
 - Unblock other work
@@ -94,13 +100,13 @@ Focus on tasks that:
 - Are quick wins with high value
 - Balance testing, features, and infrastructure
 
-### Step 5: Generate Task Options (Dual-Model Evaluation)
+### Step 6: Generate Task Options (Dual-Model Evaluation)
 
 Use dual-model pattern from `_shared-repo-logic.md` to build confidence in local model.
 
 **Note:** If local model is unavailable (see `_shared-repo-logic.md` → "Availability Check"), skip local model steps and use Claude directly. Omit `[local]`/`[claude]` markers in output.
 
-#### 5a. Summarize Each Task with Local Model
+#### 6a. Summarize Each Task with Local Model
 
 For each task identified (TODOs, complexity issues, coverage gaps):
 
@@ -119,7 +125,7 @@ Task summary:""",
 )
 ```
 
-#### 5b. Claude Reviews Each Summary
+#### 6b. Claude Reviews Each Summary
 
 **Evaluation criteria:**
 - ✓ Starts with actionable verb (Add, Fix, Refactor, Implement)
@@ -127,7 +133,7 @@ Task summary:""",
 - ✓ Accurate file/line reference preserved
 - ✓ Priority inference reasonable given context
 
-#### 5c. Build Output with Markers
+#### 6c. Build Output with Markers
 
 Mark each task with its provenance:
 - `[local]` — local model summary passed all criteria

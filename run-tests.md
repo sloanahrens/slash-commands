@@ -18,7 +18,13 @@ Run quality checks and test suite for a repository.
 
 Follow repo selection from `_shared-repo-logic.md`, then confirm: "Running tests for: <repo-name>"
 
-### Step 2: Run Quality Checks
+### Step 2: Load Context
+
+Per `_shared-repo-logic.md` → "Context Loading":
+1. Read `~/.claude/CLAUDE.md` (global settings)
+2. Read `<repo-path>/CLAUDE.md` (repo-specific guidance)
+
+### Step 3: Run Quality Checks
 
 Use `devbot check` for fast, auto-detected quality checks:
 
@@ -41,7 +47,7 @@ The command maps stacks to appropriate tools:
 
 **Subdirectory projects**: If stack not detected at root, check `work_dir` setting or common subdirs (go-api/, nextapp/, packages/*).
 
-### Step 3: Report Results
+### Step 4: Report Results
 
 ```
 | Check      | Status  | Details                    |
@@ -54,7 +60,7 @@ The command maps stacks to appropriate tools:
 | TOTAL      | PASS    | All quality gates passed   |
 ```
 
-### Step 4: Code Review (Optional)
+### Step 5: Code Review (Optional)
 
 **If all checks pass** and `--review` flag is passed (or user requests it):
 

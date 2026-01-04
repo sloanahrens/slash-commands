@@ -18,7 +18,13 @@ Run Makefile targets for a repository. Skips clean by default for faster increme
 
 Follow repo selection from `_shared-repo-logic.md`, then confirm: "Testing Makefile for: <repo-name>"
 
-### Step 2: Parse Makefile with devbot
+### Step 2: Load Context
+
+Per `_shared-repo-logic.md` → "Context Loading":
+1. Read `~/.claude/CLAUDE.md` (global settings)
+2. Read `<repo-path>/CLAUDE.md` (repo-specific guidance)
+
+### Step 3: Parse Makefile with devbot
 
 Use devbot for instant Makefile analysis:
 
@@ -33,7 +39,7 @@ This parses in ~0.01s and returns:
 
 If no Makefile found, report error and exit.
 
-### Step 3: Display Target Summary
+### Step 4: Display Target Summary
 
 Show a brief summary of discovered targets:
 
@@ -46,7 +52,7 @@ Makefile for <repo-name>: 13 targets
   dev:   dev, start (smoke test)
 ```
 
-### Step 4: Execute All Targets (Default Behavior)
+### Step 5: Execute All Targets (Default Behavior)
 
 **Run targets automatically in build order (skip clean by default).** No prompting unless `--interactive` flag is passed.
 
@@ -74,7 +80,7 @@ Makefile for <repo-name>: 13 targets
 2. Wait for user confirmation
 3. Re-check Docker status before proceeding
 
-### Step 5: Execute and Time Targets
+### Step 6: Execute and Time Targets
 
 For each target:
 
@@ -96,7 +102,7 @@ time make -C <repo-path> <target>
 - Blocking (dev, start): 5s (smoke test only)
 - Docker: 30s
 
-### Step 6: Report Results with Timing Summary
+### Step 7: Report Results with Timing Summary
 
 Display a table showing all targets with their execution times, sorted by execution order:
 

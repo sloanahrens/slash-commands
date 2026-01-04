@@ -28,12 +28,15 @@ devbot path <repo-name>
 # Output: /path/to/repo (use this literal path below)
 ```
 
-1. Read repo documentation:
-   - `/path/to/repo/CLAUDE.md`
+Per `_shared-repo-logic.md` → "Context Loading":
+1. Read `~/.claude/CLAUDE.md` (global settings)
+2. Read `<repo-path>/CLAUDE.md` (repo-specific guidance)
+
+Also read additional repo documentation:
    - `/path/to/repo/README.md`
    - `/path/to/repo/docs/overview.md` (if exists)
 
-2. Examine structure:
+Examine structure:
    ```bash
    devbot tree /path/to/repo -d 2    # Takes literal PATH
    ```
