@@ -1,14 +1,138 @@
 ---
-description: Update documentation for a repository
+description: Update documentation for a repository, or audit workspace docs
 ---
 
 # Update Documentation
 
-Update project documentation for a repository, maintaining consistency across files.
+Update project documentation for a repository, or audit workspace-level documentation.
 
-**Arguments**: `$ARGUMENTS` - Repo name (exact match). See `_shared-repo-logic.md`.
+**Arguments**: `$ARGUMENTS` - Repo name (exact match), or empty for workspace audit. See `_shared-repo-logic.md`.
 
 **Shared logic**: See `_shared-repo-logic.md` for repo discovery and selection.
+
+---
+
+## Mode Selection
+
+**If `$ARGUMENTS` is empty**: Run **Workspace Audit** (see below)
+
+**If `$ARGUMENTS` provided**: Run **Repository Update** (skip to "Repository Update Process")
+
+---
+
+## Workspace Audit (No Arguments)
+
+When run without arguments, audit the entire workspace documentation.
+
+### WA-1: Audit Global CLAUDE.md
+
+Read `~/.claude/CLAUDE.md` and verify:
+
+```bash
+# Check if documented repos match config
+cat ~/code/mono-claude/slash-commands/config.yaml
+
+# Check if documented commands match actual files
+ls ~/code/mono-claude/slash-commands/*.md | grep -v "^_"
+
+# Check devbot commands still work
+devbot --help 2>&1 | head -20
+```
+
+**Verify:**
+- Repository registry matches `config.yaml`
+- Slash commands table matches actual `.md` files
+- devbot commands documented are current
+- Setup instructions are accurate (test `/setup-workspace` flow)
+- No obsolete repos, commands, or instructions
+
+Report any discrepancies found.
+
+### WA-2: Scan Repo Documentation
+
+For each repo in config.yaml, check its CLAUDE.md (or README.md as fallback):
+
+```bash
+for repo in $(grep "name:" ~/code/mono-claude/slash-commands/config.yaml | awk '{print $3}'); do
+  REPO_PATH=$(devbot path "$repo" 2>/dev/null)
+  if [ -f "$REPO_PATH/CLAUDE.md" ]; then
+    lines=$(wc -l < "$REPO_PATH/CLAUDE.md")
+    echo "$repo: CLAUDE.md ($lines lines)"
+  elif [ -f "$REPO_PATH/README.md" ]; then
+    lines=$(wc -l < "$REPO_PATH/README.md")
+    echo "$repo: README.md only ($lines lines) - needs CLAUDE.md"
+  else
+    echo "$repo: NO DOCS"
+  fi
+done
+```
+
+**Flag repos that need attention:**
+- No CLAUDE.md or README.md
+- README.md only (suggest creating CLAUDE.md from it)
+- CLAUDE.md over 250 lines (needs trimming)
+- CLAUDE.md under 30 lines (may be incomplete)
+- Last git commit to CLAUDE.md > 30 days ago
+
+### WA-3: Clean Workspace docs/ Folder
+
+Check `~/code/mono-claude/docs/` for obsolete planning files:
+
+```bash
+ls -la ~/code/mono-claude/docs/
+find ~/code/mono-claude/docs -name "*.md" -type f
+```
+
+**For each file found, evaluate:**
+
+1. **Completed plans** - If the plan has been fully implemented:
+   - Delete the file
+   - Note: "Deleted <filename> - plan completed"
+
+2. **Partially completed plans** - If work remains:
+   - Ask user: "Keep, delete, or consolidate <filename>?"
+   - If consolidate: extract remaining TODOs to relevant repo's docs/ or CLAUDE.md
+
+3. **Reference documentation** - If it's useful ongoing reference:
+   - Move to appropriate repo's `docs/` folder, OR
+   - Consolidate key info into `~/.claude/CLAUDE.md` if workspace-wide
+
+4. **Obsolete/stale** - If outdated and no longer relevant:
+   - Delete the file
+
+**Goal**: The workspace `docs/` folder should be empty or contain only active plans.
+
+### WA-4: Report Summary
+
+```
+Workspace Documentation Audit
+=============================
+
+Global CLAUDE.md:
+  ✓ Repos match config.yaml (12 repos)
+  ✓ Commands match files (22 commands)
+  ⚠ devops-cloud-run marked "legacy" but still in registry
+
+Repo CLAUDE.md Status:
+  ✓ 10 repos: healthy (50-200 lines)
+  ⚠ mango: 245 lines (consider trimming)
+  ✗ physics-stuff: missing CLAUDE.md
+
+Workspace docs/ Cleanup:
+  Deleted: 2025-12-28-documentation-improvements-design.md (completed)
+  Moved: new-gcp-project-setup-plan.md → devops-pulumi-ts/docs/
+
+Recommended actions:
+  1. Trim mango/CLAUDE.md (move details to docs/overview.md)
+  2. Create physics-stuff/CLAUDE.md
+  3. Consider archiving devops-cloud-run if truly legacy
+```
+
+---
+
+## Repository Update Process
+
+When a repo name is provided.
 
 ---
 
@@ -209,8 +333,8 @@ Report:
 ## Examples
 
 ```bash
-/update-docs              # Interactive selection
-/update-docs cli          # Update CLI docs
-/update-docs server       # Update server docs
-/update-docs my-app       # Update app repo docs
+/update-docs              # Workspace audit (global CLAUDE.md, all repos, cleanup docs/)
+/update-docs fractals     # Update fractals-nextjs docs
+/update-docs mango        # Update mango docs
+/update-docs slash        # Update slash-commands docs
 ```
