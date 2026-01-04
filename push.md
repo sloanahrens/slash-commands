@@ -21,8 +21,10 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Pushing for: 
 ### Step 2: Check for Uncommitted Changes
 
 ```bash
-cd <repo-path> && git status --porcelain
+devbot status <repo-name>
 ```
+
+This provides branch, dirty file count, and ahead/behind status in ~0.01s.
 
 **If uncommitted changes exist:**
 

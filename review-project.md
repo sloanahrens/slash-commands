@@ -30,8 +30,9 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Reviewing: <r
 2. Examine structure:
    ```bash
    ls -la <repo-path>
-   tree <repo-path> -L 2 -I 'node_modules|.git|dist|__pycache__'
+   devbot tree <repo-path> -d 2
    ```
+   devbot tree automatically respects .gitignore, excluding node_modules, dist, etc.
 
 ### Step 3: Analyze Codebase Metrics
 

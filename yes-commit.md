@@ -21,8 +21,10 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Committing fo
 ### Step 2: Check Repository Status
 
 ```bash
-git -C <repo-path> status
+devbot status <repo-name>
 ```
+
+This provides branch, dirty file count, and ahead/behind status in ~0.01s.
 
 If no changes, report "No changes to commit" and exit.
 

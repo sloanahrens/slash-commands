@@ -267,6 +267,8 @@ Fast parallel operations across repos. Use devbot for speed-critical operations:
 | `devbot detect <path>` | Stack detection | instant |
 | `devbot config` | Config file discovery | ~0.01s |
 | `devbot stats <path>` | File/directory code metrics | ~0.01s |
+| `devbot deps [repo]` | Dependency analysis (shared deps) | ~0.01s |
+| `devbot tree <path>` | Directory tree (respects .gitignore) | ~0.01s |
 
 Install: Run `/install-devbot` or `cd ~/code/slash-commands/devbot && make install`
 

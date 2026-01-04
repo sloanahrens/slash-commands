@@ -168,14 +168,14 @@ Quick actions:
 
 ## Group Selection (Working Repos)
 
-Ask user or infer from repo contents:
+Use devbot for fast language detection after cloning:
 
-| Indicator | Language |
-|-----------|----------|
-| `package.json` | typescript |
-| `pyproject.toml`, `requirements.txt` | python |
-| `go.mod` | go |
-| `Cargo.toml` | rust |
+```bash
+devbot detect <repo-path>
+# Output: Detected: typescript, nextjs
+```
+
+This checks for package.json, go.mod, pyproject.toml, Cargo.toml, etc. and identifies frameworks (Next.js, React, etc.) in ~0.01s.
 
 ---
 
