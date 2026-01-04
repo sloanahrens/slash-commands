@@ -2,6 +2,8 @@
 
 Portable slash commands for managing multi-repo workspaces with Claude Code.
 
+> **See also:** [mlx-hub](https://github.com/sloanahrens/mlx-hub-claude-plugin) - Claude Code plugin for local ML inference on Apple Silicon
+
 ## Installation
 
 ```bash
