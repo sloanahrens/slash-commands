@@ -18,16 +18,17 @@ Commit git changes for a repository. Shows the proposed message then proceeds to
 
 Follow repo selection from `_shared-repo-logic.md`, then confirm: "Committing for: <repo-name>"
 
-### Step 2: Check Repository Status and Review Changes
+### Step 2: Check Repository Status and Get Diff
 
 ```bash
-devbot diff <repo-name>
+devbot diff <repo-name> --full
 ```
 
 This provides in a single call (~0.02s):
 - Branch name
 - Staged files with addition/deletion counts
 - Unstaged files with addition/deletion counts
+- Full diff content (for commit message generation)
 
 If no changes (clean), report "No changes to commit" and exit.
 
@@ -35,17 +36,9 @@ If no changes (clean), report "No changes to commit" and exit.
 
 **This step uses dual-model evaluation to build confidence in local model commit messages.**
 
-**Note:** If local model is unavailable (see `_shared-repo-logic.md` → "Availability Check"), skip to step 3c and use Claude directly.
+**Note:** If local model is unavailable (see `_shared-repo-logic.md` → "Availability Check"), skip to step 3b and use Claude directly.
 
-#### 3a. Get the diff
-
-```bash
-cd /path/to/repo
-git diff --staged   # If files are staged
-git diff            # If nothing staged yet
-```
-
-#### 3b. Generate local model message
+#### 3a. Generate local model message
 
 Use `mcp__plugin_mlx-hub_mlx-hub__mlx_infer` with local model:
 
@@ -59,11 +52,11 @@ mcp__plugin_mlx-hub_mlx-hub__mlx_infer(
 
 Store result as `local_message`.
 
-#### 3c. Generate Claude message
+#### 3b. Generate Claude message
 
-Using the same diff, generate a commit message following the requirements below. Store as `claude_message`.
+Using the diff from Step 2, generate a commit message following the requirements below. Store as `claude_message`.
 
-#### 3d. Compare and select
+#### 3c. Compare and select
 
 Display both for evaluation:
 
