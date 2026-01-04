@@ -25,9 +25,9 @@ type FileStats struct {
 
 // FunctionInfo holds info about a function
 type FunctionInfo struct {
-	Name   string
-	Lines  int
-	Line   int // starting line number
+	Name  string
+	Lines int
+	Line  int // starting line number
 }
 
 // DirStats holds aggregated statistics for a directory
