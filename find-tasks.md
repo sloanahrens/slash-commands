@@ -96,6 +96,8 @@ Focus on tasks that:
 
 Use dual-model pattern from `_shared-repo-logic.md` to build confidence in local model.
 
+**Note:** If local model is unavailable (see `_shared-repo-logic.md` → "Availability Check"), skip local model steps and use Claude directly. Omit `[local]`/`[claude]` markers in output.
+
 #### 5a. Summarize Each Task with Local Model
 
 For each task identified (TODOs, complexity issues, coverage gaps):

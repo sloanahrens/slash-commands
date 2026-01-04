@@ -40,14 +40,19 @@ Report "Nothing to push" and exit.
 
 ### Step 3: Execute Push
 
+**First, get the repo path:**
+```bash
+REPO_PATH=$(devbot path <repo-name>)
+```
+
 **If branch has upstream tracking:**
 ```bash
-cd <repo-path> && git push origin <branch-name>
+git -C "$REPO_PATH" push origin <branch-name>
 ```
 
 **If new branch (no upstream):**
 ```bash
-cd <repo-path> && git push -u origin <branch-name>
+git -C "$REPO_PATH" push -u origin <branch-name>
 ```
 
 ### Step 4: Confirm Result

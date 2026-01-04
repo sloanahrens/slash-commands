@@ -212,6 +212,8 @@ For significant updates, consider using local model to draft sections (see `_sha
 
 Use dual-model pattern from `_shared-repo-logic.md` to build confidence in local model.
 
+**Note:** If local model is unavailable (see `_shared-repo-logic.md` → "Availability Check"), skip local model steps and use Claude directly. Omit `[local]`/`[claude]` markers in output.
+
 #### 4a. Generate Documentation Draft (Local Model)
 
 For each section needing updates, use local model first:

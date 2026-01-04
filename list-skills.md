@@ -23,7 +23,7 @@ These are the most commonly used skills for development workflows.
 | `superpowers:receiving-code-review` | When processing code review feedback |
 | `superpowers:using-git-worktrees` | Starting feature work that needs isolation |
 | `superpowers:subagent-driven-development` | Executing plans with independent tasks |
-| `superpowers:execute-plan` | Execute plan in batches with review checkpoints |
+| `superpowers:executing-plans` | Execute plan in batches with review checkpoints |
 
 ---
 

@@ -35,6 +35,8 @@ If no changes (clean), report "No changes to commit" and exit.
 
 **This step uses dual-model evaluation to build confidence in local model commit messages.**
 
+**Note:** If local model is unavailable (see `_shared-repo-logic.md` → "Availability Check"), skip to step 3c and use Claude directly.
+
 #### 3a. Get the diff
 
 ```bash
@@ -81,11 +83,11 @@ Commit message comparison:
 
 **If local message passes all criteria:**
 - Use `local_message`
-- Append ` [local]` suffix to the message
+- Append ` [local]` suffix to the commit message
 
 **If local message fails any criteria:**
 - Use `claude_message`
-- No suffix added
+- No suffix (Claude is the default, assumed)
 
 Report which was selected: `Selected: [local]` or `Selected: [claude]`
 

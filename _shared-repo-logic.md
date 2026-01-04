@@ -153,6 +153,25 @@ For simple tasks, use local models via mlx-hub plugin:
 | Code explanation | Architecture decisions |
 | Simple code gen | Multi-file refactoring |
 
+### Availability Check
+
+**Before using local model, verify availability:**
+
+```bash
+# Check if mlx-hub plugin is installed
+claude plugin list 2>/dev/null | grep -q mlx-hub
+```
+
+**If mlx-hub is unavailable:**
+- Skip dual-model evaluation entirely
+- Use Claude directly for all generation
+- Note in output: "(local model unavailable, using Claude)"
+
+**Requirements for local model:**
+- Apple Silicon Mac (M1/M2/M3/M4)
+- mlx-hub plugin installed (`/setup-plugins`)
+- Model downloaded (`mlx-community/Qwen2.5-Coder-14B-Instruct-4bit`)
+
 ```python
 mcp__plugin_mlx-hub_mlx-hub__mlx_infer(
   model_id="mlx-community/Qwen2.5-Coder-14B-Instruct-4bit",
@@ -167,7 +186,9 @@ Always prefix output: `[local] Generated: "..."`
 
 ## Dual-Model Evaluation
 
-For text generation tasks, use this pattern to build confidence in local model:
+For text generation tasks, use this pattern to build confidence in local model.
+
+**Skip this section if local model is unavailable** - use Claude directly instead.
 
 ### Pattern
 
@@ -192,15 +213,19 @@ For text generation tasks, use this pattern to build confidence in local model:
 - Accurate file/line references
 - Reasonable priority inference
 
-### Inline Markers
+### Inline Markers (Comparison Only)
 
-Show provenance in output:
+During evaluation, show both for comparison:
 ```
-[local] Add retry logic for API failures
+[local]  Add retry logic for API failures
 [claude] Refactor authentication to use OAuth2 (local missed requirement)
 ```
 
-### Commit Suffix
+This helps evaluate local model quality over time.
 
-If >50% of generated content used local model, append ` [local]` to commit message.
+### Commit Message Suffix
+
+- If local model message is used → append ` [local]` to commit message
+- If Claude message is used → no suffix (Claude is the default, assumed)
+
 This creates visible audit trail: `git log --oneline | grep "\[local\]"`
