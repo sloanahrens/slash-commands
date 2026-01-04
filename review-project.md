@@ -35,10 +35,9 @@ devbot path <repo-name>
 
 2. Examine structure:
    ```bash
-   ls -la /path/to/repo
    devbot tree /path/to/repo -d 2    # Takes literal PATH
    ```
-   devbot tree automatically respects .gitignore, excluding node_modules, dist, etc.
+   devbot tree respects .gitignore, excluding node_modules, dist, etc.
 
 ### Step 3: Analyze Codebase Metrics
 
