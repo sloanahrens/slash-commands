@@ -272,9 +272,10 @@ func TestDiscoverSubApps(t *testing.T) {
 		// Find each app
 		var goApp, nextApp *SubApp
 		for i := range apps {
-			if apps[i].Path == "go-api" {
+			switch apps[i].Path {
+			case "go-api":
 				goApp = &apps[i]
-			} else if apps[i].Path == "nextapp" {
+			case "nextapp":
 				nextApp = &apps[i]
 			}
 		}

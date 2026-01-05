@@ -74,7 +74,7 @@ func AnalyzeFile(path string) (FileStats, error) {
 	if err != nil {
 		return stats, err
 	}
-	defer file.Close()
+	defer func() { _ = file.Close() }()
 
 	scanner := bufio.NewScanner(file)
 	lineNum := 0

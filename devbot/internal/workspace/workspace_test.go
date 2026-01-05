@@ -251,9 +251,10 @@ func TestGetStatus(t *testing.T) {
 		// Find each repo's status (order not guaranteed due to parallel execution)
 		var repo1Status, repo2Status *RepoStatus
 		for i := range statuses {
-			if statuses[i].Name == "repo1" {
+			switch statuses[i].Name {
+			case "repo1":
 				repo1Status = &statuses[i]
-			} else if statuses[i].Name == "repo2" {
+			case "repo2":
 				repo2Status = &statuses[i]
 			}
 		}
