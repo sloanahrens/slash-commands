@@ -47,6 +47,18 @@ git log                    # Regular git commands
 | `devbot check <repo>` | `npm test && npm run lint` |
 | `devbot last-commit <repo> [file]` | `git log -1 --format="%ar"` |
 
+## Subdirectory Commands (NO cd &&)
+
+Run commands in subdirectories using flags, not `cd /path && cmd`:
+
+| Tool | Pattern | Example |
+|------|---------|---------|
+| npm | `npm run <cmd> --prefix <path>` | `npm run build --prefix /path/to/app` |
+| make | `make -C <path> <target>` | `make -C /path/to/app build` |
+| timeout | `timeout <sec> <cmd>` | `timeout 5 npm run dev --prefix /path` |
+
+**Sequential commands:** Run each command separately, one tool call at a time. Do NOT combine with `&&` or `;`.
+
 ## Slash Commands
 
 All require exact repo names. Run `/list-commands` for full list.
