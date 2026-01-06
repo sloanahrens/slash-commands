@@ -18,6 +18,7 @@ import (
 	"github.com/sloanahrens/devbot-go/internal/lastcommit"
 	"github.com/sloanahrens/devbot-go/internal/makefile"
 	"github.com/sloanahrens/devbot-go/internal/output"
+	pulumiPkg "github.com/sloanahrens/devbot-go/internal/pulumi"
 	"github.com/sloanahrens/devbot-go/internal/remote"
 	"github.com/sloanahrens/devbot-go/internal/runner"
 	"github.com/sloanahrens/devbot-go/internal/stats"
@@ -252,6 +253,84 @@ var (
 	deployVerify bool
 )
 
+// Pulumi command - safe infrastructure state inspection
+var pulumiCmd = &cobra.Command{
+	Use:   "pulumi <repo>",
+	Short: "Check Pulumi infrastructure state (MUST run before any pulumi commands)",
+	Long: `Safely inspects Pulumi infrastructure state for a repository.
+
+THIS COMMAND MUST BE RUN BEFORE ANY OTHER PULUMI COMMAND.
+
+It shows:
+- All Pulumi directories in the repo
+- Available stacks
+- Currently selected stack
+- Number of deployed resources
+
+This prevents destructive operations like 'pulumi stack init' on repos
+that already have deployed infrastructure.
+
+Examples:
+  devbot pulumi hanscom-fcu-poc-plaid-token-manager
+  devbot pulumi my-infra-repo`,
+	Args: cobra.ExactArgs(1),
+	Run:  runPulumi,
+}
+
+// Log command
+var logCmd = &cobra.Command{
+	Use:                "log <repo> [args...]",
+	Short:              "Show git log for a repository",
+	DisableFlagParsing: true,
+	Long: `Shows git log with sensible defaults (--oneline -20).
+Additional arguments are passed to git log.
+
+Examples:
+  devbot log slash-commands
+  devbot log slash-commands --since="1 week ago"
+  devbot log slash-commands -5`,
+	Run: runLog,
+}
+
+// Show command
+var showCmd = &cobra.Command{
+	Use:   "show <repo> [ref]",
+	Short: "Show commit details for a repository",
+	Long: `Shows details of a commit (default: HEAD).
+
+Examples:
+  devbot show slash-commands
+  devbot show slash-commands abc123
+  devbot show slash-commands HEAD~3`,
+	Args: cobra.RangeArgs(1, 2),
+	Run:  runShow,
+}
+
+// Fetch command
+var fetchCmd = &cobra.Command{
+	Use:   "fetch <repo>",
+	Short: "Fetch from remote for a repository",
+	Long: `Fetches all remotes and prunes stale references.
+
+Examples:
+  devbot fetch slash-commands`,
+	Args: cobra.ExactArgs(1),
+	Run:  runFetch,
+}
+
+// Switch command
+var switchCmd = &cobra.Command{
+	Use:   "switch <repo> <branch>",
+	Short: "Switch branches for a repository",
+	Long: `Switches to the specified branch.
+
+Examples:
+  devbot switch slash-commands main
+  devbot switch slash-commands feature/new-thing`,
+	Args: cobra.ExactArgs(2),
+	Run:  runSwitch,
+}
+
 func init() {
 	// Status flags
 	statusCmd.Flags().BoolVar(&showDirtyOnly, "dirty", false, "Only show repos with uncommitted changes")
@@ -312,6 +391,11 @@ func init() {
 	rootCmd.AddCommand(pathCmd)
 	rootCmd.AddCommand(lastCommitCmd)
 	rootCmd.AddCommand(deployCmd)
+	rootCmd.AddCommand(pulumiCmd)
+	rootCmd.AddCommand(logCmd)
+	rootCmd.AddCommand(showCmd)
+	rootCmd.AddCommand(fetchCmd)
+	rootCmd.AddCommand(switchCmd)
 }
 
 func runStatus(cmd *cobra.Command, args []string) {
@@ -1573,6 +1657,300 @@ func runDeploy(cmd *cobra.Command, args []string) {
 	makeCmd.Stdin = os.Stdin
 
 	if err := makeCmd.Run(); err != nil {
+		os.Exit(1)
+	}
+}
+
+func runPulumi(cmd *cobra.Command, args []string) {
+	start := time.Now()
+
+	workspacePath := workspace.DefaultWorkspace()
+	if workspacePath == "" {
+		fmt.Fprintln(os.Stderr, "Error: could not determine home directory")
+		os.Exit(1)
+	}
+
+	repos, err := workspace.Discover(workspacePath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error discovering repos: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Find the target repo (exact match preferred)
+	target := args[0]
+	var targetRepo *workspace.RepoInfo
+	for _, r := range repos {
+		if r.Name == target {
+			repo := r
+			targetRepo = &repo
+			break
+		}
+	}
+
+	if targetRepo == nil {
+		fmt.Fprintf(os.Stderr, "Repository '%s' not found\n", target)
+		os.Exit(1)
+	}
+
+	results := pulumiPkg.Check(*targetRepo)
+	elapsed := time.Since(start)
+
+	// Header
+	fmt.Printf("\n%s/ - Pulumi Infrastructure State\n", targetRepo.Name)
+	fmt.Println(strings.Repeat("═", 60))
+
+	if len(results) == 0 || !results[0].HasPulumiYaml {
+		fmt.Println("  No Pulumi.yaml found in this repository")
+		fmt.Printf("\n(%.2fs)\n", elapsed.Seconds())
+		return
+	}
+
+	hasExistingInfra := false
+
+	for _, r := range results {
+		dirLabel := r.PulumiDir
+		if dirLabel == "" {
+			dirLabel = "(root)"
+		}
+
+		fmt.Printf("\n  📁 %s/\n", dirLabel)
+		fmt.Println(strings.Repeat("─", 50))
+
+		if r.Error != nil {
+			fmt.Printf("    ⚠️  Error: %v\n", r.Error)
+			continue
+		}
+
+		// Stacks
+		if len(r.Stacks) == 0 {
+			fmt.Println("    Stacks:    (none)")
+		} else {
+			fmt.Printf("    Stacks:    %s\n", strings.Join(r.Stacks, ", "))
+		}
+
+		// Current stack
+		if r.CurrentStack != "" {
+			fmt.Printf("    Current:   %s\n", r.CurrentStack)
+			fmt.Printf("    Resources: %d\n", r.ResourceCount)
+
+			if r.HasInfra {
+				hasExistingInfra = true
+				fmt.Println()
+				fmt.Println("    ⚠️  INFRASTRUCTURE EXISTS - DO NOT run 'pulumi stack init'")
+			}
+		} else {
+			fmt.Println("    Current:   (no stack selected)")
+			if len(r.Stacks) > 0 {
+				fmt.Printf("\n    ℹ️  Run: pulumi stack select %s\n", r.Stacks[0])
+			}
+		}
+	}
+
+	// Safety guidance
+	fmt.Println()
+	fmt.Println(strings.Repeat("═", 60))
+	if hasExistingInfra {
+		fmt.Println("🛑 EXISTING INFRASTRUCTURE DETECTED")
+		fmt.Println()
+		fmt.Println("   Safe commands:")
+		fmt.Println("     pulumi preview       # See what would change")
+		fmt.Println("     pulumi up            # Apply changes")
+		fmt.Println("     pulumi stack         # Show current state")
+		fmt.Println()
+		fmt.Println("   DANGEROUS - DO NOT RUN:")
+		fmt.Println("     pulumi stack init    # Would orphan existing infra!")
+		fmt.Println("     pulumi destroy       # Would delete everything!")
+		fmt.Println("     pulumi stack rm      # Would lose state!")
+	} else if len(results) > 0 && len(results[0].Stacks) > 0 {
+		fmt.Println("📋 STACKS EXIST - Select one before running commands")
+		fmt.Println()
+		fmt.Printf("   Run: cd <pulumi-dir> && pulumi stack select %s\n", results[0].Stacks[0])
+	} else {
+		fmt.Println("✅ NO EXISTING INFRASTRUCTURE")
+		fmt.Println()
+		fmt.Println("   Safe to initialize:")
+		fmt.Println("     pulumi stack init dev")
+	}
+
+	fmt.Printf("\n(%.2fs)\n", elapsed.Seconds())
+}
+
+func runLog(cmd *cobra.Command, args []string) {
+	workspacePath := workspace.DefaultWorkspace()
+	if workspacePath == "" {
+		fmt.Fprintln(os.Stderr, "Error: could not determine home directory")
+		os.Exit(1)
+	}
+
+	repos, err := workspace.Discover(workspacePath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error discovering repos: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Find the target repo
+	target := args[0]
+	var targetRepo *workspace.RepoInfo
+	for _, r := range repos {
+		if r.Name == target || strings.Contains(strings.ToLower(r.Name), strings.ToLower(target)) {
+			repo := r
+			targetRepo = &repo
+			break
+		}
+	}
+
+	if targetRepo == nil {
+		fmt.Fprintf(os.Stderr, "Repository '%s' not found\n", target)
+		os.Exit(1)
+	}
+
+	// Build git log command with defaults
+	gitArgs := []string{"log"}
+	if len(args) > 1 {
+		// User provided additional args
+		gitArgs = append(gitArgs, args[1:]...)
+	} else {
+		// Default: --oneline -20
+		gitArgs = append(gitArgs, "--oneline", "-20")
+	}
+
+	gitCmd := exec.Command("git", gitArgs...)
+	gitCmd.Dir = targetRepo.Path
+	gitCmd.Stdout = os.Stdout
+	gitCmd.Stderr = os.Stderr
+
+	if err := gitCmd.Run(); err != nil {
+		os.Exit(1)
+	}
+}
+
+func runShow(cmd *cobra.Command, args []string) {
+	workspacePath := workspace.DefaultWorkspace()
+	if workspacePath == "" {
+		fmt.Fprintln(os.Stderr, "Error: could not determine home directory")
+		os.Exit(1)
+	}
+
+	repos, err := workspace.Discover(workspacePath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error discovering repos: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Find the target repo
+	target := args[0]
+	var targetRepo *workspace.RepoInfo
+	for _, r := range repos {
+		if r.Name == target || strings.Contains(strings.ToLower(r.Name), strings.ToLower(target)) {
+			repo := r
+			targetRepo = &repo
+			break
+		}
+	}
+
+	if targetRepo == nil {
+		fmt.Fprintf(os.Stderr, "Repository '%s' not found\n", target)
+		os.Exit(1)
+	}
+
+	// Build git show command
+	gitArgs := []string{"show"}
+	if len(args) > 1 {
+		gitArgs = append(gitArgs, args[1])
+	}
+	// else defaults to HEAD
+
+	gitCmd := exec.Command("git", gitArgs...)
+	gitCmd.Dir = targetRepo.Path
+	gitCmd.Stdout = os.Stdout
+	gitCmd.Stderr = os.Stderr
+
+	if err := gitCmd.Run(); err != nil {
+		os.Exit(1)
+	}
+}
+
+func runFetch(cmd *cobra.Command, args []string) {
+	workspacePath := workspace.DefaultWorkspace()
+	if workspacePath == "" {
+		fmt.Fprintln(os.Stderr, "Error: could not determine home directory")
+		os.Exit(1)
+	}
+
+	repos, err := workspace.Discover(workspacePath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error discovering repos: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Find the target repo
+	target := args[0]
+	var targetRepo *workspace.RepoInfo
+	for _, r := range repos {
+		if r.Name == target || strings.Contains(strings.ToLower(r.Name), strings.ToLower(target)) {
+			repo := r
+			targetRepo = &repo
+			break
+		}
+	}
+
+	if targetRepo == nil {
+		fmt.Fprintf(os.Stderr, "Repository '%s' not found\n", target)
+		os.Exit(1)
+	}
+
+	fmt.Printf("Fetching %s...\n", targetRepo.Name)
+
+	gitCmd := exec.Command("git", "fetch", "--all", "--prune")
+	gitCmd.Dir = targetRepo.Path
+	gitCmd.Stdout = os.Stdout
+	gitCmd.Stderr = os.Stderr
+
+	if err := gitCmd.Run(); err != nil {
+		os.Exit(1)
+	}
+
+	fmt.Println("Done.")
+}
+
+func runSwitch(cmd *cobra.Command, args []string) {
+	workspacePath := workspace.DefaultWorkspace()
+	if workspacePath == "" {
+		fmt.Fprintln(os.Stderr, "Error: could not determine home directory")
+		os.Exit(1)
+	}
+
+	repos, err := workspace.Discover(workspacePath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error discovering repos: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Find the target repo
+	target := args[0]
+	var targetRepo *workspace.RepoInfo
+	for _, r := range repos {
+		if r.Name == target || strings.Contains(strings.ToLower(r.Name), strings.ToLower(target)) {
+			repo := r
+			targetRepo = &repo
+			break
+		}
+	}
+
+	if targetRepo == nil {
+		fmt.Fprintf(os.Stderr, "Repository '%s' not found\n", target)
+		os.Exit(1)
+	}
+
+	branchName := args[1]
+	fmt.Printf("Switching %s to branch '%s'...\n", targetRepo.Name, branchName)
+
+	gitCmd := exec.Command("git", "switch", branchName)
+	gitCmd.Dir = targetRepo.Path
+	gitCmd.Stdout = os.Stdout
+	gitCmd.Stderr = os.Stderr
+
+	if err := gitCmd.Run(); err != nil {
 		os.Exit(1)
 	}
 }

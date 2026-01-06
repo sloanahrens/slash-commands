@@ -2,14 +2,20 @@
 name: block-git-c
 enabled: true
 event: bash
-pattern: git\s+-C
+pattern: git\s+-C\s
 action: block
 ---
 
-**git -C is not allowed**
+**git -C is blocked** - cannot control commits/pushes with this flag.
 
-Use the two-step pattern instead:
-1. `cd /path/to/repo`
-2. `git <command>`
+Use the two-step pattern:
+1. `devbot path <repo>` - get path
+2. `cd /path/to/repo`
+3. `git <command>`
 
-This ensures commands work correctly and follows workspace rules in ~/.claude/CLAUDE.md.
+Or use devbot directly:
+- `devbot status <repo>`
+- `devbot diff <repo>`
+- `devbot log <repo>`
+- `devbot branch <repo>`
+- `devbot fetch <repo>`
