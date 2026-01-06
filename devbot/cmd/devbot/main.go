@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -231,6 +232,26 @@ var lastCommitCmd = &cobra.Command{
 	Run:   runLastCommit,
 }
 
+// Deploy command
+var deployCmd = &cobra.Command{
+	Use:   "deploy <repo> [environment]",
+	Short: "Deploy a repository to cloud environment",
+	Long: `Deploy a repository using its Makefile deploy targets.
+
+Examples:
+  devbot deploy hanscom-fcu-poc-plaid-token-manager       # deploy to dev
+  devbot deploy hanscom-fcu-poc-plaid-token-manager prod  # deploy to prod
+  devbot deploy hanscom-fcu-poc-plaid-token-manager --quick  # skip build
+  devbot deploy hanscom-fcu-poc-plaid-token-manager --verify # verify only`,
+	Args: cobra.RangeArgs(1, 2),
+	Run:  runDeploy,
+}
+
+var (
+	deployQuick  bool
+	deployVerify bool
+)
+
 func init() {
 	// Status flags
 	statusCmd.Flags().BoolVar(&showDirtyOnly, "dirty", false, "Only show repos with uncommitted changes")
@@ -269,6 +290,10 @@ func init() {
 	checkCmd.Flags().StringVar(&checkOnly, "only", "", "Only run specific checks (comma-separated: lint,typecheck,build,test)")
 	checkCmd.Flags().BoolVar(&checkFix, "fix", false, "Auto-fix issues where possible")
 
+	// Deploy flags
+	deployCmd.Flags().BoolVar(&deployQuick, "quick", false, "Skip build step")
+	deployCmd.Flags().BoolVar(&deployVerify, "verify", false, "Verify deployment only")
+
 	rootCmd.AddCommand(statusCmd)
 	rootCmd.AddCommand(runCmd)
 	rootCmd.AddCommand(depsCmd)
@@ -286,6 +311,7 @@ func init() {
 	rootCmd.AddCommand(findRepoCmd)
 	rootCmd.AddCommand(pathCmd)
 	rootCmd.AddCommand(lastCommitCmd)
+	rootCmd.AddCommand(deployCmd)
 }
 
 func runStatus(cmd *cobra.Command, args []string) {
@@ -1490,6 +1516,65 @@ func runLastCommit(cmd *cobra.Command, args []string) {
 
 	// Output just the relative time (simple output for scripting)
 	fmt.Println(result.RelativeAge)
+}
+
+func runDeploy(cmd *cobra.Command, args []string) {
+	workspacePath := workspace.DefaultWorkspace()
+	if workspacePath == "" {
+		fmt.Fprintln(os.Stderr, "Error: could not determine home directory")
+		os.Exit(1)
+	}
+
+	repos, err := workspace.Discover(workspacePath)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error discovering repos: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Find the target repo (exact match only for deploy)
+	target := args[0]
+	var targetRepo *workspace.RepoInfo
+	for _, r := range repos {
+		if r.Name == target {
+			repo := r
+			targetRepo = &repo
+			break
+		}
+	}
+
+	if targetRepo == nil {
+		fmt.Fprintf(os.Stderr, "Repository '%s' not found\n", target)
+		os.Exit(1)
+	}
+
+	// Environment defaults to dev
+	env := "dev"
+	if len(args) > 1 {
+		env = args[1]
+	}
+
+	// Build target name
+	var makeTarget string
+	switch {
+	case deployVerify:
+		makeTarget = fmt.Sprintf("deploy-verify-%s", env)
+	case deployQuick:
+		makeTarget = fmt.Sprintf("deploy-%s-quick", env)
+	default:
+		makeTarget = fmt.Sprintf("deploy-%s", env)
+	}
+
+	fmt.Printf("Running: make -C %s %s\n\n", targetRepo.Path, makeTarget)
+
+	// Run make with output streaming
+	makeCmd := exec.Command("make", "-C", targetRepo.Path, makeTarget)
+	makeCmd.Stdout = os.Stdout
+	makeCmd.Stderr = os.Stderr
+	makeCmd.Stdin = os.Stdin
+
+	if err := makeCmd.Run(); err != nil {
+		os.Exit(1)
+	}
 }
 
 func main() {
