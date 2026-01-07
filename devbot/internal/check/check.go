@@ -92,6 +92,12 @@ var stackMarkers = map[string]string{
 	"requirements.txt": "python",
 }
 
+// sstProject tracks if a project uses SST and whether types are generated
+type sstProject struct {
+	hasSST      bool // sst.config.ts exists
+	typesReady  bool // .sst/platform/config.d.ts exists
+}
+
 // Run executes checks for a repository
 func Run(repo workspace.RepoInfo, only []CheckType, fix bool) Result {
 	start := time.Now()
@@ -320,12 +326,29 @@ func runCheck(workDir string, stack []string, checkType CheckType, fix bool) Che
 		return result
 	}
 
+	// SST project detection: skip root typecheck if types aren't generated
+	if checkType == CheckTypecheck {
+		sst := detectSST(workDir)
+		if sst.hasSST && !sst.typesReady {
+			result.Status = "skip"
+			result.Output = "SST project: run 'sst dev' to generate types first"
+			return result
+		}
+	}
+
 	// For npm commands, check if the script exists in package.json before running
 	// This prevents false failures when sub-packages don't define certain scripts
 	if scriptName := isNpmRunCommand(cmdArgs); scriptName != "" {
 		if !npmScriptExists(workDir, scriptName) {
 			result.Status = "skip"
 			result.Output = "script not defined in package.json"
+			return result
+		}
+
+		// Check if script uses bun but bun isn't installed
+		if scriptUsesBun(workDir, scriptName) && !bunAvailable() {
+			result.Status = "skip"
+			result.Output = "script requires bun runtime (not installed)"
 			return result
 		}
 	}
@@ -436,6 +459,50 @@ func appendCheckUnique(slice []CheckType, item CheckType) []CheckType {
 		}
 	}
 	return append(slice, item)
+}
+
+// detectSST checks if a directory is an SST project and if types are generated
+func detectSST(path string) sstProject {
+	sst := sstProject{}
+
+	// Check for sst.config.ts or sst.config.js
+	if fileExists(filepath.Join(path, "sst.config.ts")) ||
+	   fileExists(filepath.Join(path, "sst.config.js")) {
+		sst.hasSST = true
+		// Check if types have been generated
+		sst.typesReady = fileExists(filepath.Join(path, ".sst", "platform", "config.d.ts"))
+	}
+
+	return sst
+}
+
+// scriptUsesBun checks if a test script in package.json uses bun
+func scriptUsesBun(dir string, scriptName string) bool {
+	pkgPath := filepath.Join(dir, "package.json")
+	data, err := os.ReadFile(pkgPath)
+	if err != nil {
+		return false
+	}
+
+	var pkg struct {
+		Scripts map[string]string `json:"scripts"`
+	}
+	if err := json.Unmarshal(data, &pkg); err != nil {
+		return false
+	}
+
+	script, exists := pkg.Scripts[scriptName]
+	if !exists {
+		return false
+	}
+
+	return strings.HasPrefix(script, "bun ") || strings.Contains(script, " bun ")
+}
+
+// bunAvailable checks if bun runtime is installed
+func bunAvailable() bool {
+	_, err := exec.LookPath("bun")
+	return err == nil
 }
 
 // Passed returns true if all checks passed
