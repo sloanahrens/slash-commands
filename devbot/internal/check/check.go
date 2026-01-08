@@ -94,8 +94,8 @@ var stackMarkers = map[string]string{
 
 // sstProject tracks if a project uses SST and whether types are generated
 type sstProject struct {
-	hasSST      bool // sst.config.ts exists
-	typesReady  bool // .sst/platform/config.d.ts exists
+	hasSST     bool // sst.config.ts exists
+	typesReady bool // .sst/platform/config.d.ts exists
 }
 
 // Run executes checks for a repository
@@ -467,7 +467,7 @@ func detectSST(path string) sstProject {
 
 	// Check for sst.config.ts or sst.config.js
 	if fileExists(filepath.Join(path, "sst.config.ts")) ||
-	   fileExists(filepath.Join(path, "sst.config.js")) {
+		fileExists(filepath.Join(path, "sst.config.js")) {
 		sst.hasSST = true
 		// Check if types have been generated
 		sst.typesReady = fileExists(filepath.Join(path, ".sst", "platform", "config.d.ts"))

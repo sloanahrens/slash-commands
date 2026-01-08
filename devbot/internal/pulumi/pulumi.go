@@ -15,16 +15,16 @@ import (
 
 // StateResult holds the result of a Pulumi state check
 type StateResult struct {
-	Repo           workspace.RepoInfo
-	PulumiDir      string   // Directory containing Pulumi.yaml (relative to repo)
-	HasPulumiYaml  bool     // Whether Pulumi.yaml exists
-	Stacks         []string // Available stacks
-	CurrentStack   string   // Currently selected stack (if any)
-	ResourceCount  int      // Number of resources in current stack
-	HasInfra       bool     // Whether infrastructure exists (resources > 0)
-	Error          error    // Any error during inspection
-	StackLsOutput  string   // Raw output from pulumi stack ls
-	StackOutput    string   // Raw output from pulumi stack
+	Repo          workspace.RepoInfo
+	PulumiDir     string   // Directory containing Pulumi.yaml (relative to repo)
+	HasPulumiYaml bool     // Whether Pulumi.yaml exists
+	Stacks        []string // Available stacks
+	CurrentStack  string   // Currently selected stack (if any)
+	ResourceCount int      // Number of resources in current stack
+	HasInfra      bool     // Whether infrastructure exists (resources > 0)
+	Error         error    // Any error during inspection
+	StackLsOutput string   // Raw output from pulumi stack ls
+	StackOutput   string   // Raw output from pulumi stack
 }
 
 // FindPulumiDirs finds all directories containing Pulumi.yaml in a repo
@@ -33,11 +33,11 @@ func FindPulumiDirs(repoPath string) []string {
 
 	// Common locations to check
 	candidates := []string{
-		"",                    // repo root
-		"platform",           // platform infra
-		"infra",              // infra directory
-		"infrastructure",     // alternative name
-		"pulumi",             // pulumi directory
+		"",               // repo root
+		"platform",       // platform infra
+		"infra",          // infra directory
+		"infrastructure", // alternative name
+		"pulumi",         // pulumi directory
 	}
 
 	// Also check apps/*/infra pattern
