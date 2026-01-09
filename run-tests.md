@@ -47,6 +47,17 @@ The command maps stacks to appropriate tools:
 
 **Subdirectory projects**: If stack not detected at root, check `work_dir` setting or common subdirs (go-api/, nextapp/, packages/*).
 
+**Manual testing in monorepos**: For targeted testing in specific subdirectories, use `devbot exec`:
+
+```bash
+# Run tests in specific monorepo subproject
+devbot exec mango/go-api go test ./...
+devbot exec mango/nextapp npm test
+
+# Uses work_dir from config automatically
+devbot exec atap-automation2 npm test  # runs in nextapp/
+```
+
 ### Step 4: Report Results
 
 ```

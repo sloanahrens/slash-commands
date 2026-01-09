@@ -39,8 +39,7 @@ devbot path <repo-name>
 
 2. Check recent commits:
    ```bash
-   cd /path/to/repo
-   git log --oneline -10
+   devbot log <repo-name> -10    # Takes repo NAME, shows last 10 commits
    ```
 
 3. Examine test coverage gaps (if test scripts exist)

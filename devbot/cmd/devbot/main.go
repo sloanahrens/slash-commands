@@ -6,6 +6,7 @@ import (
 	"os/exec"
 	"path/filepath"
 	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -15,9 +16,11 @@ import (
 	"github.com/sloanahrens/devbot-go/internal/deps"
 	"github.com/sloanahrens/devbot-go/internal/detect"
 	"github.com/sloanahrens/devbot-go/internal/diff"
+	execPkg "github.com/sloanahrens/devbot-go/internal/exec"
 	"github.com/sloanahrens/devbot-go/internal/lastcommit"
 	"github.com/sloanahrens/devbot-go/internal/makefile"
 	"github.com/sloanahrens/devbot-go/internal/output"
+	portPkg "github.com/sloanahrens/devbot-go/internal/port"
 	pulumiPkg "github.com/sloanahrens/devbot-go/internal/pulumi"
 	"github.com/sloanahrens/devbot-go/internal/remote"
 	"github.com/sloanahrens/devbot-go/internal/runner"
@@ -331,6 +334,42 @@ Examples:
 	Run:  runSwitch,
 }
 
+// Exec command
+var execCmd = &cobra.Command{
+	Use:                "exec <repo>[/subdir] <command> [args...]",
+	Short:              "Run a command in a repository directory",
+	DisableFlagParsing: true,
+	Long: `Executes a command in a repository's working directory.
+
+Directory resolution:
+  1. If /subdir specified: {repo_path}/{subdir}
+  2. If trailing slash (repo/): use repo root
+  3. If work_dir in config: {repo_path}/{work_dir}
+  4. Otherwise: {repo_path}
+
+Examples:
+  devbot exec atap-automation2 npm run build    # runs in nextapp/ (from work_dir)
+  devbot exec mango/go-api go test ./...        # runs in mango/go-api/
+  devbot exec slash-commands/devbot make test   # runs in slash-commands/devbot/
+  devbot exec atap-automation2/ docker build .  # runs in repo root (trailing /)`,
+	Run: runExec,
+}
+
+// Port command
+var portCmd = &cobra.Command{
+	Use:   "port <port> [--kill]",
+	Short: "Check or kill process on a port",
+	Long: `Shows what process is using a port, optionally kills it.
+
+Examples:
+  devbot port 3000          # Show what's on port 3000
+  devbot port 3000 --kill   # Kill process on port 3000`,
+	Args: cobra.ExactArgs(1),
+	Run:  runPort,
+}
+
+var portKill bool
+
 func init() {
 	// Status flags
 	statusCmd.Flags().BoolVar(&showDirtyOnly, "dirty", false, "Only show repos with uncommitted changes")
@@ -373,6 +412,9 @@ func init() {
 	deployCmd.Flags().BoolVar(&deployQuick, "quick", false, "Skip build step")
 	deployCmd.Flags().BoolVar(&deployVerify, "verify", false, "Verify deployment only")
 
+	// Port flags
+	portCmd.Flags().BoolVar(&portKill, "kill", false, "Kill the process on the port")
+
 	rootCmd.AddCommand(statusCmd)
 	rootCmd.AddCommand(runCmd)
 	rootCmd.AddCommand(depsCmd)
@@ -396,6 +438,8 @@ func init() {
 	rootCmd.AddCommand(showCmd)
 	rootCmd.AddCommand(fetchCmd)
 	rootCmd.AddCommand(switchCmd)
+	rootCmd.AddCommand(execCmd)
+	rootCmd.AddCommand(portCmd)
 }
 
 func runStatus(cmd *cobra.Command, args []string) {
@@ -1952,6 +1996,71 @@ func runSwitch(cmd *cobra.Command, args []string) {
 
 	if err := gitCmd.Run(); err != nil {
 		os.Exit(1)
+	}
+}
+
+func runExec(cmd *cobra.Command, args []string) {
+	if len(args) < 2 {
+		fmt.Fprintln(os.Stderr, "Usage: devbot exec <repo>[/subdir] <command> [args...]")
+		os.Exit(1)
+	}
+
+	target := args[0]
+	cmdName := args[1]
+	cmdArgs := args[2:]
+
+	// Resolve target to directory
+	dir, err := execPkg.ResolveTarget(target)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
+	}
+
+	// Show where we're running
+	fmt.Printf("Running in %s\n", dir)
+
+	// Execute command
+	result := execPkg.Run(dir, cmdName, cmdArgs)
+	if result.Error != nil {
+		os.Exit(result.ExitCode)
+	}
+}
+
+func runPort(cmd *cobra.Command, args []string) {
+	portNum, err := strconv.Atoi(args[0])
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: invalid port number '%s'\n", args[0])
+		os.Exit(1)
+	}
+
+	processes, err := portPkg.Check(portNum)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
+	}
+
+	if len(processes) == 0 {
+		fmt.Printf("Port %d: nothing running\n", portNum)
+		return
+	}
+
+	// Get unique processes (lsof can return duplicates for same process)
+	unique := portPkg.GetUniqueProcesses(processes)
+
+	if portKill {
+		for _, p := range unique {
+			fmt.Printf("Killing %s (PID %d) on port %d...\n", p.Command, p.PID, portNum)
+			if err := portPkg.Kill(p.PID); err != nil {
+				fmt.Fprintf(os.Stderr, "  Failed to kill PID %d: %v\n", p.PID, err)
+			} else {
+				fmt.Printf("  Killed PID %d\n", p.PID)
+			}
+		}
+	} else {
+		fmt.Printf("Port %d:\n", portNum)
+		for _, p := range unique {
+			fmt.Printf("  %s (PID %d) - %s\n", p.Command, p.PID, p.User)
+		}
 	}
 }
 

@@ -51,6 +51,25 @@ git commit                 # Commands like commit/push need cd first
 | `devbot check <repo>` | `npm test && npm run lint` |
 | `devbot last-commit <repo> [file]` | `git log -1 --format="%ar"` |
 
+## Running Commands in Repos (NO cd &&)
+
+**Preferred:** Use `devbot exec` for any command in a repo directory:
+
+```bash
+devbot exec my-app npm run build         # Uses work_dir from config
+devbot exec monorepo/subdir go test      # Explicit subdir for monorepos
+devbot exec my-app/ docker build .       # Trailing / = repo root (ignores work_dir)
+```
+
+**Fallback patterns** (when devbot exec isn't suitable):
+
+| Tool | Pattern | Example |
+|------|---------|---------|
+| npm | `npm run <cmd> --prefix <path>` | `npm run build --prefix /path/to/app` |
+| make | `make -C <path> <target>` | `make -C /path/to/app build` |
+
+**Sequential commands:** Run each command separately. Do NOT combine with `&&` or `;`.
+
 ## Slash Commands
 
 All require exact repo names. Run `/list-commands` for full list.
@@ -89,6 +108,10 @@ Defined in `~/code/slash-commands/config.yaml`.
 
 **PATH commands:** `tree`, `stats`, `detect` (use `devbot path` first)
 
+**Execution helpers:**
+- `exec <repo>[/subdir] <cmd...>` - Run command in repo directory (respects work_dir)
+- `port <port> [--kill]` - Check/kill process on port
+
 **Other:** `run` (parallel command across repos), `find-repo` (GitHub org/repo lookup)
 
 **Git wrappers** (faster, auto-approved):
@@ -100,8 +123,8 @@ Defined in `~/code/slash-commands/config.yaml`.
 **CRITICAL:** `devbot pulumi <repo>` - **MANDATORY before any Pulumi operation**
 
 ```bash
-devbot path fractals-nextjs   # Get path
-devbot tree /full/path        # Then use path
+devbot exec my-app npm test   # Run in repo's work_dir
+devbot port 3000 --kill       # Free up port 3000
 devbot pulumi my-repo         # Check infra state BEFORE any pulumi command
 ```
 

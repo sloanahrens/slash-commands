@@ -109,14 +109,12 @@ gh pr checks {number} --repo {owner}/{repo}
 Using the matched local repository path from Step 3:
 
 1. Identify all files mentioned in review comments
-2. Read each file to understand current state:
-   ```bash
-   # Example - use actual matched path
-   cat "<matched-repo-path>/<file-path>"
-   ```
+2. Read each file using the **Read tool** (not cat/bash):
+   - Use absolute paths: `<matched-repo-path>/<file-path>`
+   - For specific lines, use offset/limit parameters
 3. Pay attention to the specific line numbers mentioned in comments
 
-**Always use absolute paths based on the matched repository directory.**
+**Always use Read tool with absolute paths - never use cat or bash for file reading.**
 
 ## Step 6: Organize Feedback
 

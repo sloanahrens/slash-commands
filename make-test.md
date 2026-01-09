@@ -94,6 +94,9 @@ For each target:
 **Use `time` command** to measure each target:
 ```bash
 time make -C <repo-path> <target>
+
+# Or use devbot exec for repos with work_dir:
+time devbot exec <repo-name> make <target>
 ```
 
 **Timeouts by category:**

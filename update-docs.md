@@ -26,18 +26,11 @@ When run without arguments, audit the entire workspace documentation.
 
 ### WA-1: Audit Global CLAUDE.md
 
-Read `~/.claude/CLAUDE.md` and verify:
+Read `~/.claude/CLAUDE.md` and verify against:
 
-```bash
-# Check if documented repos match config
-cat ~/code/mono-claude/slash-commands/config.yaml
-
-# Check if documented commands match actual files
-ls ~/code/mono-claude/slash-commands/*.md | grep -v "^_"
-
-# Check devbot commands still work
-devbot --help 2>&1 | head -20
-```
+1. **Config file** - Use Read tool on `~/code/mono-claude/slash-commands/config.yaml`
+2. **Slash command files** - Use Glob tool with pattern `~/code/mono-claude/slash-commands/*.md`
+3. **devbot commands** - Run `devbot --help`
 
 **Verify:**
 - Repository registry matches `config.yaml`
@@ -52,20 +45,11 @@ Report any discrepancies found.
 
 For each repo in config.yaml, check its CLAUDE.md (or README.md as fallback):
 
-```bash
-for repo in $(grep "name:" ~/code/mono-claude/slash-commands/config.yaml | awk '{print $3}'); do
-  REPO_PATH=$(devbot path "$repo" 2>/dev/null)
-  if [ -f "$REPO_PATH/CLAUDE.md" ]; then
-    lines=$(wc -l < "$REPO_PATH/CLAUDE.md")
-    echo "$repo: CLAUDE.md ($lines lines)"
-  elif [ -f "$REPO_PATH/README.md" ]; then
-    lines=$(wc -l < "$REPO_PATH/README.md")
-    echo "$repo: README.md only ($lines lines) - needs CLAUDE.md"
-  else
-    echo "$repo: NO DOCS"
-  fi
-done
-```
+1. **Get repo list** - Read config.yaml, extract repo names
+2. **For each repo:**
+   - Run `devbot path <repo-name>` to get path
+   - Use Read tool on `<path>/CLAUDE.md` and `<path>/README.md`
+   - Check file existence and line counts
 
 **Flag repos that need attention:**
 - No CLAUDE.md or README.md
@@ -78,10 +62,8 @@ done
 
 Check `~/code/mono-claude/docs/` for obsolete planning files:
 
-```bash
-ls -la ~/code/mono-claude/docs/
-find ~/code/mono-claude/docs -name "*.md" -type f
-```
+1. **List docs** - Use Glob tool with pattern `~/code/mono-claude/docs/**/*.md`
+2. **Check last modified** - Run `devbot last-commit mono-claude docs/`
 
 **For each file found, evaluate:**
 
@@ -195,8 +177,7 @@ devbot check <repo-name>                     # Runs lint, typecheck, test
 
 **For recent changes:**
 ```bash
-cd /path/to/repo
-git log --oneline -5
+devbot log <repo-name> -5    # Takes repo NAME, shows last 5 commits
 ```
 
 Use stats output to update CLAUDE.md metrics section if present:

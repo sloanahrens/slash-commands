@@ -44,19 +44,17 @@ git branch --show-current
 
 **Get commits ahead of base:**
 ```bash
-git log <base>..HEAD --oneline
+devbot branch <repo-name>    # Shows commits ahead/behind
 ```
 
-If no commits → "Nothing to PR, branch is up to date with <base>"
+If no commits ahead → "Nothing to PR, branch is up to date with <base>"
 
 ### Step 4: Gather PR Content
 
 ```bash
-# Commits for title/summary generation
-git log <base>..HEAD --oneline
-
-# Diff stats for context
-git diff <base> --stat
+# Use devbot for branch info and diffs
+devbot branch <repo-name>     # Commits to push
+devbot diff <repo-name>       # Diff summary with stats
 ```
 
 ### Step 5: Generate PR Title (Dual-Model Evaluation)

@@ -117,10 +117,12 @@ Fast operations across repos:
 | `devbot config <repo>` | repo name | Show config files |
 | `devbot tree <path>` | **filesystem path** | Directory tree |
 | `devbot stats <path>` | **filesystem path** | Code metrics |
+| `devbot exec <repo>[/subdir] <cmd>` | repo + command | Run command in repo directory |
+| `devbot port <port> [--kill]` | port number | Check/kill process on port |
 
 ### CRITICAL: Path vs Name Commands
 
-**Commands that take repo NAME:** `path`, `status`, `diff`, `branch`, `check`, `make`, `config`
+**Commands that take repo NAME:** `path`, `status`, `diff`, `branch`, `check`, `make`, `config`, `exec`
 
 **Commands that take filesystem PATH:** `tree`, `stats`
 
@@ -140,6 +142,38 @@ devbot tree ~/code/fractals-nextjs                          # ❌ Guessed path
 All repo-name commands require exact names from config.yaml.
 
 Install: `/setup-workspace` (or `make -C ~/code/mono-claude/slash-commands/devbot install`)
+
+---
+
+## Running Commands in Repos
+
+Use `devbot exec` instead of `cd && command` (which is blocked by hookify):
+
+```bash
+# Instead of: cd /path/to/repo && npm run build
+devbot exec <repo-name> npm run build
+
+# For monorepo subprojects
+devbot exec <repo-name>/<subdir> <command>
+
+# Override work_dir and use repo root (trailing slash)
+devbot exec <repo-name>/ <command>
+```
+
+**Directory resolution:**
+1. If `/subdir` specified → `{repo_path}/{subdir}`
+2. If trailing slash (`repo/`) → repo root (ignores work_dir)
+3. If `work_dir` in config.yaml → `{repo_path}/{work_dir}`
+4. Otherwise → `{repo_path}`
+
+**Examples:**
+
+| Command | Runs in |
+|---------|---------|
+| `devbot exec atap-automation2 npm test` | `.../atap-automation2/nextapp` (uses work_dir) |
+| `devbot exec mango/go-api go build` | `.../mango/go-api` (explicit subdir) |
+| `devbot exec slash-commands/devbot make` | `.../slash-commands/devbot` |
+| `devbot exec atap-automation2/ docker build .` | `.../atap-automation2` (root, ignores work_dir) |
 
 ---
 
