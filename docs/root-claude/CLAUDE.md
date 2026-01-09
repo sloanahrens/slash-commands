@@ -5,7 +5,7 @@ Global Claude Code configuration. Each repo also has its own CLAUDE.md - read th
 ## Setup
 
 ```bash
-git clone https://github.com/sloanahrens/slash-commands.git ~/code/mono-claude/slash-commands
+git clone https://github.com/sloanahrens/slash-commands.git ~/code/slash-commands
 /setup-workspace  # Handles config, devbot, symlinks, plugins
 ```
 
@@ -33,10 +33,10 @@ git clone https://github.com/sloanahrens/slash-commands.git ~/code/mono-claude/s
 ## Bash Patterns
 
 ```bash
-# Get path, cd, then git
+# Get path, cd, then git (for commands without devbot wrappers)
 devbot path my-repo        # → /full/path/to/my-repo
 cd /full/path/to/my-repo
-git log                    # Regular git commands
+git commit                 # Commands like commit/push need cd first
 ```
 
 | Use This | Not This |
@@ -44,20 +44,12 @@ git log                    # Regular git commands
 | `devbot status <repo>` | `git status` |
 | `devbot diff <repo>` | `git diff` |
 | `devbot branch <repo>` | `git branch -vv` |
+| `devbot log <repo>` | `git log` |
+| `devbot show <repo> [ref]` | `git show` |
+| `devbot fetch <repo>` | `git fetch` |
+| `devbot switch <repo> <branch>` | `git switch/checkout` |
 | `devbot check <repo>` | `npm test && npm run lint` |
 | `devbot last-commit <repo> [file]` | `git log -1 --format="%ar"` |
-
-## Subdirectory Commands (NO cd &&)
-
-Run commands in subdirectories using flags, not `cd /path && cmd`:
-
-| Tool | Pattern | Example |
-|------|---------|---------|
-| npm | `npm run <cmd> --prefix <path>` | `npm run build --prefix /path/to/app` |
-| make | `make -C <path> <target>` | `make -C /path/to/app build` |
-| timeout | `timeout <sec> <cmd>` | `timeout 5 npm run dev --prefix /path` |
-
-**Sequential commands:** Run each command separately, one tool call at a time. Do NOT combine with `&&` or `;`.
 
 ## Slash Commands
 
@@ -74,33 +66,72 @@ All require exact repo names. Run `/list-commands` for full list.
 
 ## Repository Registry
 
-Defined in `~/code/mono-claude/slash-commands/config.yaml`.
+Defined in `~/code/slash-commands/config.yaml`.
 
 | Repo | Stack | Notes |
 |------|-------|-------|
 | `fractals-nextjs` | Next.js + Canvas | Mandelbrot visualizer |
 | `mango` | Go + Next.js + DuckDB | **CGO required** |
 | `devops-pulumi-ts` | Pulumi + TypeScript | GCP Cloud Run |
-| `devops-cloud-run` | Shell | Legacy Cloud Run scripts |
 | `slash-commands` | Go + Markdown | This workspace's tools |
 | `mlx-hub-claude-plugin` | TypeScript | MLX model inference plugin |
-| `git-monitor` | TypeScript | Git repository monitoring |
+| `trabian-ai` | TypeScript | Trabian AI tools |
 | `sandbox` | Go + TypeScript | Experimental pnpm workspace |
 | `machine-learning` | Python | ML experiments |
 | `physics-stuff` | Mixed | Physics simulations |
+| `docs` | Markdown | Documentation |
+| `service-cu-cloud-services-platform` | SST + TypeScript | AWS SCU integrations (Plaid, Temporal) |
+| `hanscom-fcu-poc-plaid-token-manager` | Pulumi + TypeScript | Azure Plaid service (port of service-cu) |
 
 ## devbot CLI
 
-**NAME commands:** `path`, `status`, `diff`, `branch`, `check`, `make`, `todos`, `last-commit`, `config`, `deps`, `remote`, `worktrees`
+**NAME commands:** `path`, `status`, `diff`, `branch`, `log`, `show`, `fetch`, `switch`, `check`, `make`, `todos`, `last-commit`, `config`, `deps`, `remote`, `worktrees`, `pulumi`, `deploy`
 
 **PATH commands:** `tree`, `stats`, `detect` (use `devbot path` first)
 
 **Other:** `run` (parallel command across repos), `find-repo` (GitHub org/repo lookup)
 
+**Git wrappers** (faster, auto-approved):
+- `log <repo>` - git log (default: --oneline -20)
+- `show <repo> [ref]` - git show (default: HEAD)
+- `fetch <repo>` - git fetch --all --prune
+- `switch <repo> <branch>` - git switch
+
+**CRITICAL:** `devbot pulumi <repo>` - **MANDATORY before any Pulumi operation**
+
 ```bash
 devbot path fractals-nextjs   # Get path
 devbot tree /full/path        # Then use path
+devbot pulumi my-repo         # Check infra state BEFORE any pulumi command
 ```
+
+## Pulumi (CRITICAL)
+
+### MANDATORY: Run `devbot pulumi <repo>` BEFORE any Pulumi command
+
+This prevents destructive operations by showing existing infrastructure state.
+
+### Forbidden Commands (unless devbot pulumi shows NO infrastructure)
+
+| Command | Why Dangerous |
+|---------|--------------|
+| `pulumi stack init` | Orphans existing infrastructure |
+| `pulumi destroy` | Deletes all resources |
+| `pulumi stack rm` | Loses state permanently |
+
+### Safe Workflow
+
+```bash
+devbot pulumi my-repo         # 1. ALWAYS check state first
+cd /path/to/platform          # 2. cd to pulumi directory
+pulumi stack select dev       # 3. Select existing stack (never init if stacks exist!)
+pulumi preview                # 4. Then preview/up
+```
+
+### Other Rules
+
+- **Never prefix with `PULUMI_CONFIG_PASSPHRASE=""`** - already set in zsh
+- **If "no stack selected"** → `pulumi stack ls` then `pulumi stack select`, NEVER `stack init`
 
 ## Key Skills
 
@@ -129,3 +160,16 @@ mcp__plugin_mlx-hub_mlx-hub__mlx_infer(
   prompt="...", max_tokens=100
 )
 ```
+
+## Usage Monitoring
+
+Claude Max subscription doesn't support `/usage` command (it's for API billing only). Use **ccusage** instead:
+
+```bash
+npx ccusage@latest          # Daily token usage
+npx ccusage@latest blocks   # 5-hour rate limit windows (shows % of limit used)
+npx ccusage@latest monthly  # Monthly totals
+npx ccusage@latest blocks --live  # Real-time dashboard
+```
+
+Rate limits reset every 5 hours. The `blocks` view shows usage within each window.
