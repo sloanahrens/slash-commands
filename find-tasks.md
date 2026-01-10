@@ -24,13 +24,52 @@ Per `_shared-repo-logic.md` → "Context Loading":
 1. Read `~/.claude/CLAUDE.md` (global settings)
 2. Read `<repo-path>/CLAUDE.md` (repo-specific guidance)
 
-### Step 3: Review Current State
+### Step 3: Check Implementation Plans (FIRST PRIORITY)
 
 **First, get the repo path (REQUIRED):**
 ```bash
 devbot path <repo-name>
 # Output: /path/to/repo (use this literal path below)
 ```
+
+Check for plan documents in `docs/plans/`:
+```bash
+ls /path/to/repo/docs/plans/*.md 2>/dev/null
+```
+
+**If plans exist, process each one:**
+
+1. **Read the plan** and determine its status:
+   - Look for completion markers: `✅ COMPLETED`, `Status: Done`, all checklist items checked
+   - Compare plan tasks against current codebase state
+
+2. **For completed plans:**
+   - Confirm all tasks are actually done by checking the codebase
+   - If truly complete, delete the plan file:
+     ```bash
+     rm /path/to/repo/docs/plans/<plan-file>.md
+     ```
+   - Note: "Deleted completed plan: <plan-name>"
+
+3. **For incomplete plans:**
+   - Check which tasks are done vs pending
+   - Update the plan file to reflect current state (mark completed items)
+   - Extract remaining tasks as high-priority suggestions
+
+4. **For outdated plans:**
+   - If plan references files/code that no longer exists, update or delete
+   - If plan's goals are superseded by other work, delete
+
+**Output plan-based tasks first** before other analysis:
+```
+From Implementation Plans:
+1. **<plan-name>: <next-task>** (High)
+   - Plan: docs/plans/<file>.md
+   - Progress: 2/5 tasks complete
+   - Next step: <specific action>
+```
+
+### Step 4: Review Current State
 
 1. Read repo documentation:
    - `/path/to/repo/CLAUDE.md` - Repo-specific guidance
@@ -60,14 +99,9 @@ devbot path <repo-name>
    - Long functions (>50 lines) → "Refactor <function> (<lines> lines)"
    - Deep nesting (>4 levels) → "Simplify control flow in <file>"
 
-6. Check for incomplete implementation plans:
-   ```bash
-   ls /path/to/repo/docs/plans/*.md
-   ```
-
 **NEVER construct paths manually - always use `devbot path` first.**
 
-### Step 4: Check Linear Issues (Optional)
+### Step 5: Check Linear Issues (Optional)
 
 If Linear integration is configured, use Linear MCP to find relevant issues:
 
@@ -90,7 +124,7 @@ Linear Issues:
     └── PROJ-789: Update documentation (Normal)
 ```
 
-### Step 5: Identify High-Impact Work
+### Step 6: Identify High-Impact Work
 
 Focus on tasks that:
 - Unblock other work
@@ -99,13 +133,13 @@ Focus on tasks that:
 - Are quick wins with high value
 - Balance testing, features, and infrastructure
 
-### Step 6: Generate Task Options (Dual-Model Evaluation)
+### Step 7: Generate Task Options (Dual-Model Evaluation)
 
 Use dual-model pattern from `_shared-repo-logic.md` to build confidence in local model.
 
 **Note:** If local model is unavailable (see `_shared-repo-logic.md` → "Availability Check"), skip local model steps and use Claude directly. Omit `[local]`/`[claude]` markers in output.
 
-#### 6a. Summarize Each Task with Local Model
+#### 7a. Summarize Each Task with Local Model
 
 For each task identified (TODOs, complexity issues, coverage gaps):
 
@@ -124,7 +158,7 @@ Task summary:""",
 )
 ```
 
-#### 6b. Claude Reviews Each Summary
+#### 7b. Claude Reviews Each Summary
 
 **Evaluation criteria:**
 - ✓ Starts with actionable verb (Add, Fix, Refactor, Implement)
@@ -132,7 +166,7 @@ Task summary:""",
 - ✓ Accurate file/line reference preserved
 - ✓ Priority inference reasonable given context
 
-#### 6c. Build Output with Markers
+#### 7c. Build Output with Markers
 
 Mark each task with its provenance:
 - `[local]` — local model summary passed all criteria
@@ -148,39 +182,41 @@ Provide 3-5 concrete, actionable tasks with markers.
 Tasks for: my-cli
 ======================
 
+From Implementation Plans:
+1. **Performance Optimizations: Implement Top-K algorithm** (High)
+   - Plan: docs/plans/performance-optimizations-design.md
+   - Progress: 1/4 tasks complete
+   - Next step: Replace full sort with heap-based Top-K in analyze-overlap
+
+(Deleted completed plan: quick-wins-design.md)
+
 From Linear:
-1. **PROJ-123: API redesign** (High, In Progress)
+2. **PROJ-123: API redesign** (High, In Progress)
    - Impact: Unblocks mobile team
    - Start: Review current API in src/api/
    - Success: New endpoints pass integration tests
 
 From Codebase Analysis:
-2. [local] **Add missing test coverage for config command** (Medium)
+3. [local] **Add missing test coverage for config command** (Medium)
    - Impact: Increases confidence in releases
    - Start: src/commands/config.ts (0% coverage)
    - Success: >80% coverage for config module
 
 From TODO Comments:
-3. [local] **Implement retry logic in clone setup** (Medium)
+4. [local] **Implement retry logic in clone setup** (Medium)
    - Location: src/commands/clones.ts:245
    - Impact: Reduces failed clone attempts
    - Success: Retry with exponential backoff
 
 From Complexity Analysis:
-4. [claude] **Refactor runStats into smaller focused functions** (Medium)
+5. [claude] **Refactor runStats into smaller focused functions** (Medium)
    - Location: cmd/main.go:793 (127 lines)
    - Impact: Improves maintainability
    - Success: Function under 50 lines
    - (local summary lacked specificity)
-
-Quick Win:
-5. [local] **Fix typo in error message** (Low)
-   - Location: src/utils/logger.ts:42
-   - Impact: Professional error messages
-   - Success: Corrected spelling
 ```
 
-Note: Linear issues don't get markers (external source, not generated).
+Note: Linear issues and plan tasks don't get markers (external source, not generated).
 
 ---
 
