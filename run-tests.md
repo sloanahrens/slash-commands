@@ -30,7 +30,14 @@ Use `devbot check` for fast, auto-detected quality checks:
 
 ```bash
 devbot check <repo-name>
+
+# Or with prerequisite validation first:
+devbot check <repo-name> --prereq
 ```
+
+The `--prereq` flag validates tools, dependencies, and environment variables before running checks. This catches missing deps/env issues early instead of producing confusing test failures.
+
+**Note:** If tests fail with dependency or environment errors, suggest running `devbot prereq <repo>` to diagnose.
 
 This auto-detects the project stack (go, ts, nextjs, python, rust) and runs:
 - **lint** and **typecheck** in parallel
@@ -102,6 +109,8 @@ Parse flags from `$ARGUMENTS`:
 | `--fix` | Auto-fix issues where possible (lint, format) |
 | `--watch` | Run tests in watch mode (if supported) |
 | `--review` | Run code-reviewer agent after tests pass |
+
+**Note:** Use `devbot check <repo> --prereq` to validate prerequisites before checks.
 
 **Check names:** `lint`, `typecheck`, `build`, `test`
 

@@ -194,8 +194,13 @@ Examples:
 - Analyze common failure patterns:
   - Missing dependencies → suggest `make install` or `pnpm install`
   - Docker not running → suggest starting Docker
-  - Port in use → identify blocking process
+  - Port in use → identify blocking process with `devbot port <port>`
   - Missing env vars → check for `.env.example`
+- **For dependency or environment issues**, run `devbot prereq <repo>` to diagnose:
+  ```bash
+  devbot prereq <repo-name>
+  ```
+  This validates tools, dependencies, and environment variables in one check.
 - Offer to fix issues and retry
 - If unable to diagnose, report with full error context
 

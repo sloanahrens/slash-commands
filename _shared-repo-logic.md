@@ -119,6 +119,7 @@ Fast operations across repos:
 | `devbot stats <path>` | **filesystem path** | Code metrics |
 | `devbot exec <repo>[/subdir] <cmd>` | repo + command | Run command in repo directory |
 | `devbot port <port> [--kill]` | port number | Check/kill process on port |
+| `devbot prereq <repo>[/subdir]` | repo name | Validate tools, deps, and env vars |
 
 ### CRITICAL: Path vs Name Commands
 

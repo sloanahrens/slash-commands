@@ -17,19 +17,19 @@ func RenderStatus(statuses []workspace.RepoStatus, elapsed time.Duration, showAl
 		return statuses[i].Name < statuses[j].Name
 	})
 
-	// Filter if needed
-	var dirty, clean []workspace.RepoStatus
+	// Filter if needed: repos needing attention have dirty files OR unpushed commits
+	var needsAttention, upToDate []workspace.RepoStatus
 	for _, s := range statuses {
-		if s.DirtyFiles > 0 {
-			dirty = append(dirty, s)
+		if s.DirtyFiles > 0 || s.Ahead > 0 {
+			needsAttention = append(needsAttention, s)
 		} else {
-			clean = append(clean, s)
+			upToDate = append(upToDate, s)
 		}
 	}
 
 	toShow := statuses
 	if !showAll {
-		toShow = dirty
+		toShow = needsAttention
 	}
 
 	// Header - show workspace path (abbreviate home to ~)
@@ -41,7 +41,7 @@ func RenderStatus(statuses []workspace.RepoStatus, elapsed time.Duration, showAl
 	fmt.Println(strings.Repeat("─", 70))
 
 	if len(toShow) == 0 {
-		fmt.Println("  All repositories clean")
+		fmt.Println("  All repositories up-to-date")
 	} else {
 		for _, s := range toShow {
 			printRepoLine(s)
@@ -49,8 +49,8 @@ func RenderStatus(statuses []workspace.RepoStatus, elapsed time.Duration, showAl
 	}
 
 	// Summary
-	if !showAll && len(clean) > 0 {
-		fmt.Printf("\n  (%d more clean)\n", len(clean))
+	if !showAll && len(upToDate) > 0 {
+		fmt.Printf("\n  (%d more up-to-date)\n", len(upToDate))
 	}
 
 	fmt.Println()

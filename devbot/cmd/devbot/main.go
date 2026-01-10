@@ -21,6 +21,7 @@ import (
 	"github.com/sloanahrens/devbot-go/internal/makefile"
 	"github.com/sloanahrens/devbot-go/internal/output"
 	portPkg "github.com/sloanahrens/devbot-go/internal/port"
+	"github.com/sloanahrens/devbot-go/internal/prereq"
 	pulumiPkg "github.com/sloanahrens/devbot-go/internal/pulumi"
 	"github.com/sloanahrens/devbot-go/internal/remote"
 	"github.com/sloanahrens/devbot-go/internal/runner"
@@ -187,8 +188,9 @@ var checkCmd = &cobra.Command{
 }
 
 var (
-	checkOnly string
-	checkFix  bool
+	checkOnly   string
+	checkFix    bool
+	checkPrereq bool
 )
 
 // Branch command
@@ -370,6 +372,26 @@ Examples:
 
 var portKill bool
 
+// Prereq command
+var prereqCmd = &cobra.Command{
+	Use:   "prereq <repo>[/subdir]",
+	Short: "Validate prerequisites for a repository",
+	Long: `Checks that tools, dependencies, and environment variables are set up correctly.
+
+Uses same directory resolution as 'exec':
+  1. If /subdir specified: {repo_path}/{subdir}
+  2. If trailing slash (repo/): use repo root
+  3. If work_dir in config: {repo_path}/{work_dir}
+  4. Otherwise: {repo_path}
+
+Examples:
+  devbot prereq atap-automation2      # checks nextapp/ (from work_dir)
+  devbot prereq mango/go-api          # checks mango/go-api/
+  devbot prereq slash-commands/devbot # checks slash-commands/devbot/`,
+	Args: cobra.ExactArgs(1),
+	Run:  runPrereq,
+}
+
 func init() {
 	// Status flags
 	statusCmd.Flags().BoolVar(&showDirtyOnly, "dirty", false, "Only show repos with uncommitted changes")
@@ -407,6 +429,7 @@ func init() {
 	// Check flags
 	checkCmd.Flags().StringVar(&checkOnly, "only", "", "Only run specific checks (comma-separated: lint,typecheck,build,test)")
 	checkCmd.Flags().BoolVar(&checkFix, "fix", false, "Auto-fix issues where possible")
+	checkCmd.Flags().BoolVar(&checkPrereq, "prereq", false, "Validate tools, deps, and env vars before running checks")
 
 	// Deploy flags
 	deployCmd.Flags().BoolVar(&deployQuick, "quick", false, "Skip build step")
@@ -440,6 +463,7 @@ func init() {
 	rootCmd.AddCommand(switchCmd)
 	rootCmd.AddCommand(execCmd)
 	rootCmd.AddCommand(portCmd)
+	rootCmd.AddCommand(prereqCmd)
 }
 
 func runStatus(cmd *cobra.Command, args []string) {
@@ -1307,6 +1331,24 @@ func runCheckCmd(cmd *cobra.Command, args []string) {
 		os.Exit(1)
 	}
 
+	// Run prereq checks if requested
+	if checkPrereq {
+		dir, err := execPkg.ResolveTarget(target)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "Error resolving target: %v\n", err)
+			os.Exit(1)
+		}
+
+		prereqResult := prereq.Run(dir)
+		prereq.Render(prereqResult)
+
+		if !prereqResult.Passed() {
+			fmt.Fprintln(os.Stderr, "Prereq checks failed. Fix issues before running checks.")
+			os.Exit(1)
+		}
+		fmt.Println() // Blank line between prereq and check output
+	}
+
 	// Parse --only flag
 	var only []check.CheckType
 	if checkOnly != "" {
@@ -2061,6 +2103,24 @@ func runPort(cmd *cobra.Command, args []string) {
 		for _, p := range unique {
 			fmt.Printf("  %s (PID %d) - %s\n", p.Command, p.PID, p.User)
 		}
+	}
+}
+
+func runPrereq(cmd *cobra.Command, args []string) {
+	target := args[0]
+
+	// Resolve target to directory (reuse exec's resolution)
+	dir, err := execPkg.ResolveTarget(target)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
+		os.Exit(1)
+	}
+
+	result := prereq.Run(dir)
+	prereq.Render(result)
+
+	if !result.Passed() {
+		os.Exit(1)
 	}
 }
 

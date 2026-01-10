@@ -63,8 +63,8 @@ func TestRenderStatusDirtyOnly(t *testing.T) {
 	if !strings.Contains(output, "dirty-repo") {
 		t.Error("Output should contain dirty-repo")
 	}
-	if !strings.Contains(output, "1 more clean") {
-		t.Error("Output should show clean count summary")
+	if !strings.Contains(output, "1 more up-to-date") {
+		t.Error("Output should show up-to-date count summary")
 	}
 }
 
@@ -78,8 +78,8 @@ func TestRenderStatusAllClean(t *testing.T) {
 		RenderStatus(statuses, 30*time.Millisecond, false, "/Users/test/code")
 	})
 
-	if !strings.Contains(output, "All repositories clean") {
-		t.Error("Output should say all repositories clean")
+	if !strings.Contains(output, "All repositories up-to-date") {
+		t.Error("Output should say all repositories up-to-date")
 	}
 }
 
@@ -261,8 +261,32 @@ func TestRenderStatusEmpty(t *testing.T) {
 		RenderStatus([]workspace.RepoStatus{}, 10*time.Millisecond, true, "/Users/test/code")
 	})
 
-	if !strings.Contains(output, "All repositories clean") {
-		t.Error("Empty list should show all repositories clean")
+	if !strings.Contains(output, "All repositories up-to-date") {
+		t.Error("Empty list should show all repositories up-to-date")
+	}
+}
+
+func TestRenderStatusShowsUnpushedCommits(t *testing.T) {
+	statuses := []workspace.RepoStatus{
+		{RepoInfo: workspace.RepoInfo{Name: "clean-synced"}, Branch: "main", DirtyFiles: 0, Ahead: 0},
+		{RepoInfo: workspace.RepoInfo{Name: "clean-ahead"}, Branch: "main", DirtyFiles: 0, Ahead: 2},
+	}
+
+	output := captureOutput(func() {
+		RenderStatus(statuses, 50*time.Millisecond, false, "/Users/test/code")
+	})
+
+	if strings.Contains(output, "clean-synced") {
+		t.Error("Output should not contain clean-synced when showAll=false (no dirty files, no ahead)")
+	}
+	if !strings.Contains(output, "clean-ahead") {
+		t.Error("Output should contain clean-ahead because it has unpushed commits")
+	}
+	if !strings.Contains(output, "2 ahead") {
+		t.Error("Output should show 2 ahead for clean-ahead repo")
+	}
+	if !strings.Contains(output, "1 more up-to-date") {
+		t.Error("Output should show summary of up-to-date repos")
 	}
 }
 
