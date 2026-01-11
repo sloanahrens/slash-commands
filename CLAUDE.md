@@ -138,6 +138,10 @@ This prevents destructive operations by showing existing infrastructure state.
 | `~/.claude/hookify.*.md` | Hookify rules |
 | `~/.claude/commands/` | Slash commands |
 | `~/.claude/devbot/` | CLI tool source |
+| `~/.claude/hooks/` | Session start/end hooks |
+| `~/.claude/patterns/` | Versioned patterns (git tracked) |
+| `~/.claude/templates/` | Prompt templates |
+| `~/.claude/notes/` | Local notes (gitignored) |
 | `<repo>/CLAUDE.md` | Repo-specific guidance |
 
 ## Local Model
