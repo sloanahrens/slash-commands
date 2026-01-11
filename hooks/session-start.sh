@@ -19,20 +19,20 @@ if [ -d "${PATTERNS_DIR}" ]; then
     pattern_count=$(find "${PATTERNS_DIR}" -name "*.md" ! -name "README.md" 2>/dev/null | wc -l | tr -d ' ')
 fi
 
-# Build context message
+# Build context message using actual newlines
 context_parts=""
 
 if [ "$recent_hindsight" -gt 0 ]; then
-    context_parts="${context_parts}**${recent_hindsight} recent hindsight note(s)** in ~/.claude/notes/hindsight/ (last 7 days)\n"
+    context_parts="${context_parts}**${recent_hindsight} recent hindsight note(s)** in ~/.claude/notes/hindsight/ (last 7 days)"$'\n'
 fi
 
 if [ "$pattern_count" -gt 0 ]; then
-    context_parts="${context_parts}**${pattern_count} pattern(s)** available in docs/patterns/\n"
+    context_parts="${context_parts}**${pattern_count} pattern(s)** available in docs/patterns/"$'\n'
 fi
 
 # Only output if there's something to report
 if [ -n "$context_parts" ]; then
-    # Escape for JSON
+    # Escape for JSON - converts actual newlines to \n, etc.
     escape_for_json() {
         local input="$1"
         local output=""
@@ -40,7 +40,7 @@ if [ -n "$context_parts" ]; then
         for (( i=0; i<${#input}; i++ )); do
             char="${input:$i:1}"
             case "$char" in
-                $'\\') output+='\\' ;;
+                '\') output+='\' ;;
                 '"') output+='\"' ;;
                 $'\n') output+='\n' ;;
                 $'\r') output+='\r' ;;
@@ -51,7 +51,7 @@ if [ -n "$context_parts" ]; then
         printf '%s' "$output"
     }
 
-    message="## Agent Memory Available\n\n${context_parts}\nRun \`/prime <repo>\` to load relevant notes before starting work."
+    message="## Agent Memory Available"$'\n\n'"${context_parts}"$'\n'"Run \`/prime <repo>\` to load relevant notes before starting work."
     escaped_message=$(escape_for_json "$message")
 
     cat <<EOF
