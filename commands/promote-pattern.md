@@ -110,7 +110,7 @@ Show the transformed pattern:
 
 ```
 Promoting: 2026-01-11-hookify-cd-blocked.md
-Target: docs/patterns/bash-execution.md
+Target: ~/.claude/patterns/bash-execution.md
 
 Preview:
 ---
@@ -138,7 +138,7 @@ Proceed with promotion? [Y/n]
 
 ### Step 6: Write Pattern
 
-Write to `docs/patterns/<filename>`:
+Write to `~/.claude/patterns/<filename>`:
 
 ```bash
 # Get slash-commands path
@@ -158,14 +158,14 @@ repos: [atap-automation2]
 tags: [hookify, bash]
 created: 2026-01-11
 status: promoted  # ← Updated
-promoted_to: docs/patterns/bash-execution.md  # ← Added
+promoted_to: ~/.claude/patterns/bash-execution.md  # ← Added
 ---
 ```
 
 ### Step 8: Offer to Commit
 
 ```
-✓ Pattern created: docs/patterns/bash-execution.md
+✓ Pattern created: ~/.claude/patterns/bash-execution.md
 ✓ Original note marked as promoted
 
 Commit this pattern? [Y/n]
@@ -183,7 +183,7 @@ If yes, create commit (following commit rules from `_shared-repo-logic.md`):
 Promoting hindsight to pattern...
 
 Source: ~/.claude/notes/hindsight/2026-01-11-hookify-cd-blocked.md
-Target: docs/patterns/bash-execution.md
+Target: ~/.claude/patterns/bash-execution.md
 
 Changes:
 - Generalized from atap-automation2 → all repos
@@ -191,7 +191,7 @@ Changes:
 - Added multiple examples
 - Added "Related" section
 
-✓ Pattern created: docs/patterns/bash-execution.md
+✓ Pattern created: ~/.claude/patterns/bash-execution.md
 ✓ Original marked: status: promoted
 
 Would you like to commit this pattern? [Y/n]
@@ -204,7 +204,7 @@ Would you like to commit this pattern? [Y/n]
 If a similar pattern already exists:
 
 ```
-⚠️ Similar pattern exists: docs/patterns/bash-execution.md
+⚠️ Similar pattern exists: ~/.claude/patterns/bash-execution.md
 
 Options:
 1. Merge new content into existing pattern

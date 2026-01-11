@@ -13,7 +13,7 @@ Analyze a repository and suggest 3-5 high-priority tasks.
 ## Process
 
 1. **Resolve repo** per `_shared-repo-logic.md`
-2. **Check implementation plans** in `docs/plans/` (first priority)
+2. **Check implementation plans** in `<repo>/docs/` (first priority)
 3. **Scan for TODOs** with `devbot todos <repo>`
 4. **Check complexity** with `devbot stats <path>`
 5. **Review recent commits** with `devbot log <repo>`
@@ -25,7 +25,7 @@ Analyze a repository and suggest 3-5 high-priority tasks.
 
 ### Implementation Plans (First Priority)
 
-Check `docs/plans/*.md` for incomplete work:
+Check `<repo>/docs/*.md` for incomplete plans:
 - If plan complete → delete the file
 - If plan incomplete → extract remaining tasks as high priority
 

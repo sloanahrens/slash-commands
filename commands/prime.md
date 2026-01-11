@@ -26,11 +26,11 @@ Follow repo selection from `_shared-repo-logic.md`, then confirm: "Priming conte
 
 ### Step 2: Search Versioned Patterns
 
-Search `docs/patterns/*.md` for patterns that apply:
+Search `~/.claude/patterns/*.md` for patterns that apply:
 
 ```bash
 # Patterns tagged for this repo or "all"
-grep -l "repos:.*<repo-name>\|repos:.*all" /path/to/slash-commands/docs/patterns/*.md 2>/dev/null
+grep -l "repos:.*<repo-name>\|repos:.*all" ~/.claude/patterns/*.md 2>/dev/null
 ```
 
 For each match, extract:
@@ -166,7 +166,7 @@ When using `--tag=<tag>`:
 
 1. Search patterns for tag:
 ```bash
-grep -l "tags:.*<tag>" /path/to/slash-commands/docs/patterns/*.md 2>/dev/null
+grep -l "tags:.*<tag>" ~/.claude/patterns/*.md 2>/dev/null
 ```
 
 2. Search local notes for tag:

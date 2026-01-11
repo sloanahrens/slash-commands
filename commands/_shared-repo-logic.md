@@ -62,7 +62,7 @@ devbot path fractals-nextjs
 3. Consider `/prime <repo>` for relevant patterns
 
 **Note locations:**
-- `docs/patterns/` → Versioned patterns (git tracked)
+- `~/.claude/patterns/` → Versioned patterns (git tracked)
 - `~/.claude/notes/hindsight/` → Local failure captures
 - `~/.claude/notes/sessions/` → Local session summaries
 

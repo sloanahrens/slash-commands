@@ -5,7 +5,7 @@
 set -euo pipefail
 
 NOTES_DIR="${HOME}/.claude/notes"
-PATTERNS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]:-$0}")/.." && pwd)/docs/patterns"
+PATTERNS_DIR="${HOME}/.claude/patterns"
 
 # Count recent hindsight notes (last 7 days)
 recent_hindsight=0
@@ -27,7 +27,7 @@ if [ "$recent_hindsight" -gt 0 ]; then
 fi
 
 if [ "$pattern_count" -gt 0 ]; then
-    context_parts="${context_parts}**${pattern_count} pattern(s)** available in docs/patterns/"$'\n'
+    context_parts="${context_parts}**${pattern_count} pattern(s)** available in ~/.claude/patterns/"$'\n'
 fi
 
 # Only output if there's something to report

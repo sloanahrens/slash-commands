@@ -83,9 +83,9 @@ Run commands in subdirectories using flags, not `cd /path && cmd`:
 
 ## File Creation
 
-- **NO `/tmp` files** - create temporary/working files in `docs/` directories
+- **NO `/tmp` files** - create temporary/working files in `<repo>/docs/` directories
 - **Prefer editing over creating** - modify existing files when possible
-- **Plans go in** `docs/plans/YYYY-MM-DD-<topic>-<type>.md`
+- **Plans go in** `<repo>/docs/YYYY-MM-DD-<topic>-<type>.md`
 
 ---
 

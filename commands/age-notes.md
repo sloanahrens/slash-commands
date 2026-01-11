@@ -60,7 +60,7 @@ Discovered need for exponential backoff in API client...
 Options:
 1. Keep active — Still relevant
 2. Mark stale — Hide from /prime, keep for reference
-3. Promote to pattern — Graduate to docs/patterns/
+3. Promote to pattern — Graduate to ~/.claude/patterns/
 4. Delete — No longer useful
 ```
 
