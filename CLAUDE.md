@@ -113,9 +113,11 @@ Run `/list-commands` for full list. All require exact repo names from config.yam
 
 ## devbot CLI
 
-**NAME commands:** `path`, `status`, `diff`, `branch`, `log`, `show`, `fetch`, `switch`, `check`, `make`, `todos`, `last-commit`, `config`, `deps`, `remote`, `worktrees`, `pulumi`, `deploy`
+**NAME commands:** `path`, `status`, `diff`, `branch`, `log`, `show`, `fetch`, `switch`, `check`, `make`, `todos`, `last-commit`, `config`, `deps`, `remote`, `worktrees`, `pulumi`, `deploy`, `find-repo`
 
 **PATH commands:** `tree`, `stats`, `detect` (use `devbot path` first)
+
+**GitHub lookup:** `devbot find-repo owner/repo` or `devbot find-repo https://github.com/owner/repo/pull/123` → returns local repo name
 
 **Execution helpers:**
 - `exec <repo>[/subdir] <cmd...>` - Run command in repo directory (respects work_dir)
@@ -192,3 +194,14 @@ mcp__plugin_mlx-hub_mlx-hub__mlx_infer(
 npx ccusage@latest          # Daily token usage
 npx ccusage@latest blocks   # 5-hour rate limit windows
 ```
+
+## Developing devbot
+
+```bash
+make -C ~/.claude/devbot build    # Build binary
+make -C ~/.claude/devbot test     # Run tests
+make -C ~/.claude/devbot ci       # Full CI: fmt, vet, test, lint
+make -C ~/.claude/devbot install  # Install to PATH
+```
+
+Add new commands in `devbot/internal/` following existing patterns (cobra CLI in `cmd/devbot/main.go`).
