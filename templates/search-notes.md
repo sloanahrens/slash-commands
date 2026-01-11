@@ -14,7 +14,7 @@ Search the note system for relevant prior knowledge that could help with the cur
 
 ## Locations to Search
 
-1. **Patterns:** `<slash-commands-path>/docs/patterns/*.md`
+1. **Patterns:** `~/.claude/patterns/*.md`
 2. **Hindsight:** `~/.claude/notes/hindsight/*.md`
 3. **Sessions:** `~/.claude/notes/sessions/*.md`
 

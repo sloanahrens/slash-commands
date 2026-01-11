@@ -38,10 +38,10 @@ Patterns are **promoted** from hindsight notes:
 
 ```bash
 # Find patterns for a repo
-grep -l "repos:.*atap" docs/patterns/*.md
+grep -l "repos:.*atap" ~/.claude/patterns/*.md
 
 # Find by tag
-grep -l "tags:.*hookify" docs/patterns/*.md
+grep -l "tags:.*hookify" ~/.claude/patterns/*.md
 
 # Or use /prime <repo> to search automatically
 ```

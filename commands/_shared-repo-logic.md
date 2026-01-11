@@ -14,13 +14,7 @@ devbot path <repo-name>
 # Example: devbot path slash-commands → /Users/sloan/code/slash-commands
 ```
 
-**For slash-commands repo specifically:**
-```bash
-SLASH_CMD_PATH=$(devbot path slash-commands)
-# Use $SLASH_CMD_PATH for config.yaml, docs/, etc.
-```
-
-**Note:** `setup-workspace.md` hardcodes paths because it runs before devbot is installed.
+**Note:** `setup-workspace.md` hardcodes `~/.claude/` paths because it runs before devbot is installed.
 
 ---
 
