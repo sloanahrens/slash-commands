@@ -86,6 +86,19 @@ After resolving the repo path:
 
 1. Read `~/.claude/CLAUDE.md` (global settings)
 2. Read `<repo-path>/CLAUDE.md` (repo-specific guidance)
+3. **Prime with notes** (optional but recommended):
+   - Run `/prime <repo>` to surface relevant patterns and hindsight
+   - Or manually search `docs/patterns/` and `~/.claude/notes/`
+
+### Note Locations
+
+| Location | Contents |
+|----------|----------|
+| `docs/patterns/` | Versioned patterns (git tracked) |
+| `~/.claude/notes/hindsight/` | Local failure captures |
+| `~/.claude/notes/sessions/` | Local session summaries |
+
+See `/prime`, `/capture-hindsight`, and `/promote-pattern` for the full knowledge management workflow.
 
 ---
 
