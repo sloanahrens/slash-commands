@@ -4,7 +4,7 @@ Guidance for Claude Code when working in this repository.
 
 ## Overview
 
-Meta-tooling for the mono-claude workspace:
+Meta-tooling for the workspace:
 - **Slash commands** (`.md` files) → Claude Code skills
 - **devbot CLI** (`devbot/`) → Fast parallel repo operations
 

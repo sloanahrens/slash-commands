@@ -1,6 +1,6 @@
 # Patterns
 
-Proven, reusable knowledge for working in the mono-claude workspace.
+Proven, reusable knowledge for working in the workspace.
 
 ## What belongs here
 

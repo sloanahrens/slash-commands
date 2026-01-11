@@ -8,6 +8,8 @@ Complete idempotent workspace initialization in one command.
 
 **Arguments**: `$ARGUMENTS` - Optional flags: `--skip-config`, `--skip-plugins`, `--force`
 
+**Note:** This command hardcodes `~/code/slash-commands` paths because it runs before devbot is installed. Other commands should use `devbot path slash-commands` per `_shared-repo-logic.md`.
+
 ---
 
 ## Quick Status Check (ALWAYS DO THIS FIRST)
@@ -16,7 +18,7 @@ Before doing anything else, check if setup is already complete:
 
 ```bash
 # Single command to check all components
-CONFIG_OK=$( [ -f ~/code/mono-claude/slash-commands/config.yaml ] && echo "yes" || echo "no" )
+CONFIG_OK=$( [ -f ~/code/slash-commands/config.yaml ] && echo "yes" || echo "no" )
 DEVBOT_OK=$( command -v devbot >/dev/null 2>&1 && echo "yes" || echo "no" )
 SYMLINKS_OK=$( [ $(ls ~/.claude/commands/*.md 2>/dev/null | wc -l) -gt 20 ] && echo "yes" || echo "no" )
 
@@ -28,7 +30,7 @@ echo "Config: $CONFIG_OK | devbot: $DEVBOT_OK | Symlinks: $SYMLINKS_OK"
 ```
 ✓ Workspace already configured
 
-  Config:    ~/code/mono-claude/slash-commands/config.yaml
+  Config:    ~/code/slash-commands/config.yaml
   devbot:    $(which devbot)
   Symlinks:  $(ls ~/.claude/commands/*.md | wc -l) commands
 
@@ -44,11 +46,11 @@ Nothing to do. Use --force to re-run setup.
 **Skip if**: config.yaml exists AND --skip-config not passed AND --force not passed
 
 ```bash
-if [ ! -f ~/code/mono-claude/slash-commands/config.yaml ]; then
+if [ ! -f ~/code/slash-commands/config.yaml ]; then
   echo "Creating config.yaml..."
   # Copy from example if it exists
-  cp ~/code/mono-claude/slash-commands/config.yaml.example \
-     ~/code/mono-claude/slash-commands/config.yaml 2>/dev/null || \
+  cp ~/code/slash-commands/config.yaml.example \
+     ~/code/slash-commands/config.yaml 2>/dev/null || \
   echo "⚠ No config.yaml.example found - create config.yaml manually"
 fi
 ```
@@ -64,7 +66,7 @@ If new config created, prompt user to edit it with their repos.
 ```bash
 if ! command -v devbot >/dev/null 2>&1; then
   echo "Installing devbot..."
-  make -C ~/code/mono-claude/slash-commands/devbot install
+  make -C ~/code/slash-commands/devbot install
 fi
 ```
 
@@ -78,7 +80,7 @@ fi
 COMMANDS_DIR=~/.claude/commands
 mkdir -p "$COMMANDS_DIR"
 
-for file in ~/code/mono-claude/slash-commands/*.md; do
+for file in ~/code/slash-commands/*.md; do
   name=$(basename "$file")
   [ "${name:0:1}" = "_" ] && continue  # Skip _shared files
   ln -sf "$file" "$COMMANDS_DIR/$name"
@@ -102,7 +104,7 @@ Delegate to `/setup-plugins` command.
 ```
 ✓ Workspace setup complete!
 
-  Config:    ~/code/mono-claude/slash-commands/config.yaml
+  Config:    ~/code/slash-commands/config.yaml
   devbot:    $(which devbot)
   Symlinks:  $(ls ~/.claude/commands/*.md | wc -l) commands
   Plugins:   Run /setup-plugins if needed

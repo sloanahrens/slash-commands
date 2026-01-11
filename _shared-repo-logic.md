@@ -4,6 +4,26 @@ Shared patterns for repo-targeting slash commands.
 
 ---
 
+## Workspace Paths
+
+The workspace root is defined in `config.yaml` as `workspace: ~/code`.
+
+**Getting any repo path:**
+```bash
+devbot path <repo-name>
+# Example: devbot path slash-commands → /Users/sloan/code/slash-commands
+```
+
+**For slash-commands repo specifically:**
+```bash
+SLASH_CMD_PATH=$(devbot path slash-commands)
+# Use $SLASH_CMD_PATH for config.yaml, docs/, etc.
+```
+
+**Note:** `setup-workspace.md` hardcodes paths because it runs before devbot is installed.
+
+---
+
 ## Repo Resolution
 
 ### From `@directory/` (Claude Code context)
@@ -18,7 +38,7 @@ Extract name from path → `devbot path <name>` → if not found, show suggestio
 
 ```bash
 devbot path fractals-nextjs
-# Output: /Users/sloan/code/mono-claude/fractals-nextjs
+# Output: /Users/sloan/code/fractals-nextjs
 ```
 
 **NEVER construct paths manually.**

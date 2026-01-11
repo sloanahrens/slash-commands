@@ -31,7 +31,7 @@ Idempotently install all recommended Claude Code plugins for this workspace.
 | `mlx-hub` | Local MLX model inference for speed (Apple Silicon only) |
 
 > **Dev Setup Note**: `mlx-hub` is registered as a local marketplace pointing to
-> `~/code/mono-claude/mlx-hub-claude-plugin`. Use `claude plugin update mlx-hub@mlx-hub`
+> `~/code/mlx-hub-claude-plugin`. Use `claude plugin update mlx-hub@mlx-hub`
 > to sync changes from the dev repo to the plugin cache.
 
 ### Official Anthropic
@@ -151,7 +151,7 @@ claude plugin update <plugin-name>@<marketplace>
 2. If registered → Run `claude plugin update mlx-hub@mlx-hub` to sync latest changes
 3. If not registered → Set up manually:
    ```bash
-   claude plugin marketplace add ~/code/mono-claude/mlx-hub-claude-plugin
+   claude plugin marketplace add ~/code/mlx-hub-claude-plugin
    claude plugin install mlx-hub@mlx-hub
    ```
 
@@ -175,7 +175,7 @@ Updated:
   ...
 
 Local dev plugins:
-  - mlx-hub (local marketplace → ~/code/mono-claude/mlx-hub-claude-plugin) ✓
+  - mlx-hub (local marketplace → ~/code/mlx-hub-claude-plugin) ✓
 
 Total: X plugins installed, Y updated
 
