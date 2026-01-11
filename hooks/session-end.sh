@@ -31,10 +31,7 @@ escaped_message=$(escape_for_json "$message")
 
 cat <<EOF
 {
-  "hookSpecificOutput": {
-    "hookEventName": "Stop",
-    "additionalContext": "${escaped_message}"
-  }
+  "systemMessage": "${escaped_message}"
 }
 EOF
 
