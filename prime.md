@@ -156,6 +156,45 @@ knowledge for future sessions.
 | `--all` | Show all patterns and notes, not just repo-specific |
 | `--tag=<tag>` | Filter by specific tag across all notes |
 | `--verbose` | Show full content of all matched notes |
+| `--stale` | Include notes marked as stale (normally hidden) |
+
+---
+
+## Tag-Based Search
+
+When using `--tag=<tag>`:
+
+1. Search patterns for tag:
+```bash
+grep -l "tags:.*<tag>" /path/to/slash-commands/docs/patterns/*.md 2>/dev/null
+```
+
+2. Search local notes for tag:
+```bash
+grep -l "tags:.*<tag>" ~/.claude/notes/hindsight/*.md 2>/dev/null
+grep -l "tags:.*<tag>" ~/.claude/notes/sessions/*.md 2>/dev/null
+```
+
+3. Display all matches regardless of repo, grouped by type
+
+**Common tags:**
+- `hookify` — Hookify rules and workarounds
+- `bash` — Bash command patterns
+- `devbot` — devbot CLI usage
+- `git` — Git operations
+- `testing` — Test-related patterns
+
+---
+
+## Pattern Promotion Suggestions
+
+When displaying notes, check if any hindsight note has been active for 14+ days and hasn't been promoted:
+
+```
+💡 Promotion candidate: 2026-01-05-monorepo-subdir.md
+   Active for 16 days, referenced multiple times.
+   Run /promote-pattern to make it permanent.
+```
 
 ---
 

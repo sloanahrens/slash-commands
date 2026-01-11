@@ -83,6 +83,18 @@ All require exact repo names. Run `/list-commands` for full list.
 | `/status [repo]` | Repository status |
 | `/update-docs <repo>` | Update documentation |
 
+### Agent Scaffolding Commands
+
+Cross-session learning system (Confucius-inspired):
+
+| Command | Description |
+|---------|-------------|
+| `/prime <repo>` | Load relevant patterns and notes before work |
+| `/capture-hindsight` | Save failure/discovery as a note |
+| `/promote-pattern` | Graduate useful note to versioned pattern |
+| `/age-notes` | Review and clean up old notes |
+| `/improve <repo> <task>` | Meta-agent loop with parallel subagents |
+
 ## Repository Registry
 
 Defined in `~/code/slash-commands/config.yaml`.
@@ -111,6 +123,7 @@ Defined in `~/code/slash-commands/config.yaml`.
 **Execution helpers:**
 - `exec <repo>[/subdir] <cmd...>` - Run command in repo directory (respects work_dir)
 - `port <port> [--kill]` - Check/kill process on port
+- `prereq <repo>[/subdir]` - Validate tools, deps, and env vars before work
 
 **Other:** `run` (parallel command across repos), `find-repo` (GitHub org/repo lookup)
 
@@ -170,8 +183,11 @@ pulumi preview                # 4. Then preview/up
 |----------|---------|
 | `~/.claude/settings.json` | Global permissions + plugins |
 | `~/.claude/hookify.*.md` | Global hookify rules |
+| `~/.claude/notes/hindsight/` | Local failure/discovery captures |
+| `~/.claude/notes/sessions/` | Local session summaries |
 | `<repo>/CLAUDE.md` | Repo-specific guidance |
-| `slash-commands/docs/` | Reference copies of config |
+| `slash-commands/docs/patterns/` | Versioned knowledge patterns |
+| `slash-commands/docs/config/` | Reference copies of hookify rules |
 
 ## Local Model
 

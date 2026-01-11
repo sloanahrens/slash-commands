@@ -65,3 +65,79 @@ After modifying devbot:
 1. `make test` in `devbot/` directory
 2. Verify with actual repo: `./devbot status`, `./devbot check <repo>`
 3. If changing slash commands, test by invoking the command in Claude Code
+
+## New Machine Setup
+
+After cloning this repo on a new machine, run these steps to set up the full environment:
+
+### 1. Install devbot
+
+```bash
+cd devbot
+make install
+```
+
+### 2. Create notes directory structure
+
+```bash
+mkdir -p ~/.claude/notes/hindsight ~/.claude/notes/sessions
+```
+
+### 3. Copy hookify rules
+
+```bash
+cp docs/config/hookify.*.local.md ~/.claude/
+```
+
+### 4. Symlink slash commands
+
+```bash
+# Create commands directory if needed
+mkdir -p ~/.claude/commands
+
+# Symlink all slash commands
+for f in *.md; do
+  [[ "$f" != "README.md" && "$f" != "_"* ]] && ln -sf "$(pwd)/$f" ~/.claude/commands/
+done
+
+# Also symlink config.yaml
+ln -sf "$(pwd)/config.yaml" ~/.claude/commands/
+```
+
+### 5. Copy root CLAUDE.md
+
+```bash
+cp docs/root-claude/CLAUDE.md ~/.claude/CLAUDE.md
+# Edit as needed for your specific workspace path
+```
+
+### 6. Update config.yaml
+
+```bash
+cp config.yaml.example config.yaml
+# Edit to match your workspace structure
+```
+
+Or run `/setup-workspace` which automates most of the above.
+
+## docs/ Directory Contents
+
+| Path | Purpose |
+|------|---------|
+| `docs/config/` | Hookify rules to copy to `~/.claude/` |
+| `docs/root-claude/` | Example global CLAUDE.md |
+| `docs/patterns/` | Versioned knowledge patterns (agent scaffolding) |
+| `docs/templates/` | Subagent templates for `/improve` command |
+| `docs/plans/` | Design documents |
+
+## Agent Scaffolding Commands
+
+These commands implement Confucius-inspired agent scaffolding for cross-session learning:
+
+| Command | Purpose |
+|---------|---------|
+| `/prime <repo>` | Load relevant patterns and notes before work |
+| `/capture-hindsight` | Save failure/discovery as a note |
+| `/promote-pattern` | Graduate useful note to versioned pattern |
+| `/age-notes` | Review and clean up old notes |
+| `/improve <repo> <task>` | Meta-agent loop with parallel subagents |
