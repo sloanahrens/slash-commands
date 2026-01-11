@@ -35,6 +35,31 @@ devbot diff <repo> --full       # Include diff content
 devbot branch <repo>            # Branch, tracking, ahead/behind
 ```
 
+#### log - Git Log
+```bash
+devbot log <repo>               # --oneline -20 (sensible defaults)
+devbot log <repo> -5            # Last 5 commits
+devbot log <repo> --since="1 week ago"
+```
+
+#### show - Commit Details
+```bash
+devbot show <repo>              # Show HEAD commit
+devbot show <repo> abc123       # Show specific commit
+devbot show <repo> HEAD~3       # Show relative commit
+```
+
+#### fetch - Fetch Remotes
+```bash
+devbot fetch <repo>             # git fetch --all --prune
+```
+
+#### switch - Switch Branch
+```bash
+devbot switch <repo> main
+devbot switch <repo> feature/new-thing
+```
+
 #### remote - Remote Info
 ```bash
 devbot remote <repo>            # Remote URLs and GitHub identifiers
@@ -102,6 +127,39 @@ devbot run -f myapp -- make     # Filter repos
 devbot run -q -- git fetch      # Quiet mode
 ```
 
+#### exec - Run Command in Repo
+```bash
+devbot exec <repo> npm test                # Run in work_dir
+devbot exec <repo>/subdir go test ./...    # Explicit subdir
+devbot exec <repo>/ docker build .         # Repo root (trailing /)
+```
+
+#### prereq - Validate Prerequisites
+```bash
+devbot prereq <repo>            # Check tools, deps, env vars
+devbot prereq <repo>/subdir     # Check for specific subdir
+```
+
+#### port - Port Management
+```bash
+devbot port 3000                # Show what's on port
+devbot port 3000 --kill         # Kill process on port
+```
+
+#### pulumi - Infrastructure State (CRITICAL)
+```bash
+devbot pulumi <repo>            # MUST run before any pulumi command
+```
+Shows stacks, resources, and prevents destructive operations.
+
+#### deploy - Cloud Deployment
+```bash
+devbot deploy <repo>            # Deploy to dev
+devbot deploy <repo> prod       # Deploy to prod
+devbot deploy <repo> --quick    # Skip build
+devbot deploy <repo> --verify   # Verify only
+```
+
 ### PATH Commands (take filesystem path)
 
 #### tree - Gitignore-Aware Tree
@@ -143,9 +201,13 @@ devbot/
 │   ├── deps/              # Dependency analysis
 │   ├── detect/            # Stack detection
 │   ├── diff/              # Git diff
+│   ├── exec/              # Command execution in repos
 │   ├── lastcommit/        # Commit recency
 │   ├── makefile/          # Makefile parsing
 │   ├── output/            # Terminal rendering
+│   ├── port/              # Port management
+│   ├── prereq/            # Prerequisite validation
+│   ├── pulumi/            # Pulumi state inspection
 │   ├── remote/            # Git remote parsing
 │   ├── runner/            # Parallel execution
 │   ├── stats/             # Code metrics

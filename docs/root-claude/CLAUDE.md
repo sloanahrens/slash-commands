@@ -1,6 +1,6 @@
 # CLAUDE.md
 
-Global Claude Code configuration. Each repo also has its own CLAUDE.md - read that first.
+Global Claude Code configuration. Each repo has its own CLAUDE.md - read that first.
 
 ## Setup
 
@@ -17,157 +17,62 @@ git clone https://github.com/sloanahrens/slash-commands.git ~/code/slash-command
 - **Use devbot** - prefer over manual git/file operations
 - **Simple bash only** - no `&&`, `$()`, `;`, or `git -C` (blocked by hookify)
 
-## Tool Selection Guide
+## Tool Selection
 
-**STOP before running bash.** Use the right tool:
-
-| Need | Tool | Example |
-|------|------|---------|
-| Git status/diff/branch | `devbot` | `devbot diff slash-commands --full` |
-| Read file content | `Read` tool | Read tool on any file path |
-| Search files | `Grep`/`Glob` | Grep for pattern, Glob for filenames |
-| File operations | `Read`/`Edit`/`Write` | Never use cat/sed/awk |
-
-**Never improvise bash commands.** If devbot doesn't have a command for it, use Claude Code's built-in tools (Read, Grep, Glob, Edit, Write).
+| Need | Tool |
+|------|------|
+| Git operations | `devbot` commands |
+| Read files | `Read` tool |
+| Search files | `Grep`/`Glob` |
+| File operations | `Read`/`Edit`/`Write` (never cat/sed/awk) |
 
 ## Bash Patterns
 
 ```bash
-# Get path, cd, then git (for commands without devbot wrappers)
-devbot path my-repo        # → /full/path/to/my-repo
-cd /full/path/to/my-repo
-git commit                 # Commands like commit/push need cd first
+devbot path my-repo        # Get path first
+cd /full/path/to/my-repo   # Then cd
+git commit                 # Then git command
 ```
 
-| Use This | Not This |
-|----------|----------|
-| `devbot status <repo>` | `git status` |
-| `devbot diff <repo>` | `git diff` |
-| `devbot branch <repo>` | `git branch -vv` |
-| `devbot log <repo>` | `git log` |
-| `devbot show <repo> [ref]` | `git show` |
-| `devbot fetch <repo>` | `git fetch` |
-| `devbot switch <repo> <branch>` | `git switch/checkout` |
-| `devbot check <repo>` | `npm test && npm run lint` |
-| `devbot last-commit <repo> [file]` | `git log -1 --format="%ar"` |
-
-## Running Commands in Repos (NO cd &&)
-
-**Preferred:** Use `devbot exec` for any command in a repo directory:
-
+**Use devbot exec for running commands:**
 ```bash
-devbot exec my-app npm run build         # Uses work_dir from config
-devbot exec monorepo/subdir go test      # Explicit subdir for monorepos
-devbot exec my-app/ docker build .       # Trailing / = repo root (ignores work_dir)
+devbot exec my-app npm run build    # Respects work_dir
+devbot exec my-app/subdir go test   # Explicit subdir
 ```
-
-**Fallback patterns** (when devbot exec isn't suitable):
-
-| Tool | Pattern | Example |
-|------|---------|---------|
-| npm | `npm run <cmd> --prefix <path>` | `npm run build --prefix /path/to/app` |
-| make | `make -C <path> <target>` | `make -C /path/to/app build` |
-
-**Sequential commands:** Run each command separately. Do NOT combine with `&&` or `;`.
 
 ## Slash Commands
 
-All require exact repo names. Run `/list-commands` for full list.
+Run `/list-commands` for full list. Key commands:
 
 | Command | Description |
 |---------|-------------|
 | `/super <repo>` | Brainstorming with context |
 | `/run-tests <repo>` | Lint, type-check, build, test |
-| `/yes-commit <repo>` | Draft and commit (no AI attribution) |
-| `/push <repo>` | Push to origin |
+| `/yes-commit <repo>` | Draft and commit |
 | `/status [repo]` | Repository status |
-| `/update-docs <repo>` | Update documentation |
-
-### Agent Scaffolding Commands
-
-Cross-session learning system (Confucius-inspired):
-
-| Command | Description |
-|---------|-------------|
-| `/prime <repo>` | Load relevant patterns and notes before work |
-| `/capture-hindsight` | Save failure/discovery as a note |
-| `/promote-pattern` | Graduate useful note to versioned pattern |
-| `/age-notes` | Review and clean up old notes |
-| `/improve <repo> <task>` | Meta-agent loop with parallel subagents |
-
-## Repository Registry
-
-Defined in `~/code/slash-commands/config.yaml`.
-
-| Repo | Stack | Notes |
-|------|-------|-------|
-| `fractals-nextjs` | Next.js + Canvas | Mandelbrot visualizer |
-| `mango` | Go + Next.js + DuckDB | **CGO required** |
-| `devops-pulumi-ts` | Pulumi + TypeScript | GCP Cloud Run |
-| `slash-commands` | Go + Markdown | This workspace's tools |
-| `mlx-hub-claude-plugin` | TypeScript | MLX model inference plugin |
-| `trabian-ai` | TypeScript | Trabian AI tools |
-| `sandbox` | Go + TypeScript | Experimental pnpm workspace |
-| `machine-learning` | Python | ML experiments |
-| `physics-stuff` | Mixed | Physics simulations |
-| `docs` | Markdown | Documentation |
-| `service-cu-cloud-services-platform` | SST + TypeScript | AWS SCU integrations (Plaid, Temporal) |
-| `hanscom-fcu-poc-plaid-token-manager` | Pulumi + TypeScript | Azure Plaid service (port of service-cu) |
+| `/prime <repo>` | Load patterns and notes |
+| `/capture-hindsight` | Save failure as note |
 
 ## devbot CLI
 
-**NAME commands:** `path`, `status`, `diff`, `branch`, `log`, `show`, `fetch`, `switch`, `check`, `make`, `todos`, `last-commit`, `config`, `deps`, `remote`, `worktrees`, `pulumi`, `deploy`
+See `slash-commands/devbot/README.md` for full reference.
 
-**PATH commands:** `tree`, `stats`, `detect` (use `devbot path` first)
-
-**Execution helpers:**
-- `exec <repo>[/subdir] <cmd...>` - Run command in repo directory (respects work_dir)
-- `port <port> [--kill]` - Check/kill process on port
-- `prereq <repo>[/subdir]` - Validate tools, deps, and env vars before work
-
-**Other:** `run` (parallel command across repos), `find-repo` (GitHub org/repo lookup)
-
-**Git wrappers** (faster, auto-approved):
-- `log <repo>` - git log (default: --oneline -20)
-- `show <repo> [ref]` - git show (default: HEAD)
-- `fetch <repo>` - git fetch --all --prune
-- `switch <repo> <branch>` - git switch
-
-**CRITICAL:** `devbot pulumi <repo>` - **MANDATORY before any Pulumi operation**
-
+**Quick reference:**
 ```bash
-devbot exec my-app npm test   # Run in repo's work_dir
-devbot port 3000 --kill       # Free up port 3000
-devbot pulumi my-repo         # Check infra state BEFORE any pulumi command
+devbot status              # All repos
+devbot check <repo>        # Quality checks
+devbot exec <repo> <cmd>   # Run command in repo
+devbot pulumi <repo>       # MUST run before any pulumi command
 ```
 
 ## Pulumi (CRITICAL)
 
-### MANDATORY: Run `devbot pulumi <repo>` BEFORE any Pulumi command
+**MANDATORY:** Run `devbot pulumi <repo>` BEFORE any Pulumi command.
 
-This prevents destructive operations by showing existing infrastructure state.
-
-### Forbidden Commands (unless devbot pulumi shows NO infrastructure)
-
-| Command | Why Dangerous |
-|---------|--------------|
-| `pulumi stack init` | Orphans existing infrastructure |
-| `pulumi destroy` | Deletes all resources |
-| `pulumi stack rm` | Loses state permanently |
-
-### Safe Workflow
-
-```bash
-devbot pulumi my-repo         # 1. ALWAYS check state first
-cd /path/to/platform          # 2. cd to pulumi directory
-pulumi stack select dev       # 3. Select existing stack (never init if stacks exist!)
-pulumi preview                # 4. Then preview/up
-```
-
-### Other Rules
-
-- **Never prefix with `PULUMI_CONFIG_PASSPHRASE=""`** - already set in zsh
-- **If "no stack selected"** → `pulumi stack ls` then `pulumi stack select`, NEVER `stack init`
+**Forbidden** (unless devbot pulumi shows NO infrastructure):
+- `pulumi stack init` - Orphans existing infrastructure
+- `pulumi destroy` - Deletes all resources
+- `pulumi stack rm` - Loses state permanently
 
 ## Key Skills
 
@@ -183,15 +88,13 @@ pulumi preview                # 4. Then preview/up
 |----------|---------|
 | `~/.claude/settings.json` | Global permissions + plugins |
 | `~/.claude/hookify.*.md` | Global hookify rules |
-| `~/.claude/notes/hindsight/` | Local failure/discovery captures |
-| `~/.claude/notes/sessions/` | Local session summaries |
+| `~/.claude/notes/` | Local notes (hindsight, sessions) |
 | `<repo>/CLAUDE.md` | Repo-specific guidance |
 | `slash-commands/docs/patterns/` | Versioned knowledge patterns |
-| `slash-commands/docs/config/` | Reference copies of hookify rules |
 
 ## Local Model
 
-Use Qwen for simple tasks (commit messages, explanations). Prefix output with `[qwen]`.
+Use Qwen for simple tasks. Prefix output with `[local]`.
 
 ```python
 mcp__plugin_mlx-hub_mlx-hub__mlx_infer(
@@ -202,13 +105,7 @@ mcp__plugin_mlx-hub_mlx-hub__mlx_infer(
 
 ## Usage Monitoring
 
-Claude Max subscription doesn't support `/usage` command (it's for API billing only). Use **ccusage** instead:
-
 ```bash
 npx ccusage@latest          # Daily token usage
-npx ccusage@latest blocks   # 5-hour rate limit windows (shows % of limit used)
-npx ccusage@latest monthly  # Monthly totals
-npx ccusage@latest blocks --live  # Real-time dashboard
+npx ccusage@latest blocks   # 5-hour rate limit windows
 ```
-
-Rate limits reset every 5 hours. The `blocks` view shows usage within each window.
