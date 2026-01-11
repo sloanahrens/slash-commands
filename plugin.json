@@ -1,6 +1,0 @@
-{
-  "name": "slash-commands",
-  "version": "1.0.0",
-  "description": "Workspace slash commands and Confucius-inspired agent scaffolding",
-  "main": "hooks/hooks.json"
-}
