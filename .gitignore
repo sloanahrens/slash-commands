@@ -1,13 +1,34 @@
-# Local configuration (user-specific paths)
+# User-specific configuration
 config.yaml
+
+# Claude Code runtime directories
+cache/
+debug/
+file-history/
+ide/
+notes/
+paste-cache/
+plans/
+plugins/
+projects/
+session-env/
+shell-snapshots/
+statsig/
+telemetry/
+todos/
+
+# Claude Code runtime files
+history.jsonl
+stats-cache.json
+*.db
+*.db-journal
 
 # devbot build artifacts
 devbot/devbot
 *.exe
-
-# Coverage
 coverage.out
 coverage.html
+*.out
 
 # IDE
 .idea/
@@ -15,5 +36,5 @@ coverage.html
 *.swp
 *.swo
 
-# Temp files
-*.out
+# OS
+.DS_Store

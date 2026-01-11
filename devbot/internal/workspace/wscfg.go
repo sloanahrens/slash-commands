@@ -36,8 +36,7 @@ func ResetConfigCache() {
 // LoadConfig finds and loads the workspace config.yaml
 // Search order:
 // 1. $DEVBOT_CONFIG environment variable
-// 2. ~/.claude/commands/config.yaml (symlink to slash-commands)
-// 3. ~/code/slash-commands/config.yaml (fallback)
+// 2. ~/.claude/config.yaml (this repo IS ~/.claude)
 func LoadConfig() (*WorkspaceConfig, error) {
 	if cachedConfig != nil {
 		return cachedConfig, nil
@@ -81,16 +80,10 @@ func findConfigPath() string {
 		return ""
 	}
 
-	// 2. Check ~/.claude/commands/config.yaml (follows symlinks automatically)
-	claudePath := filepath.Join(home, ".claude", "commands", "config.yaml")
+	// 2. Check ~/.claude/config.yaml (this repo IS ~/.claude)
+	claudePath := filepath.Join(home, ".claude", "config.yaml")
 	if _, err := os.Stat(claudePath); err == nil {
 		return claudePath
-	}
-
-	// 3. Fallback: ~/code/slash-commands/config.yaml
-	fallbackPath := filepath.Join(home, "code", "slash-commands", "config.yaml")
-	if _, err := os.Stat(fallbackPath); err == nil {
-		return fallbackPath
 	}
 
 	return ""

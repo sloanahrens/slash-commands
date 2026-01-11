@@ -1,12 +1,42 @@
-# Claude Code Slash Commands
+# Claude Code Configuration
 
-Portable slash commands for managing multi-repo workspaces with Claude Code.
+This repository is designed to be cloned directly as `~/.claude/` - the Claude Code configuration directory.
 
 ## Installation
 
 ```bash
-git clone https://github.com/sloanahrens/slash-commands.git ~/code/slash-commands
-/setup-workspace  # In Claude Code - handles config, devbot, symlinks, plugins
+# Clone as ~/.claude
+git clone https://github.com/sloanahrens/slash-commands.git ~/.claude
+
+# Configure
+cd ~/.claude
+cp config.yaml.example config.yaml
+# Edit config.yaml with your workspace path and repos
+
+# Install devbot CLI
+make -C devbot install
+```
+
+Or after cloning, run `/setup-workspace` in Claude Code.
+
+## Structure
+
+```
+~/.claude/                   # This repo
+├── CLAUDE.md               # Global instructions (tracked)
+├── settings.json           # Permissions + plugins (tracked)
+├── config.yaml             # Your workspace config (gitignored)
+├── hookify.*.local.md      # Hookify rules (tracked)
+├── commands/               # Slash commands (tracked)
+├── devbot/                 # CLI tool (tracked)
+├── docs/                   # Patterns, templates (tracked)
+│
+│ # Runtime (gitignored):
+├── history.jsonl
+├── plugins/
+├── cache/
+├── notes/
+└── ...
 ```
 
 ## Commands
@@ -18,34 +48,33 @@ Run `/list-commands` for the full list. Key commands:
 | `/super <repo>` | Brainstorming session with context |
 | `/run-tests <repo>` | Lint, type-check, build, test |
 | `/yes-commit <repo>` | Draft and commit changes |
-| `/push <repo>` | Push to origin |
 | `/status [repo]` | Repository status |
-| `/prime <repo>` | Load patterns and notes before work |
-| `/capture-hindsight` | Save failure as a note |
-| `/setup-workspace` | Full setup (config, devbot, plugins) |
-
-All repo commands require exact names from `config.yaml`.
+| `/setup-workspace` | Initial setup |
 
 ## Configuration
+
+Edit `config.yaml`:
 
 ```yaml
 workspace: ~/code/my-workspace
 repos:
-  - name: my-project        # Must match directory name
+  - name: my-project
     group: apps
     language: typescript
-    work_dir: cmd/api       # Optional subdirectory
+    work_dir: src           # Optional subdirectory
 ```
 
 ## devbot CLI
 
-Fast parallel operations. See [devbot/README.md](devbot/README.md) for full documentation.
+Fast parallel operations across repos:
 
 ```bash
 devbot status              # Git status across all repos
 devbot check <repo>        # lint, typecheck, build, test
 devbot exec <repo> <cmd>   # Run command in repo directory
 ```
+
+See [devbot/README.md](devbot/README.md) for full documentation.
 
 ## Requirements
 
