@@ -4,6 +4,7 @@ config.yaml
 # Claude Code runtime directories
 cache/
 debug/
+double-shot-latte/
 file-history/
 ide/
 notes/
