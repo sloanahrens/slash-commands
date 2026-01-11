@@ -1,6 +1,9 @@
 # User-specific configuration
 config.yaml
 
+# Project-specific command symlinks
+commands/debug-atap-automation.md
+
 # Claude Code runtime directories
 cache/
 debug/
