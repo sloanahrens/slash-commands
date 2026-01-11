@@ -24,6 +24,7 @@ todos/
 # Claude Code runtime files
 history.jsonl
 stats-cache.json
+security_warnings_state_*.json
 *.db
 *.db-journal
 
