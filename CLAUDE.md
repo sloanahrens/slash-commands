@@ -1,11 +1,26 @@
 # CLAUDE.md
 
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
 Global Claude Code configuration. Each repo also has its own CLAUDE.md - read that first.
+
+## Architecture
+
+This repo IS `~/.claude/` - the Claude Code configuration directory. Key components:
+
+| Component | Purpose |
+|-----------|---------|
+| `devbot/` | Go CLI for parallel workspace operations |
+| `commands/` | 30+ slash commands for workflow automation |
+| `hookify.*.md` | Block dangerous bash patterns |
+| `patterns/` | Proven, reusable knowledge (git tracked) |
+| `notes/` | Session notes and hindsight captures (gitignored) |
+| `templates/` | Reusable prompt templates |
+| `hooks/` | Session start/end automation |
 
 ## Setup
 
 ```bash
-# Clone this repo as ~/.claude
 git clone https://github.com/sloanahrens/slash-commands.git ~/.claude
 cd ~/.claude
 cp config.yaml.example config.yaml  # Edit with your workspace path
@@ -76,8 +91,9 @@ devbot exec my-app/subdir go test   # Explicit subdir
 
 ## Slash Commands
 
-All require exact repo names. Run `/list-commands` for full list.
+Run `/list-commands` for full list. All require exact repo names from config.yaml.
 
+**Workflow commands:**
 | Command | Description |
 |---------|-------------|
 | `/super <repo>` | Brainstorming with context |
@@ -85,7 +101,15 @@ All require exact repo names. Run `/list-commands` for full list.
 | `/yes-commit <repo>` | Draft and commit (no AI attribution) |
 | `/push <repo>` | Push to origin |
 | `/status [repo]` | Repository status |
-| `/update-docs <repo>` | Update documentation |
+| `/create-pr <repo>` | Create pull request |
+
+**Knowledge capture:**
+| Command | Description |
+|---------|-------------|
+| `/prime <repo>` | Load relevant notes/patterns before work |
+| `/capture-hindsight` | Capture failure or lesson learned |
+| `/promote-pattern` | Promote hindsight note to pattern |
+| `/capture-session` | Capture session summary |
 
 ## devbot CLI
 
@@ -128,6 +152,13 @@ This prevents destructive operations by showing existing infrastructure state.
 | `superpowers:systematic-debugging` | Bug investigation |
 | `superpowers:verification-before-completion` | Before claiming done |
 
+## Knowledge Capture Workflow
+
+1. **Capture failures** → `~/.claude/notes/hindsight/` via `/capture-hindsight`
+2. **Reference in sessions** → Pattern emerges after 2+ uses
+3. **Promote to pattern** → `~/.claude/patterns/` via `/promote-pattern`
+4. **Load before work** → `/prime <repo>` searches notes and patterns
+
 ## Files
 
 | Location | Purpose |
@@ -137,7 +168,7 @@ This prevents destructive operations by showing existing infrastructure state.
 | `~/.claude/config.yaml` | Workspace config (gitignored) |
 | `~/.claude/hookify.*.md` | Hookify rules |
 | `~/.claude/commands/` | Slash commands |
-| `~/.claude/devbot/` | CLI tool source |
+| `~/.claude/devbot/` | CLI tool source (Go) |
 | `~/.claude/hooks/` | Session start/end hooks |
 | `~/.claude/patterns/` | Versioned patterns (git tracked) |
 | `~/.claude/templates/` | Prompt templates |

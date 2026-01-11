@@ -2,26 +2,13 @@
 name: suggest-devbot
 enabled: true
 event: bash
-pattern: ^cd\s+\S+|^git\s+(status|diff|branch|log|show|fetch|remote)\b
+pattern: ^git\s+(status|diff|branch|log|show|fetch|remote)\b
 action: warn
 ---
 
 **Use devbot instead**
 
-## For cd commands → devbot exec
-
-| Instead of | Use |
-|------------|-----|
-| `cd /path/to/repo; npm run build` | `devbot exec <repo> npm run build` |
-| `cd /path/to/repo/subdir; go test` | `devbot exec <repo>/subdir go test` |
-
-`devbot exec` automatically uses `work_dir` from config.yaml.
-
-**Fallback** (when devbot exec isn't suitable):
-- `npm run build --prefix /path`
-- `make -C /path target`
-
-## For git commands → devbot wrappers
+## Git commands → devbot wrappers
 
 | Instead of | Use |
 |------------|-----|
@@ -35,4 +22,22 @@ action: warn
 
 Benefits: auto-approved, faster, no path juggling.
 
-For other git commands: `devbot path <repo>`, then `cd` + git.
+## Running commands in repos
+
+**Preferred:** `devbot exec <repo> <command>`
+
+```bash
+devbot exec my-app npm run build      # Uses work_dir from config
+devbot exec my-app/subdir go test     # Explicit subdir
+```
+
+**Fallback patterns:**
+- `npm run build --prefix /path`
+- `make -C /path target`
+
+**When cd is needed:** For git commands without devbot wrappers (commit, push, etc.):
+```bash
+devbot path my-repo
+cd /path/to/my-repo
+git commit -m "message"
+```

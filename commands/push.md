@@ -69,7 +69,19 @@ Or if new branch:
 ✓ Pushed <branch-name> to origin (new branch, upstream set)
 ```
 
-### Step 5: Suggest Next Steps
+### Step 5: Offer Session Capture
+
+Before suggesting next steps, ask the user:
+
+```
+Push complete. Capture this work?
+```
+
+Use AskUserQuestion with options:
+- "Capture session" — Run `/capture-session <repo>` to save progress
+- "Skip" — Continue without capturing
+
+### Step 6: Suggest Next Steps
 
 **For feature branches (not main/master):**
 

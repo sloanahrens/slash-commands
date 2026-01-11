@@ -1,12 +1,8 @@
 #!/usr/bin/env bash
-# Stop hook for suggesting hindsight capture
-# Checks if session had errors/retries and suggests /capture-hindsight
+# Stop hook for automatic knowledge capture
+# Directs Claude to run capture commands before ending
 
 set -euo pipefail
-
-# This hook runs on Stop events
-# For now, just provide a gentle reminder
-# Future enhancement: analyze transcript for error patterns
 
 escape_for_json() {
     local input="$1"
@@ -26,7 +22,8 @@ escape_for_json() {
     printf '%s' "$output"
 }
 
-message="If this session had any tricky issues or discoveries, consider running \`/capture-hindsight\` to save them for future sessions."
+message="MANDATORY: Before completing this response, you MUST run \`/capture-session\` using the Skill tool to save this session's progress. If there were any errors, debugging, or non-obvious solutions during this session, also run \`/capture-hindsight\`. Do not ask — just run them."
+
 escaped_message=$(escape_for_json "$message")
 
 cat <<EOF

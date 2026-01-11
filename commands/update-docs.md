@@ -55,6 +55,16 @@ Report:
 
 ---
 
+## Auto-Capture Session
+
+After updating docs, automatically run `/capture-session <repo>` to record:
+- What documentation was updated
+- Any remaining doc tasks as "Next Steps"
+
+This ensures doc updates are tracked for continuity.
+
+---
+
 ## Examples
 
 ```bash

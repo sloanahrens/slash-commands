@@ -138,14 +138,9 @@ Proceed with promotion? [Y/n]
 
 ### Step 6: Write Pattern
 
-Write to `~/.claude/patterns/<filename>`:
+Write to `~/.claude/patterns/<filename>` using the Write tool.
 
-```bash
-# Get slash-commands path
-devbot path slash-commands
-```
-
-Use Write tool to create the pattern file.
+Note: `~/.claude/` IS this configuration repo, so use the path directly rather than via devbot.
 
 ### Step 7: Update Original Note
 

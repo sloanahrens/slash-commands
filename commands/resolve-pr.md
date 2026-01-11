@@ -220,3 +220,18 @@ After implementing fixes, use `code-simplifier` agent to polish the code while p
 **Empty feedback:**
 - If no comments/reviews exist, report "No feedback to resolve on this PR"
 - Offer to run a code review instead using /pr-review-toolkit:review-pr
+
+---
+
+## Post-Resolution
+
+After successfully resolving all feedback, suggest:
+
+```
+All feedback resolved. Consider:
+- /capture-hindsight — If any resolutions were tricky or non-obvious
+- /yes-commit <repo> — Commit the fixes
+- /push <repo> — Push changes for re-review
+```
+
+Tricky resolutions are valuable learning opportunities — capturing them prevents repeating the same review feedback in future PRs.

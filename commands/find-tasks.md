@@ -13,17 +13,37 @@ Analyze a repository and suggest 3-5 high-priority tasks.
 ## Process
 
 1. **Resolve repo** per `_shared-repo-logic.md`
-2. **Check implementation plans** in `<repo>/docs/` (first priority)
-3. **Scan for TODOs** with `devbot todos <repo>`
-4. **Check complexity** with `devbot stats <path>`
-5. **Review recent commits** with `devbot log <repo>`
-6. **Present 3-5 prioritized tasks**
+2. **Check session notes** for unfinished "Next Steps" (highest priority)
+3. **Check implementation plans** in `<repo>/docs/`
+4. **Scan for TODOs** with `devbot todos <repo>`
+5. **Check complexity** with `devbot stats <path>`
+6. **Review recent commits** with `devbot log <repo>`
+7. **Present 3-5 prioritized tasks**
 
 ---
 
 ## What to Check
 
-### Implementation Plans (First Priority)
+### Session Notes (Highest Priority)
+
+Check recent session notes for this repo:
+
+```bash
+# Find session notes for this repo
+grep -l "repo:.*<repo-name>" ~/.claude/notes/sessions/*.md 2>/dev/null | head -3
+```
+
+For each note, extract unchecked items from "Next Steps":
+```markdown
+## Next Steps
+- [ ] Unfinished task 1   ← Extract these
+- [x] Completed task      ← Ignore
+- [ ] Unfinished task 2   ← Extract these
+```
+
+Session notes represent **explicit continuity** from prior work — prioritize these over discovered TODOs.
+
+### Implementation Plans (Second Priority)
 
 Check `<repo>/docs/*.md` for incomplete plans:
 - If plan complete → delete the file

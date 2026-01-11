@@ -150,6 +150,16 @@ Committed to feature/new-auth (N commits ahead of main)
 Next: /push <worktree>
 ```
 
+## Session Capture (Optional)
+
+For significant commits (new features, major refactors, milestone completions), suggest:
+
+```
+Significant commit. Consider: /capture-session <repo>
+```
+
+Do NOT suggest for routine commits (typo fixes, small tweaks, incremental changes).
+
 ---
 
 ## Options

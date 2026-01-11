@@ -42,6 +42,23 @@ Examine structure:
    ```
    devbot tree respects .gitignore, excluding node_modules, dist, etc.
 
+### Step 2.5: Load Known Issues (Memory)
+
+Check for existing patterns and hindsight notes:
+
+```bash
+# Patterns for this repo
+grep -l "repos:.*<repo-name>\|repos:.*all" ~/.claude/patterns/*.md 2>/dev/null
+
+# Hindsight notes for this repo
+grep -l "repos:.*<repo-name>" ~/.claude/notes/hindsight/*.md 2>/dev/null
+```
+
+Use these to:
+- Verify known issues are still addressed
+- Check if past patterns are still relevant
+- Note any that should be marked stale if no longer applicable
+
 ### Step 3: Analyze Codebase Metrics
 
 Run stats analysis to identify complexity hotspots:

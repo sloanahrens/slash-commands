@@ -2,7 +2,7 @@
 name: suggest-claude-tools
 enabled: true
 event: bash
-pattern: ^(cat|head|tail)\s+[^|]|^grep\s+|^find\s+.*-name|^(sed|awk)\s+|\|\s*(head|tail|grep|wc|sort|awk|sed)
+pattern: ^(cat|head|tail)\s+[^|]|^(grep|rg)\s+|^find\s+.*-name|^(sed|awk)\s+|\|\s*(head|tail|grep|rg|wc|sort|awk|sed)
 action: warn
 ---
 
@@ -16,6 +16,7 @@ action: warn
 | `head -n file` | Read tool with `limit` |
 | `tail -n file` | Read tool with `offset` |
 | `grep pattern dir` | Grep tool |
+| `rg pattern` | Grep tool |
 | `find -name "*.ts"` | Glob tool |
 | `sed` / `awk` | Edit tool |
 

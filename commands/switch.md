@@ -137,16 +137,34 @@ Show key info from both (if they exist):
 - Key commands
 - Any warnings or gotchas
 
-### Step 5: Suggest Commands
+### Step 5: Check for Notes
+
+Check for relevant notes/patterns for this repo:
+
+```bash
+# Count patterns for this repo
+grep -l "repos:.*<repo-name>\|repos:.*all" ~/.claude/patterns/*.md 2>/dev/null | wc -l
+
+# Count recent hindsight notes
+find ~/.claude/notes/hindsight -name "*.md" -mtime -7 2>/dev/null | wc -l
+```
+
+If notes exist, show:
+```
+📝 Notes available: 2 patterns, 1 recent hindsight note
+   Run /prime <repo-name> to load context
+```
+
+### Step 6: Suggest Commands
 
 Based on repo type, suggest relevant commands:
 
 | Repo Type | Suggested Commands |
 |-----------|-------------------|
-| Package | `/yes-commit`, `/run-tests` |
-| Worktree | `/yes-commit`, `/push` |
+| Package | `/prime`, `/run-tests`, `/yes-commit` |
+| Worktree | `/prime`, `/yes-commit`, `/push` |
 | Clone | Search patterns |
-| Working Repo | `/find-tasks`, `/run-tests` |
+| Working Repo | `/prime`, `/find-tasks`, `/run-tests` |
 
 ---
 
