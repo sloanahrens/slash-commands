@@ -24,6 +24,31 @@ Surface distilled knowledge from previous sessions so Claude doesn't operate fro
 
 Follow repo selection from `_shared-repo-logic.md`, then confirm: "Priming context for: <repo-name>"
 
+### Step 1.5: Confirm Global CLAUDE.md
+
+Claude Code automatically loads `~/.claude/CLAUDE.md` at session start, but `/prime` should explicitly acknowledge this and surface key reminders:
+
+1. Confirm the file exists and was loaded
+2. Surface relevant sections based on repo context:
+   - **Bash patterns** — Always relevant (devbot exec, no compound commands)
+   - **Tool selection guide** — When repo work involves bash commands
+   - **Knowledge capture workflow** — When starting new work
+
+Output format:
+```
+📋 Global CLAUDE.md loaded
+   Key reminders for this session:
+   - Use `devbot exec <repo> <cmd>` not `cd && cmd`
+   - No Claude/Anthropic attribution in commits
+   - Insights auto-captured as you work
+```
+
+If `~/.claude/CLAUDE.md` doesn't exist, warn:
+```
+⚠️ No global CLAUDE.md found at ~/.claude/CLAUDE.md
+   Consider running /setup-workspace to initialize.
+```
+
 ### Step 2: Search Versioned Patterns
 
 Search `~/.claude/patterns/*.md` for patterns that apply:
@@ -43,17 +68,17 @@ For each match, extract:
 Search `~/.claude/notes/` for repo-specific notes:
 
 ```bash
-# Hindsight notes for this repo
-grep -l "repos:.*<repo-name>" ~/.claude/notes/hindsight/*.md 2>/dev/null
+# Insights file for this repo (one file per repo, accumulated)
+cat ~/.claude/notes/insights/<repo-name>.md 2>/dev/null
 
 # Session notes for this repo
 grep -l "repos:.*<repo-name>" ~/.claude/notes/sessions/*.md 2>/dev/null
 ```
 
-Also get recent notes (last 7 days) regardless of repo:
+Also check the cross-repo insights file:
 
 ```bash
-find ~/.claude/notes/hindsight -name "*.md" -mtime -7 2>/dev/null
+cat ~/.claude/notes/insights/all.md 2>/dev/null
 ```
 
 ### Step 4: Display Results
@@ -61,7 +86,7 @@ find ~/.claude/notes/hindsight -name "*.md" -mtime -7 2>/dev/null
 Group by type, most relevant first:
 
 ```
-Priming context for: atap-automation2
+Priming context for: fractals-nextjs
 =====================================
 
 ## Patterns (versioned)
@@ -73,31 +98,30 @@ Proven knowledge that applies to this repo:
 - **hookify-rules.md** — Hookify blocked commands and workarounds
   Tags: hookify, bash, safety, blocked
 
-## Hindsight Notes (local)
-Recent failure captures for this repo:
+## Insights (accumulated)
+Learnings captured for this repo:
 
-- **2026-01-11-atap-timeout.md** — ATAP session timeout recovery
-  Tags: timeout, recovery, atap
+  [From ~/.claude/notes/insights/fractals-nextjs.md]
+  - 2026-01-11 14:30 — Session timeout handling
+  - 2026-01-10 09:15 — Form validation patterns
+  - 2026-01-08 16:45 — Zapier webhook retry logic
 
 ## Session Notes (local)
 Recent session summaries:
 
-- **2026-01-10-zapier-integration.md** — Zapier webhook integration work
-  Tags: zapier, webhooks, integration
-
-## Recent (all repos, last 7 days)
-- **2026-01-11-cd-compound-blocked.md** — Hookify blocks cd && compounds
+- **2026-01-10-fractals-nextjs.md** — Zapier webhook integration work
 ```
 
 ### Step 5: Load Key Patterns
 
 Automatically read and display the content of the **most relevant pattern** (first match). This ensures critical context is immediately available.
 
-If there are hindsight notes tagged `status: active` for this repo, mention them explicitly:
+If there's an insights file for this repo, show a summary of recent entries:
 
 ```
-⚠️ Active hindsight: 2026-01-11-atap-timeout.md
-   ATAP sessions timeout after ~20 minutes. Save progress frequently.
+📝 Recent insights for fractals-nextjs:
+   - Session timeout handling (2026-01-11)
+   - Form validation patterns (2026-01-10)
 ```
 
 ---
@@ -112,15 +136,12 @@ Priming context for: <repo-name>
 - **<filename>** — <first-heading>
   Tags: <tags>
 
-## Hindsight Notes (local)
-- **<filename>** — <first-heading>
-  Tags: <tags>
+## Insights (accumulated)
+  [From ~/.claude/notes/insights/<repo>.md]
+  - <date> — <title>
+  - <date> — <title>
 
 ## Session Notes (local)
-- **<filename>** — <first-heading>
-  Tags: <tags>
-
-## Recent (all repos, last 7 days)
 - **<filename>** — <first-heading>
 
 ---
@@ -141,10 +162,10 @@ If no patterns or notes match:
 Priming context for: <repo-name>
 =====================================
 
-No patterns or notes found for this repo.
+No patterns or insights found for this repo.
 
-Tip: After encountering issues, run /capture-hindsight to start building
-knowledge for future sessions.
+Tip: Insights are auto-captured as you work. Run /capture-insight manually
+to add specific learnings.
 ```
 
 ---
@@ -169,13 +190,17 @@ When using `--tag=<tag>`:
 grep -l "tags:.*<tag>" ~/.claude/patterns/*.md 2>/dev/null
 ```
 
-2. Search local notes for tag:
+2. Search insights for tag:
 ```bash
-grep -l "tags:.*<tag>" ~/.claude/notes/hindsight/*.md 2>/dev/null
+grep -l "Tags:.*<tag>" ~/.claude/notes/insights/*.md 2>/dev/null
+```
+
+3. Search session notes for tag:
+```bash
 grep -l "tags:.*<tag>" ~/.claude/notes/sessions/*.md 2>/dev/null
 ```
 
-3. Display all matches regardless of repo, grouped by type
+4. Display all matches regardless of repo, grouped by type
 
 **Common tags:**
 - `hookify` — Hookify rules and workarounds
@@ -188,11 +213,11 @@ grep -l "tags:.*<tag>" ~/.claude/notes/sessions/*.md 2>/dev/null
 
 ## Pattern Promotion Suggestions
 
-When displaying notes, check if any hindsight note has been active for 14+ days and hasn't been promoted:
+When displaying insights, check if any insight has been referenced multiple times or is particularly valuable:
 
 ```
-💡 Promotion candidate: 2026-01-05-monorepo-subdir.md
-   Active for 16 days, referenced multiple times.
+💡 Promotion candidate: "devbot exec patterns" from insights/slash-commands.md
+   Referenced in 3 sessions.
    Run /promote-pattern to make it permanent.
 ```
 
@@ -201,7 +226,7 @@ When displaying notes, check if any hindsight note has been active for 14+ days 
 ## Examples
 
 ```bash
-/prime atap-automation2      # Prime for ATAP work
+/prime fractals-nextjs      # Prime for ATAP work
 /prime slash-commands        # Prime for slash-commands work
 /prime --tag=hookify         # Find all hookify-related notes
 /prime --all                 # Show everything
@@ -211,5 +236,5 @@ When displaying notes, check if any hindsight note has been active for 14+ days 
 
 ## Related Commands
 
-- `/capture-hindsight` — Create a hindsight note after encountering issues
-- `/promote-pattern` — Promote a local note to a versioned pattern
+- `/capture-insight` — Manually capture an insight (usually auto-captured)
+- `/promote-pattern` — Promote an insight to a versioned pattern

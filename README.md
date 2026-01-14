@@ -17,7 +17,7 @@ cp config.yaml.example config.yaml
 make -C devbot install
 
 # Create runtime directories
-mkdir -p notes/hindsight notes/sessions
+mkdir -p notes/insights notes/sessions
 ```
 
 Or after cloning, run `/setup-workspace` in Claude Code.
@@ -62,10 +62,9 @@ make -C devbot install
 ├── devbot/                 # CLI tool
 ├── hooks/                  # Session hooks
 ├── patterns/               # Versioned patterns
-├── templates/              # Prompt templates
 │
 │ # Runtime (gitignored):
-├── notes/                  # Local hindsight/session notes
+├── notes/                  # Local insights/session notes
 ├── history.jsonl
 ├── plugins/
 ├── cache/
@@ -81,13 +80,12 @@ make -C devbot install
 - `commands/` - Slash commands
 - `devbot/` - CLI tool source
 - `patterns/` - Versioned patterns
-- `templates/` - Prompt templates
 - `hooks/` - Session hooks
 - `config.yaml.example` - Config template
 
 **Gitignored (local/runtime):**
 - `config.yaml` - Your workspace paths
-- `notes/` - Local hindsight and session notes
+- `notes/` - Local insights and session notes
 - `history.jsonl` - Conversation history
 - `plugins/` - Downloaded plugins
 - `cache/`, `debug/`, `todos/`, etc. - Runtime files

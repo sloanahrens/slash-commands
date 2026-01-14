@@ -11,7 +11,7 @@ Proven, reusable knowledge for working in the workspace.
 ## What doesn't belong here
 
 - Session-specific notes → `~/.claude/notes/sessions/`
-- Raw failure captures → `~/.claude/notes/hindsight/`
+- Raw failure captures → `~/.claude/notes/insights/`
 - Temporal or dated content
 
 ## Frontmatter format
@@ -27,9 +27,9 @@ updated: 2026-01-11
 
 ## Creating new patterns
 
-Patterns are **promoted** from hindsight notes:
+Patterns are **promoted** from insights:
 
-1. Capture failure in `~/.claude/notes/hindsight/`
+1. Capture insights in `~/.claude/notes/insights/<repo>.md`
 2. Reference it in 2+ sessions
 3. Run `/promote-pattern` to generalize and move here
 4. Commit the new pattern
@@ -38,7 +38,7 @@ Patterns are **promoted** from hindsight notes:
 
 ```bash
 # Find patterns for a repo
-grep -l "repos:.*atap" ~/.claude/patterns/*.md
+grep -l "repos:.*fractals" ~/.claude/patterns/*.md
 
 # Find by tag
 grep -l "tags:.*hookify" ~/.claude/patterns/*.md

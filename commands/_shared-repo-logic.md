@@ -57,7 +57,7 @@ devbot path fractals-nextjs
 
 **Note locations:**
 - `~/.claude/patterns/` → Versioned patterns (git tracked)
-- `~/.claude/notes/hindsight/` → Local failure captures
+- `~/.claude/notes/insights/` → Local insight captures (one file per repo)
 - `~/.claude/notes/sessions/` → Local session summaries
 
 ---

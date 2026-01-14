@@ -17,7 +17,7 @@ Spawn parallel subagents to explore a task, synthesize findings, and capture lea
 3. **Spawn subagents** - Launch 2-3 Task agents in parallel for exploration
 4. **Synthesize findings** - Analyze combined results, recommend approach
 5. **Attempt fix** - If actionable, implement with user approval
-6. **Capture learnings** - Run `/capture-hindsight` to save what was learned
+6. **Capture learnings** - Run `/capture-insight` to save what was learned
 
 ---
 
@@ -28,7 +28,7 @@ Launch agents in parallel based on task type:
 **Bug fixes:**
 - Code Explorer: Search relevant code, read context
 - History Analyzer: Check recent commits touching related files
-- Note Searcher: Search hindsight notes for similar issues
+- Note Searcher: Search insights for similar issues
 
 **Features:**
 - Pattern Finder: Find similar patterns in codebase
@@ -66,7 +66,7 @@ If task not complete:
 ## Examples
 
 ```bash
-/improve mango fix flaky test in payment service
+/improve fractals-nextjs fix flaky test in payment service
 /improve slash-commands add new devbot command
 /improve fractals optimize render performance
 ```
@@ -76,5 +76,5 @@ If task not complete:
 ## Related Commands
 
 - `/prime` — Load context before improvement
-- `/capture-hindsight` — Save learnings from session
+- `/capture-insight` — Save learnings from session
 - `/find-tasks` — Discover tasks to improve

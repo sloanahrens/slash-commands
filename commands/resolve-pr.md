@@ -229,7 +229,7 @@ After successfully resolving all feedback, suggest:
 
 ```
 All feedback resolved. Consider:
-- /capture-hindsight — If any resolutions were tricky or non-obvious
+- /capture-insight — If any resolutions were tricky or non-obvious
 - /yes-commit <repo> — Commit the fixes
 - /push <repo> — Push changes for re-review
 ```

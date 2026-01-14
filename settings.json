@@ -1,5 +1,8 @@
 {
   "permissions": {
+    "deny": [
+      "Bash(gh pr:*)"
+    ],
     "allow": [
       "Skill(superpowers:*)",
       "Skill(mlx-hub:*)",
@@ -128,11 +131,12 @@
     ]
   },
   "enabledPlugins": {
+    "linear@claude-plugins-official": true,
     "mlx-hub@mlx-hub": true,
     "superpowers@superpowers-marketplace": true,
     "elements-of-style@superpowers-marketplace": true,
     "episodic-memory@superpowers-marketplace": true,
-    "double-shot-latte@superpowers-marketplace": true,
+    "double-shot-latte@superpowers-marketplace": false,
     "superpowers-developing-for-claude-code@superpowers-marketplace": true,
     "superpowers-lab@superpowers-marketplace": true,
     "superpowers-chrome@superpowers-marketplace": true,

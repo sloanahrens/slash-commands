@@ -14,8 +14,7 @@ This repo IS `~/.claude/` - the Claude Code configuration directory. Key compone
 | `commands/` | 30+ slash commands for workflow automation |
 | `hookify.*.md` | Block dangerous bash patterns |
 | `patterns/` | Proven, reusable knowledge (git tracked) |
-| `notes/` | Session notes and hindsight captures (gitignored) |
-| `templates/` | Reusable prompt templates |
+| `notes/` | Insights and session notes (gitignored, auto-captured) |
 | `hooks/` | Session start/end automation |
 
 ## Setup
@@ -107,8 +106,8 @@ Run `/list-commands` for full list. All require exact repo names from config.yam
 | Command | Description |
 |---------|-------------|
 | `/prime <repo>` | Load relevant notes/patterns before work |
-| `/capture-hindsight` | Capture failure or lesson learned |
-| `/promote-pattern` | Promote hindsight note to pattern |
+| `/capture-insight` | Manually capture a learning (usually auto-captured) |
+| `/promote-pattern` | Promote insight to versioned pattern |
 | `/capture-session` | Capture session summary |
 
 ## devbot CLI
@@ -156,10 +155,36 @@ This prevents destructive operations by showing existing infrastructure state.
 
 ## Knowledge Capture Workflow
 
-1. **Capture failures** → `~/.claude/notes/hindsight/` via `/capture-hindsight`
-2. **Reference in sessions** → Pattern emerges after 2+ uses
-3. **Promote to pattern** → `~/.claude/patterns/` via `/promote-pattern`
-4. **Load before work** → `/prime <repo>` searches notes and patterns
+**Active insight capture:** When generating `★ Insight` blocks, immediately write them to the insights file.
+
+### Writing Insights (REQUIRED)
+
+When you output an insight block, also append it to `~/.claude/notes/insights/<repo>.md`:
+
+```
+## YYYY-MM-DD HH:MM — Auto-captured
+
+<insight content>
+```
+
+**Repo detection:** Use the repo from recent `/prime`, `/switch`, `/run-tests`, or `/super` commands. Default to `all.md` if unknown.
+
+**File format:** If file doesn't exist, create with frontmatter:
+```yaml
+---
+type: insights
+repo: <repo-name>
+created: YYYY-MM-DD
+---
+# Insights: <repo-name>
+```
+
+### Workflow
+
+1. **Generate insight** → Output `★ Insight` block AND write to insights file
+2. **Manual capture** → `/capture-insight` for insights without the block format
+3. **Promote to pattern** → `~/.claude/patterns/` via `/promote-pattern` (after 2+ uses)
+4. **Load before work** → `/prime <repo>` searches insights and patterns
 
 ## Files
 
@@ -173,7 +198,6 @@ This prevents destructive operations by showing existing infrastructure state.
 | `~/.claude/devbot/` | CLI tool source (Go) |
 | `~/.claude/hooks/` | Session start/end hooks |
 | `~/.claude/patterns/` | Versioned patterns (git tracked) |
-| `~/.claude/templates/` | Prompt templates |
 | `~/.claude/notes/` | Local notes (gitignored) |
 | `<repo>/CLAUDE.md` | Repo-specific guidance |
 

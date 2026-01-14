@@ -22,7 +22,7 @@ escape_for_json() {
     printf '%s' "$output"
 }
 
-message="MANDATORY: Before completing this response, you MUST run \`/capture-session\` using the Skill tool to save this session's progress. If there were any errors, debugging, or non-obvious solutions during this session, also run \`/capture-hindsight\`. Do not ask — just run them."
+message="💡 Run \`/capture-session <repo>\` to save progress for future sessions."
 
 escaped_message=$(escape_for_json "$message")
 

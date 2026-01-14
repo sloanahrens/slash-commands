@@ -58,11 +58,11 @@ The command maps stacks to appropriate tools:
 
 ```bash
 # Run tests in specific monorepo subproject
-devbot exec mango/go-api go test ./...
-devbot exec mango/nextapp npm test
+devbot exec fractals-nextjs/go-api go test ./...
+devbot exec fractals-nextjs/nextapp npm test
 
 # Uses work_dir from config automatically
-devbot exec atap-automation2 npm test  # runs in nextapp/
+devbot exec fractals-nextjs npm test  # runs in nextapp/
 ```
 
 ### Step 4: Report Results
@@ -129,12 +129,12 @@ Examples:
 
 ### Check for Known Patterns
 
-Before debugging, search for relevant patterns/hindsight:
+Before debugging, search for relevant patterns/insights:
 
 ```bash
 # Check for patterns tagged with testing or this repo
 grep -l "tags:.*testing\|repos:.*<repo-name>" ~/.claude/patterns/*.md 2>/dev/null
-grep -l "tags:.*testing\|repos:.*<repo-name>" ~/.claude/notes/hindsight/*.md 2>/dev/null
+grep -l "tags:.*testing\|repos:.*<repo-name>" ~/.claude/notes/insights/*.md 2>/dev/null
 ```
 
 If a matching pattern exists, apply its solution first.
@@ -155,7 +155,7 @@ After resolving a non-trivial test failure, suggest:
 
 ```
 Tests passing. If this failure was tricky:
-  /capture-hindsight — Save this solution for future sessions
+  /capture-insight — Save this solution for future sessions
 ```
 
 ---

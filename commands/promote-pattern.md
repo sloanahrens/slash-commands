@@ -1,21 +1,21 @@
 ---
-description: Promote a local hindsight note to a versioned pattern
+description: Promote an insight to a versioned pattern
 ---
 
 # Promote Pattern
 
-Move a validated hindsight note to the versioned patterns directory, generalizing it for long-term use.
+Move a validated insight to the versioned patterns directory, generalizing it for long-term use.
 
-**Arguments**: `$ARGUMENTS` - Optional: filename of note to promote (e.g., "2026-01-11-hookify-cd-blocked.md")
+**Arguments**: `$ARGUMENTS` - Optional: `<repo>` to select from that repo's insights, or `<repo> <insight-title>` to promote specific insight
 
 ---
 
 ## Purpose
 
-Graduate proven knowledge from local notes to versioned patterns. Patterns are committed to git and travel with the slash-commands repo, making them permanently available.
+Graduate proven knowledge from insights to versioned patterns. Patterns are committed to git and travel with the slash-commands repo, making them permanently available.
 
 **Promotion criteria:**
-- Note has been referenced/useful in 2+ sessions
+- Insight has been referenced/useful in 2+ sessions
 - Pattern is generalizable (not session-specific)
 - Knowledge is timeless (not "today I learned...")
 
@@ -23,50 +23,55 @@ Graduate proven knowledge from local notes to versioned patterns. Patterns are c
 
 ## Process
 
-### Step 1: List Candidates
+### Step 1: List Insight Files
 
-If no `$ARGUMENTS`, show promotion candidates:
+If no `$ARGUMENTS`, show available insight files:
 
 ```bash
-# List hindsight notes
-ls -t ~/.claude/notes/hindsight/*.md 2>/dev/null
+# List insight files
+ls ~/.claude/notes/insights/*.md 2>/dev/null
 ```
 
-Display with metadata:
+Display:
 
 ```
-Hindsight notes available for promotion:
-=========================================
+Insight files available:
+========================
 
-1. 2026-01-11-hookify-cd-blocked.md
+1. slash-commands.md (8 insights)
+2. my-app.md (3 insights)
+3. all.md (2 insights)
+
+Select a file to browse (1-3), or 'q' to quit:
+```
+
+### Step 2: Browse Insights in File
+
+Parse the selected insight file and show entries:
+
+```
+Insights in slash-commands.md:
+==============================
+
+1. 2026-01-13 14:30 — Knowledge System Design
+   Tags: architecture, memory, knowledge
+
+2. 2026-01-12 09:15 — Hookify compound command patterns
    Tags: hookify, bash, devbot
-   Repos: all
-   Status: active
 
-2. 2026-01-10-atap-timeout-recovery.md
-   Tags: timeout, atap, recovery
-   Repos: atap-automation2
-   Status: active
+3. 2026-01-11 16:45 — devbot exec for repo commands
+   Tags: devbot, bash, exec
 
-3. 2026-01-09-git-worktree-cleanup.md
-   Tags: git, worktree
-   Repos: all
-   Status: promoted  ← Already promoted
-
-Select a note to promote (1-3), or 'q' to quit:
+Select an insight to promote (1-3), or 'b' to go back:
 ```
 
-### Step 2: Read Selected Note
+### Step 3: Read Selected Insight
 
-Read the full content of the selected note:
+Extract the full content of the selected insight entry.
 
-```bash
-~/.claude/notes/hindsight/<selected-file>
-```
+### Step 4: Generalize Content
 
-### Step 3: Generalize Content
-
-Transform the note from temporal/specific to timeless/general:
+Transform the insight from temporal/specific to timeless/general:
 
 **Remove:**
 - Date-specific language ("Today I...", "Just now...")
@@ -78,55 +83,46 @@ Transform the note from temporal/specific to timeless/general:
 - Multiple examples if applicable
 - "Related" section linking to other patterns
 
-**Transform frontmatter:**
+**Create pattern frontmatter:**
 ```yaml
-# From hindsight format:
 ---
-type: hindsight
-repos: [atap-automation2]
-tags: [hookify, bash]
-created: 2026-01-11
-status: active
----
-
-# To pattern format:
----
-tags: [hookify, bash]
+tags: [hookify, bash, devbot]
 repos: [all]  # Generalize if applicable
-created: 2026-01-11
-updated: 2026-01-11
+created: 2026-01-13
+updated: 2026-01-13
 ---
 ```
 
-### Step 4: Generate Pattern Filename
+### Step 5: Generate Pattern Filename
 
 Create a descriptive slug (not date-prefixed):
-- `hookify-cd-blocked.md` → `bash-execution.md` or `hookify-compound-commands.md`
+- "Hookify compound command patterns" → `hookify-compound-commands.md`
 - Choose names that describe the **solution**, not the **problem**
 
-### Step 5: Preview and Confirm
+### Step 6: Preview and Confirm
 
 Show the transformed pattern:
 
 ```
-Promoting: 2026-01-11-hookify-cd-blocked.md
-Target: ~/.claude/patterns/bash-execution.md
+Promoting insight: "Hookify compound command patterns"
+Source: ~/.claude/notes/insights/slash-commands.md
+Target: ~/.claude/patterns/hookify-compound-commands.md
 
 Preview:
 ---
-tags: [bash, devbot, hookify]
+tags: [hookify, bash, devbot]
 repos: [all]
-created: 2026-01-11
-updated: 2026-01-11
+created: 2026-01-13
+updated: 2026-01-13
 ---
 
-# Running commands in repository directories
+# Hookify compound command patterns
 
 ## Problem
-Need to run a command in a repo directory, but hookify blocks compound commands.
+Hookify blocks compound bash commands (cd && cmd) to prevent...
 
 ## Solution
-Use `devbot exec <repo> <command>` instead of `cd && command`.
+Use `devbot exec <repo> <command>` instead.
 
 ## Examples
 ...
@@ -136,58 +132,54 @@ Use `devbot exec <repo> <command>` instead of `cd && command`.
 Proceed with promotion? [Y/n]
 ```
 
-### Step 6: Write Pattern
+### Step 7: Write Pattern
 
 Write to `~/.claude/patterns/<filename>` using the Write tool.
 
-Note: `~/.claude/` IS this configuration repo, so use the path directly rather than via devbot.
+### Step 8: Mark Insight as Promoted
 
-### Step 7: Update Original Note
+Add a note in the original insights file that this entry was promoted:
 
-Mark the original hindsight note as promoted:
+```markdown
+## 2026-01-12 09:15 — Hookify compound command patterns ✓ PROMOTED
 
-```yaml
----
-type: hindsight
-repos: [atap-automation2]
-tags: [hookify, bash]
-created: 2026-01-11
-status: promoted  # ← Updated
-promoted_to: ~/.claude/patterns/bash-execution.md  # ← Added
----
+> Promoted to ~/.claude/patterns/hookify-compound-commands.md on 2026-01-13
+
+...original content...
 ```
 
-### Step 8: Offer to Commit
+### Step 9: Offer to Commit
 
 ```
-✓ Pattern created: ~/.claude/patterns/bash-execution.md
-✓ Original note marked as promoted
+✓ Pattern created: ~/.claude/patterns/hookify-compound-commands.md
+✓ Original insight marked as promoted
 
 Commit this pattern? [Y/n]
 ```
 
 If yes, create commit (following commit rules from `_shared-repo-logic.md`):
 - No Claude/Anthropic attribution
-- Message: "Add bash-execution pattern"
+- Message: "Add hookify-compound-commands pattern"
 
 ---
 
 ## Output Format
 
 ```
-Promoting hindsight to pattern...
+Promoting insight to pattern...
 
-Source: ~/.claude/notes/hindsight/2026-01-11-hookify-cd-blocked.md
-Target: ~/.claude/patterns/bash-execution.md
+Source: ~/.claude/notes/insights/slash-commands.md
+        Entry: "Hookify compound command patterns" (2026-01-12)
+Target: ~/.claude/patterns/hookify-compound-commands.md
 
 Changes:
-- Generalized from atap-automation2 → all repos
+- Generalized from slash-commands → all repos
 - Removed date-specific language
 - Added multiple examples
 - Added "Related" section
 
-✓ Pattern created: ~/.claude/patterns/bash-execution.md
-✓ Original marked: status: promoted
+✓ Pattern created: ~/.claude/patterns/hookify-compound-commands.md
+✓ Original insight marked as promoted
 
 Would you like to commit this pattern? [Y/n]
 ```
@@ -216,13 +208,14 @@ If merging, update the existing pattern's `updated` date.
 ## Examples
 
 ```bash
-/promote-pattern                                    # Interactive selection
-/promote-pattern 2026-01-11-hookify-cd-blocked.md  # Promote specific note
+/promote-pattern                              # Interactive selection
+/promote-pattern slash-commands               # Browse slash-commands insights
+/promote-pattern slash-commands hookify       # Promote insight matching "hookify"
 ```
 
 ---
 
 ## Related Commands
 
-- `/capture-hindsight` — Create hindsight notes
+- `/capture-insight` — Capture learnings (usually auto)
 - `/prime <repo>` — Load patterns before starting work

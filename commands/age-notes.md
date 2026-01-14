@@ -1,10 +1,10 @@
 ---
-description: Review and age old notes, marking stale ones for cleanup
+description: Review and age old notes, pruning stale entries
 ---
 
 # Age Notes
 
-Review notes that haven't been referenced recently and mark them as stale or archive them.
+Review notes that haven't been referenced recently and clean up stale entries.
 
 **Arguments**: `$ARGUMENTS` - Optional: `--days=N` to set threshold (default: 30)
 
@@ -12,109 +12,107 @@ Review notes that haven't been referenced recently and mark them as stale or arc
 
 ## Purpose
 
-Prevent note accumulation by periodically reviewing old notes. Notes that haven't proven useful should be marked stale or deleted to keep the system focused.
+Prevent note accumulation by periodically reviewing old notes. Keep the knowledge system focused and relevant.
+
+---
+
+## What Gets Aged
+
+| Type | Structure | Aging Strategy |
+|------|-----------|----------------|
+| **Insights** | One file per repo | Prune old entries within file |
+| **Sessions** | One file per day/repo | Delete old files |
 
 ---
 
 ## Process
 
-### Step 1: Find Old Notes
+### Step 1: Review Session Notes
 
-Find notes older than threshold (default 30 days):
+Find session notes older than threshold (default 30 days):
 
 ```bash
-# Hindsight notes older than 30 days
-find ~/.claude/notes/hindsight -name "*.md" -mtime +30 2>/dev/null
-
 # Session notes older than 30 days
 find ~/.claude/notes/sessions -name "*.md" -mtime +30 2>/dev/null
 ```
 
-### Step 2: Check Status
+For each old session note:
+- Check if "Next Steps" items were completed
+- Check if insights were captured from the session
+- Offer to delete or archive
 
-For each old note, read the frontmatter and check:
-- `status: active` — Candidate for review
-- `status: promoted` — Already graduated, can be deleted
-- `status: stale` — Already marked stale
+### Step 2: Review Insight Files
 
-### Step 3: Analyze Usefulness
+For each repo's insight file:
 
-For `status: active` notes, consider:
-- Was it created from this date format? Extract date from filename
-- Has similar content been captured in patterns?
-- Is the issue/pattern still relevant?
+```bash
+ls ~/.claude/notes/insights/*.md 2>/dev/null
+```
 
-### Step 4: Present Options
-
-For each candidate note:
+Parse the file and identify entries older than threshold. Present options:
 
 ```
-Reviewing: 2025-12-15-api-retry-logic.md (27 days old)
+Reviewing: ~/.claude/notes/insights/my-app.md
 ─────────────────────────────────────────────────────
-Tags: api, retry, error-handling
-Repos: mango
 
-## Summary
-Discovered need for exponential backoff in API client...
+5 insights total, 2 older than 30 days:
+
+Old entries:
+  - 2025-12-01 — API rate limiting discovery
+  - 2025-12-10 — Database connection pooling
 
 Options:
-1. Keep active — Still relevant
-2. Mark stale — Hide from /prime, keep for reference
-3. Promote to pattern — Graduate to ~/.claude/patterns/
-4. Delete — No longer useful
+1. Keep all — Still relevant
+2. Prune old entries — Remove from file
+3. Promote to pattern — Move best insights to patterns/
 ```
 
-### Step 5: Apply Changes
+### Step 3: Apply Changes
 
-Based on user selection:
-
-**Mark stale:**
-```yaml
-# Update frontmatter
-status: stale
-stale_date: 2026-01-11
-```
-
-**Delete:**
+**For session notes:**
 ```bash
-rm ~/.claude/notes/hindsight/<filename>
+rm ~/.claude/notes/sessions/<filename>
 ```
 
-**Promote:**
-Run `/promote-pattern <filename>` workflow
+**For insight entries:**
+Edit the insights file to remove old entries, preserving recent ones.
+
+**For promotion:**
+Run `/promote-pattern` workflow with the selected insight.
 
 ---
 
 ## Batch Mode
 
-With `--batch` flag, automatically mark notes as stale if:
-- Older than 30 days (or `--days=N`)
-- Status is `active`
-- Not referenced in any pattern
+With `--batch` flag:
 
 ```bash
 /age-notes --batch --days=45
 ```
 
+- Delete session notes older than threshold
+- Do NOT auto-prune insights (require manual review)
+
 Output:
 ```
 Batch aging notes older than 45 days...
 
-Marked stale:
-- 2025-11-20-docker-build-cache.md
-- 2025-11-25-env-var-loading.md
+Deleted sessions:
+- 2025-11-20-my-app.md
+- 2025-11-25-api-server.md
 
-Skipped (already stale): 2
-Skipped (promoted): 1
+Insights requiring review:
+- insights/my-app.md has 3 entries older than 45 days
+- insights/api-server.md has 1 entry older than 45 days
 
-Total: 2 notes marked stale
+Run /age-notes without --batch to review insights interactively.
 ```
 
 ---
 
 ## Cleanup Mode
 
-With `--cleanup` flag, delete all stale notes:
+With `--cleanup` flag, delete old session notes:
 
 ```bash
 /age-notes --cleanup
@@ -122,11 +120,11 @@ With `--cleanup` flag, delete all stale notes:
 
 Output:
 ```
-Cleaning up stale notes...
+Cleaning up old session notes...
 
 Will delete:
-- 2025-10-01-old-issue.md (stale for 40 days)
-- 2025-10-15-resolved-bug.md (stale for 25 days)
+- 2025-10-01-my-app.md (73 days old)
+- 2025-10-15-api-server.md (58 days old)
 
 Proceed? [y/N]
 ```
@@ -138,19 +136,19 @@ Proceed? [y/N]
 | Flag | Effect |
 |------|--------|
 | `--days=N` | Set age threshold (default: 30) |
-| `--batch` | Auto-mark old active notes as stale |
-| `--cleanup` | Delete all stale notes |
-| `--dry-run` | Show what would happen without making changes |
+| `--batch` | Auto-delete old session notes |
+| `--cleanup` | Delete all old session notes |
+| `--dry-run` | Show what would happen without changes |
 
 ---
 
 ## Examples
 
 ```bash
-/age-notes                    # Interactive review of old notes
+/age-notes                    # Interactive review
 /age-notes --days=14          # Review notes older than 14 days
-/age-notes --batch            # Auto-mark old notes as stale
-/age-notes --cleanup          # Delete all stale notes
+/age-notes --batch            # Auto-clean old sessions
+/age-notes --cleanup          # Delete old session notes
 /age-notes --batch --dry-run  # Preview batch aging
 ```
 
@@ -158,6 +156,6 @@ Proceed? [y/N]
 
 ## Related Commands
 
-- `/prime` — Load notes (hides stale by default, use `--stale` to include)
-- `/capture-hindsight` — Create new hindsight notes
-- `/promote-pattern` — Graduate useful notes to patterns
+- `/prime` — Load notes before starting work
+- `/capture-insight` — Capture learnings (usually auto)
+- `/promote-pattern` — Graduate insights to patterns

@@ -68,8 +68,8 @@ On failure:
 ## Examples
 
 ```bash
-/make-test mango              # Run targets (skip clean)
-/make-test mango clean        # Include clean targets
+/make-test fractals-nextjs              # Run targets (skip clean)
+/make-test fractals-nextjs clean        # Include clean targets
 /make-test fractals --quick   # Only lint/typecheck
 /make-test slash --dry-run    # Analyze without running
 ```

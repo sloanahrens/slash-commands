@@ -44,14 +44,14 @@ Examine structure:
 
 ### Step 2.5: Load Known Issues (Memory)
 
-Check for existing patterns and hindsight notes:
+Check for existing patterns and insights:
 
 ```bash
 # Patterns for this repo
 grep -l "repos:.*<repo-name>\|repos:.*all" ~/.claude/patterns/*.md 2>/dev/null
 
-# Hindsight notes for this repo
-grep -l "repos:.*<repo-name>" ~/.claude/notes/hindsight/*.md 2>/dev/null
+# Insights for this repo
+cat ~/.claude/notes/insights/<repo-name>.md 2>/dev/null
 ```
 
 Use these to:

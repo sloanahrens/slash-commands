@@ -145,13 +145,13 @@ Check for relevant notes/patterns for this repo:
 # Count patterns for this repo
 grep -l "repos:.*<repo-name>\|repos:.*all" ~/.claude/patterns/*.md 2>/dev/null | wc -l
 
-# Count recent hindsight notes
-find ~/.claude/notes/hindsight -name "*.md" -mtime -7 2>/dev/null | wc -l
+# Count insights file entries
+ls ~/.claude/notes/insights/*.md 2>/dev/null | wc -l
 ```
 
 If notes exist, show:
 ```
-📝 Notes available: 2 patterns, 1 recent hindsight note
+📝 Notes available: 2 patterns, 1 insight file
    Run /prime <repo-name> to load context
 ```
 

@@ -69,7 +69,7 @@ fi
 
 ```bash
 mkdir -p ~/.claude/notes
-mkdir -p ~/.claude/notes/hindsight
+mkdir -p ~/.claude/notes/insights
 mkdir -p ~/.claude/notes/sessions
 
 echo "✓ Runtime directories ready"

@@ -53,21 +53,21 @@ devbot tree /path/to/repo     # Directory structure - takes literal PATH
 
 ### Step 3.5: Load Relevant Notes (Memory Priming)
 
-Search for patterns and hindsight notes that might inform this brainstorm:
+Search for patterns and insights that might inform this brainstorm:
 
 ```bash
 # Patterns tagged for this repo or "all"
 grep -l "repos:.*<repo-name>\|repos:.*all" ~/.claude/patterns/*.md 2>/dev/null
 
-# Recent hindsight notes for this repo
-grep -l "repos:.*<repo-name>" ~/.claude/notes/hindsight/*.md 2>/dev/null
+# Insights for this repo
+cat ~/.claude/notes/insights/<repo-name>.md 2>/dev/null
 ```
 
 If matches found, briefly summarize relevant insights before brainstorming:
 ```
 📝 Loaded context from notes:
    - Pattern: bash-execution.md (command execution in repos)
-   - Hindsight: 2026-01-10-timeout-handling.md (session timeouts)
+   - Insights: 3 entries for <repo-name>
 ```
 
 This prevents repeating past mistakes during ideation.
@@ -117,7 +117,7 @@ Brainstorming complete. Next steps:
 | Task Type | Suggested Commands |
 |-----------|-------------------|
 | Feature implementation | `/capture-session`, `/run-tests`, `/yes-commit` |
-| Bug fix | `/capture-hindsight` (if tricky), `/find-tasks` |
+| Bug fix | `/capture-insight` (if tricky), `/find-tasks` |
 | Documentation | `/update-docs`, `/capture-session` |
 
 ---

@@ -14,11 +14,12 @@ Analyze a repository and suggest 3-5 high-priority tasks.
 
 1. **Resolve repo** per `_shared-repo-logic.md`
 2. **Check session notes** for unfinished "Next Steps" (highest priority)
-3. **Check implementation plans** in `<repo>/docs/`
-4. **Scan for TODOs** with `devbot todos <repo>`
-5. **Check complexity** with `devbot stats <path>`
-6. **Review recent commits** with `devbot log <repo>`
-7. **Present 3-5 prioritized tasks**
+3. **Check insights** for blockers or known issues
+4. **Check implementation plans** in `<repo>/docs/`
+5. **Scan for TODOs** with `devbot todos <repo>`
+6. **Check complexity** with `devbot stats <path>`
+7. **Review recent commits** with `devbot log <repo>`
+8. **Present 3-5 prioritized tasks**
 
 ---
 
@@ -42,6 +43,22 @@ For each note, extract unchecked items from "Next Steps":
 ```
 
 Session notes represent **explicit continuity** from prior work — prioritize these over discovered TODOs.
+
+### Insights (Blockers/Known Issues)
+
+Check the insights file for this repo:
+
+```bash
+# Read insights for this repo
+cat ~/.claude/notes/insights/<repo-name>.md 2>/dev/null
+```
+
+Scan insights for entries that indicate:
+- An **unresolved blocker** → Add as high-priority task
+- A **known issue** to avoid → Surface as context for related tasks
+- A **workaround** in use → Note any tech debt to address
+
+Look for keywords like "TODO", "blocked", "workaround", "tech debt" in insight entries.
 
 ### Implementation Plans (Second Priority)
 
@@ -88,7 +105,7 @@ For each task, include:
 ## Examples
 
 ```bash
-/find-tasks mango        # Tasks for mango
+/find-tasks fractals-nextjs        # Tasks for fractals-nextjs
 /find-tasks fractals     # Tasks for fractals-nextjs
 /find-tasks slash        # Tasks for slash-commands
 ```

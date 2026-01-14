@@ -224,14 +224,14 @@ pulumi up
 - `/prime <repo>` — Load patterns and notes for context
 
 **After encountering issues:**
-- `/capture-hindsight` — Save failure/solution for future sessions
+- `/capture-insight` — Save failure/solution for future sessions
 
 **After significant work:**
 - `/capture-session <repo>` — Track progress and next steps
 
 **Notes locations:**
 - `~/.claude/patterns/` — Proven patterns (git tracked)
-- `~/.claude/notes/hindsight/` — Failure captures (local)
+- `~/.claude/notes/insights/` — Insight captures (local, one file per repo)
 - `~/.claude/notes/sessions/` — Session summaries (local)
 
 ---

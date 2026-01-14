@@ -22,7 +22,7 @@ Available Commands
 |---------|-------------|
 | /add-repo | Add a new repository to the workspace |
 | /age-notes | Review and age old notes |
-| /capture-hindsight | Capture a failure or lesson learned |
+| /capture-insight | Capture a failure or lesson learned |
 ...
 ```
 
