@@ -44,7 +44,7 @@ devbot exec <repo-name>/ <command>    # Trailing slash = repo root
 
 | Instead of | Use |
 |------------|-----|
-| `cd /path/to/atap-automation2/nextapp && npm test` | `devbot exec atap-automation2 npm test` |
+| `cd /path/to/my-app/nextapp && npm test` | `devbot exec my-app npm test` |
 | `cd /path/to/mango/go-api && go build` | `devbot exec mango/go-api go build` |
 | `cd /path/to/slash-commands/devbot && make test` | `devbot exec slash-commands/devbot make test` |
 

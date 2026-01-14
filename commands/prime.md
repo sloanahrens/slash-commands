@@ -226,7 +226,7 @@ When displaying insights, check if any insight has been referenced multiple time
 ## Examples
 
 ```bash
-/prime fractals-nextjs      # Prime for ATAP work
+/prime fractals-nextjs      # Prime for fractals work
 /prime slash-commands        # Prime for slash-commands work
 /prime --tag=hookify         # Find all hookify-related notes
 /prime --all                 # Show everything
