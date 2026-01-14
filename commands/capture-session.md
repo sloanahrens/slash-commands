@@ -12,7 +12,7 @@ Create or update a session summary note for today's work on a repo.
 
 ## Purpose
 
-Summarize what was accomplished in a session. Unlike insights (learnings captured as you work), session notes track progress and decisions for continuity across sessions.
+Summarize what was accomplished in a session. Session notes track progress and decisions for continuity across sessions.
 
 **Idempotent**: Running multiple times on the same day updates the existing note.
 
@@ -28,14 +28,18 @@ If `$ARGUMENTS` provided, use that. Otherwise:
 
 ### Step 2: Check for Existing Note
 
-Session notes use date-based filenames:
+Session notes live in the repo's `.claude/sessions/` directory:
 ```
-~/.claude/notes/sessions/YYYY-MM-DD-<repo-slug>.md
+<repo-path>/.claude/sessions/YYYY-MM-DD.md
 ```
 
 ```bash
+# Get repo path
+devbot path <repo-name>
+# Output: /path/to/repo
+
 # Check if today's session note exists
-ls ~/.claude/notes/sessions/$(date +%Y-%m-%d)-<repo-slug>.md 2>/dev/null
+ls /path/to/repo/.claude/sessions/$(date +%Y-%m-%d).md 2>/dev/null
 ```
 
 If exists, read it for context before updating.
@@ -54,6 +58,17 @@ Ask user (or infer from conversation):
 - Blockers encountered
 - Recommended next steps
 
+### Step 3.5: Find Previous Session Notes
+
+Search for existing session notes for this repo:
+
+```bash
+# Previous sessions are in the same repo directory
+ls -t /path/to/repo/.claude/sessions/*.md 2>/dev/null | head -5
+```
+
+If previous sessions exist, note their filenames for the "Related" section.
+
 ### Step 4: Generate/Update Note
 
 ```markdown
@@ -63,6 +78,7 @@ repo: <repo-name>
 date: YYYY-MM-DD
 updated: YYYY-MM-DD HH:MM
 status: active
+tags: <relevant-tags>
 ---
 
 # Session: <repo-name> - YYYY-MM-DD
@@ -80,21 +96,31 @@ status: active
 
 ## Notes
 <Any additional context for future sessions>
+
+## Related
+
+- Previous session: [YYYY-MM-DD.md](filename) — <brief description>
+- <other related notes or docs>
 ```
+
+**IMPORTANT:** The "Related" section MUST include links to previous session notes if they exist. This creates a navigable history chain.
 
 ### Step 5: Write Note
 
-Write to `~/.claude/notes/sessions/YYYY-MM-DD-<repo-slug>.md`
+Write to `<repo-path>/.claude/sessions/YYYY-MM-DD.md`
 
 If file exists, **replace it** with updated content (keeps the same filename).
+
+**Note:** Ensure `.claude/sessions/` directory exists in the repo. Create if needed.
 
 ### Step 6: Confirm
 
 ```
-✓ Session captured: ~/.claude/notes/sessions/2026-01-11-fractals-nextjs.md
+✓ Session captured: /path/to/fractals-nextjs/.claude/sessions/2026-01-11.md
 
   Repo: fractals-nextjs
   Status: updated (previous version replaced)
+  Linked to: 2026-01-10.md (previous session)
 
   This note will appear when you run /prime fractals-nextjs.
 ```
@@ -128,7 +154,7 @@ Review the session for tooling discoveries or pattern changes that should be ref
 
 **Keep CLAUDE.md general:**
 - Only suggest changes that apply to ALL repos or the tooling itself
-- Repo-specific patterns belong in repo's CLAUDE.md or as insights
+- Repo-specific guidance belongs in repo's CLAUDE.md
 - Focus on: commands, tools, workflows, critical rules
 
 If no tooling changes: skip this step silently.
@@ -156,8 +182,8 @@ If you work on the same repo multiple times in a day, each `/capture-session` **
 
 For truly separate sessions on the same day, add a suffix:
 ```
-2026-01-11-fractals-nextjs-morning.md
-2026-01-11-fractals-nextjs-evening.md
+2026-01-11-morning.md
+2026-01-11-evening.md
 ```
 
 ---
@@ -171,23 +197,22 @@ Capturing session for: fractals-nextjs
 # Session: fractals-nextjs - 2026-01-11
 
 ## Accomplished
-- Restructured ~/.claude directory (patterns/, templates/ to root)
+- Restructured ~/.claude directory
 - Fixed session hooks JSON schema
 - Updated all command paths
 
 ## Key Decisions
-- Moved patterns/templates to root for simpler paths
+- Simplified notes system to just session notes
 - Merged SETUP.md into README.md
 
 ## Next Steps
 - [ ] Test /prime command with new paths
-- [ ] Review insight promotion workflow
 
 ## Notes
 Session hooks use systemMessage for Stop events, not hookSpecificOutput.
 ---
 
-Save to ~/.claude/notes/sessions/2026-01-11-slash-commands.md? [Y/n]
+Save to <repo-path>/.claude/sessions/2026-01-11.md? [Y/n]
 ```
 
 ---
@@ -204,6 +229,4 @@ Save to ~/.claude/notes/sessions/2026-01-11-slash-commands.md? [Y/n]
 
 ## Related Commands
 
-- `/capture-insight` — Manually capture an insight (usually auto-captured)
 - `/prime <repo>` — Load session notes before starting work
-- `/age-notes` — Review old session notes for cleanup

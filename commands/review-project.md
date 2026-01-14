@@ -42,22 +42,24 @@ Examine structure:
    ```
    devbot tree respects .gitignore, excluding node_modules, dist, etc.
 
-### Step 2.5: Load Known Issues (Memory)
+### Step 2.5: Load Previous Context
 
-Check for existing patterns and insights:
+Check for project context and session notes:
 
 ```bash
-# Patterns for this repo
-grep -l "repos:.*<repo-name>\|repos:.*all" ~/.claude/patterns/*.md 2>/dev/null
+# Get repo path
+devbot path <repo-name>
+# Output: /path/to/repo
 
-# Insights for this repo
-cat ~/.claude/notes/insights/<repo-name>.md 2>/dev/null
+# Project context (external links, stakeholders)
+ls /path/to/repo/.claude/project-context.md 2>/dev/null
+
+# Most recent session note
+ls -t /path/to/repo/.claude/sessions/*.md 2>/dev/null | head -1
 ```
 
-Use these to:
-- Verify known issues are still addressed
-- Check if past patterns are still relevant
-- Note any that should be marked stale if no longer applicable
+Use project context for stakeholder/external link awareness.
+Use session notes to verify known issues from previous sessions are addressed.
 
 ### Step 3: Analyze Codebase Metrics
 

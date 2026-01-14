@@ -53,12 +53,11 @@ devbot path fractals-nextjs
 
 1. Read `~/.claude/CLAUDE.md` (global)
 2. Read `<repo-path>/CLAUDE.md` (repo-specific)
-3. Consider `/prime <repo>` for relevant patterns
+3. Consider `/prime <repo>` for previous session context
 
-**Note locations:**
-- `~/.claude/patterns/` → Versioned patterns (git tracked)
-- `~/.claude/notes/insights/` → Local insight captures (one file per repo)
-- `~/.claude/notes/sessions/` → Local session summaries
+**Repo .claude/ folder (gitignored):**
+- `<repo-path>/.claude/project-context.md` → External links, stakeholders, decisions
+- `<repo-path>/.claude/sessions/` → Session notes (one file per day)
 
 ---
 

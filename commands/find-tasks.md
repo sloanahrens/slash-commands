@@ -30,8 +30,12 @@ Analyze a repository and suggest 3-5 high-priority tasks.
 Check recent session notes for this repo:
 
 ```bash
+# Get repo path
+devbot path <repo-name>
+# Output: /path/to/repo
+
 # Find session notes for this repo
-grep -l "repo:.*<repo-name>" ~/.claude/notes/sessions/*.md 2>/dev/null | head -3
+ls -t /path/to/repo/.claude/sessions/*.md 2>/dev/null | head -3
 ```
 
 For each note, extract unchecked items from "Next Steps":
@@ -43,22 +47,6 @@ For each note, extract unchecked items from "Next Steps":
 ```
 
 Session notes represent **explicit continuity** from prior work — prioritize these over discovered TODOs.
-
-### Insights (Blockers/Known Issues)
-
-Check the insights file for this repo:
-
-```bash
-# Read insights for this repo
-cat ~/.claude/notes/insights/<repo-name>.md 2>/dev/null
-```
-
-Scan insights for entries that indicate:
-- An **unresolved blocker** → Add as high-priority task
-- A **known issue** to avoid → Surface as context for related tasks
-- A **workaround** in use → Note any tech debt to address
-
-Look for keywords like "TODO", "blocked", "workaround", "tech debt" in insight entries.
 
 ### Implementation Plans (Second Priority)
 

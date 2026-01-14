@@ -13,8 +13,6 @@ This repo IS `~/.claude/` - the Claude Code configuration directory. Key compone
 | `devbot/` | Go CLI for parallel workspace operations |
 | `commands/` | 30+ slash commands for workflow automation |
 | `hookify.*.md` | Block dangerous bash patterns |
-| `patterns/` | Proven, reusable knowledge (git tracked) |
-| `notes/` | Insights and session notes (gitignored, auto-captured) |
 | `hooks/` | Session start/end automation |
 
 ## Setup
@@ -105,10 +103,8 @@ Run `/list-commands` for full list. All require exact repo names from config.yam
 **Knowledge capture:**
 | Command | Description |
 |---------|-------------|
-| `/prime <repo>` | Load relevant notes/patterns before work |
-| `/capture-insight` | Manually capture a learning (usually auto-captured) |
-| `/promote-pattern` | Promote insight to versioned pattern |
-| `/capture-session` | Capture session summary |
+| `/prime <repo>` | Load most recent session note |
+| `/capture-session` | Save session progress and decisions |
 
 ## devbot CLI
 
@@ -153,38 +149,17 @@ This prevents destructive operations by showing existing infrastructure state.
 | `superpowers:systematic-debugging` | Bug investigation |
 | `superpowers:verification-before-completion` | Before claiming done |
 
-## Knowledge Capture Workflow
+## Repo Context Workflow
 
-**Active insight capture:** When generating `★ Insight` blocks, immediately write them to the insights file.
-
-### Writing Insights (REQUIRED)
-
-When you output an insight block, also append it to `~/.claude/notes/insights/<repo>.md`:
-
-```
-## YYYY-MM-DD HH:MM — Auto-captured
-
-<insight content>
-```
-
-**Repo detection:** Use the repo from recent `/prime`, `/switch`, `/run-tests`, or `/super` commands. Default to `all.md` if unknown.
-
-**File format:** If file doesn't exist, create with frontmatter:
-```yaml
----
-type: insights
-repo: <repo-name>
-created: YYYY-MM-DD
----
-# Insights: <repo-name>
-```
+Each repo has a `.claude/` folder (gitignored) containing:
+- `project-context.md` — External links, stakeholders, key decisions
+- `sessions/` — Daily session notes tracking progress
 
 ### Workflow
 
-1. **Generate insight** → Output `★ Insight` block AND write to insights file
-2. **Manual capture** → `/capture-insight` for insights without the block format
-3. **Promote to pattern** → `~/.claude/patterns/` via `/promote-pattern` (after 2+ uses)
-4. **Load before work** → `/prime <repo>` searches insights and patterns
+1. **Start work** → `/prime <repo>` loads project context + most recent session note
+2. **Do work** → Session notes link to previous sessions if more context needed
+3. **End session** → `/capture-session` saves progress to repo's `.claude/sessions/`
 
 ## Files
 
@@ -197,8 +172,9 @@ created: YYYY-MM-DD
 | `~/.claude/commands/` | Slash commands |
 | `~/.claude/devbot/` | CLI tool source (Go) |
 | `~/.claude/hooks/` | Session start/end hooks |
-| `~/.claude/patterns/` | Versioned patterns (git tracked) |
-| `~/.claude/notes/` | Local notes (gitignored) |
+| `<repo>/.claude/` | Repo-local context (gitignored) |
+| `<repo>/.claude/project-context.md` | External links, stakeholders, decisions |
+| `<repo>/.claude/sessions/` | Session notes (one file per day) |
 | `<repo>/CLAUDE.md` | Repo-specific guidance |
 
 ## Local Model

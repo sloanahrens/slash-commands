@@ -1,10 +1,10 @@
 ---
-description: Load relevant notes and patterns for a repo before starting work
+description: Load the most recent session note for a repo before starting work
 ---
 
 # Prime
 
-Search and display relevant patterns and notes to prime context before working on a repo.
+Load the most recent session note for a repo to get context from previous work.
 
 **Arguments**: `$ARGUMENTS` - Repo name (exact match). See `_shared-repo-logic.md`.
 
@@ -14,7 +14,7 @@ Search and display relevant patterns and notes to prime context before working o
 
 ## Purpose
 
-Surface distilled knowledge from previous sessions so Claude doesn't operate from a blank slate. This implements the "context priming" phase of the Confucius-inspired agent scaffolding.
+Surface context from previous sessions so Claude doesn't operate from a blank slate. Session notes link to previous sessions, forming a chain of context.
 
 ---
 
@@ -24,23 +24,15 @@ Surface distilled knowledge from previous sessions so Claude doesn't operate fro
 
 Follow repo selection from `_shared-repo-logic.md`, then confirm: "Priming context for: <repo-name>"
 
-### Step 1.5: Confirm Global CLAUDE.md
+### Step 2: Confirm Global CLAUDE.md
 
-Claude Code automatically loads `~/.claude/CLAUDE.md` at session start, but `/prime` should explicitly acknowledge this and surface key reminders:
+Claude Code automatically loads `~/.claude/CLAUDE.md` at session start. Acknowledge this:
 
-1. Confirm the file exists and was loaded
-2. Surface relevant sections based on repo context:
-   - **Bash patterns** — Always relevant (devbot exec, no compound commands)
-   - **Tool selection guide** — When repo work involves bash commands
-   - **Knowledge capture workflow** — When starting new work
-
-Output format:
 ```
 📋 Global CLAUDE.md loaded
-   Key reminders for this session:
+   Key reminders:
    - Use `devbot exec <repo> <cmd>` not `cd && cmd`
    - No Claude/Anthropic attribution in commits
-   - Insights auto-captured as you work
 ```
 
 If `~/.claude/CLAUDE.md` doesn't exist, warn:
@@ -49,79 +41,43 @@ If `~/.claude/CLAUDE.md` doesn't exist, warn:
    Consider running /setup-workspace to initialize.
 ```
 
-### Step 2: Search Versioned Patterns
+### Step 3: Load Project Context (if exists)
 
-Search `~/.claude/patterns/*.md` for patterns that apply:
-
-```bash
-# Patterns tagged for this repo or "all"
-grep -l "repos:.*<repo-name>\|repos:.*all" ~/.claude/patterns/*.md 2>/dev/null
-```
-
-For each match, extract:
-- Filename (without path)
-- First heading (after frontmatter)
-- Tags from frontmatter
-
-### Step 3: Search Local Notes
-
-Search `~/.claude/notes/` for repo-specific notes:
+Check for project context file:
 
 ```bash
-# Insights file for this repo (one file per repo, accumulated)
-cat ~/.claude/notes/insights/<repo-name>.md 2>/dev/null
+# Get repo path
+devbot path <repo-name>
+# Output: /path/to/repo
 
-# Session notes for this repo
-grep -l "repos:.*<repo-name>" ~/.claude/notes/sessions/*.md 2>/dev/null
+# Check for project context
+ls /path/to/repo/.claude/project-context.md 2>/dev/null
 ```
 
-Also check the cross-repo insights file:
+If exists, read and summarize key info:
+- External links (Linear, Notion, etc.)
+- Key stakeholders
+- Important decisions
+
+### Step 4: Load Most Recent Session Note
+
+Find the most recent session note:
 
 ```bash
-cat ~/.claude/notes/insights/all.md 2>/dev/null
+# Find most recent session note in repo
+ls -t /path/to/repo/.claude/sessions/*.md 2>/dev/null | head -1
 ```
 
-### Step 4: Display Results
+Read and display the full content. Session notes contain:
+- What was accomplished
+- Key decisions made
+- Action items and next steps
+- Links to previous related sessions
 
-Group by type, most relevant first:
-
+If no session note exists:
 ```
-Priming context for: fractals-nextjs
-=====================================
-
-## Patterns (versioned)
-Proven knowledge that applies to this repo:
-
-- **bash-execution.md** — Running commands in repository directories
-  Tags: bash, devbot, cd, exec
-
-- **hookify-rules.md** — Hookify blocked commands and workarounds
-  Tags: hookify, bash, safety, blocked
-
-## Insights (accumulated)
-Learnings captured for this repo:
-
-  [From ~/.claude/notes/insights/fractals-nextjs.md]
-  - 2026-01-11 14:30 — Session timeout handling
-  - 2026-01-10 09:15 — Form validation patterns
-  - 2026-01-08 16:45 — Zapier webhook retry logic
-
-## Session Notes (local)
-Recent session summaries:
-
-- **2026-01-10-fractals-nextjs.md** — Zapier webhook integration work
-```
-
-### Step 5: Load Key Patterns
-
-Automatically read and display the content of the **most relevant pattern** (first match). This ensures critical context is immediately available.
-
-If there's an insights file for this repo, show a summary of recent entries:
-
-```
-📝 Recent insights for fractals-nextjs:
-   - Session timeout handling (2026-01-11)
-   - Form validation patterns (2026-01-10)
+📝 No session notes found for <repo-name>
+   Session notes are created via /capture-session after working.
 ```
 
 ---
@@ -132,41 +88,27 @@ If there's an insights file for this repo, show a summary of recent entries:
 Priming context for: <repo-name>
 =====================================
 
-## Patterns (versioned)
-- **<filename>** — <first-heading>
-  Tags: <tags>
+📋 Global CLAUDE.md loaded
 
-## Insights (accumulated)
-  [From ~/.claude/notes/insights/<repo>.md]
-  - <date> — <title>
-  - <date> — <title>
+## Project Context (if exists)
+[Key info from .claude/project-context.md]
 
-## Session Notes (local)
-- **<filename>** — <first-heading>
+## Most Recent Session
+[Full content of most recent session note]
 
 ---
-
-[Auto-loaded pattern: bash-execution.md]
-
-# Running commands in repository directories
-...
+Ready to continue where you left off.
 ```
 
 ---
 
-## No Results
+## Following the Chain
 
-If no patterns or notes match:
+Session notes include a "Related" section linking to previous sessions. If more context is needed:
 
-```
-Priming context for: <repo-name>
-=====================================
-
-No patterns or insights found for this repo.
-
-Tip: Insights are auto-captured as you work. Run /capture-insight manually
-to add specific learnings.
-```
+1. Check the "Related" links in the loaded session
+2. Read previous sessions as needed
+3. The chain provides full history without searching
 
 ---
 
@@ -174,52 +116,7 @@ to add specific learnings.
 
 | Flag | Effect |
 |------|--------|
-| `--all` | Show all patterns and notes, not just repo-specific |
-| `--tag=<tag>` | Filter by specific tag across all notes |
-| `--verbose` | Show full content of all matched notes |
-| `--stale` | Include notes marked as stale (normally hidden) |
-
----
-
-## Tag-Based Search
-
-When using `--tag=<tag>`:
-
-1. Search patterns for tag:
-```bash
-grep -l "tags:.*<tag>" ~/.claude/patterns/*.md 2>/dev/null
-```
-
-2. Search insights for tag:
-```bash
-grep -l "Tags:.*<tag>" ~/.claude/notes/insights/*.md 2>/dev/null
-```
-
-3. Search session notes for tag:
-```bash
-grep -l "tags:.*<tag>" ~/.claude/notes/sessions/*.md 2>/dev/null
-```
-
-4. Display all matches regardless of repo, grouped by type
-
-**Common tags:**
-- `hookify` — Hookify rules and workarounds
-- `bash` — Bash command patterns
-- `devbot` — devbot CLI usage
-- `git` — Git operations
-- `testing` — Test-related patterns
-
----
-
-## Pattern Promotion Suggestions
-
-When displaying insights, check if any insight has been referenced multiple times or is particularly valuable:
-
-```
-💡 Promotion candidate: "devbot exec patterns" from insights/slash-commands.md
-   Referenced in 3 sessions.
-   Run /promote-pattern to make it permanent.
-```
+| `--verbose` | Also load previous linked sessions |
 
 ---
 
@@ -227,14 +124,12 @@ When displaying insights, check if any insight has been referenced multiple time
 
 ```bash
 /prime fractals-nextjs      # Prime for fractals work
-/prime slash-commands        # Prime for slash-commands work
-/prime --tag=hookify         # Find all hookify-related notes
-/prime --all                 # Show everything
+/prime hanscom-plaid        # Prime for hanscom work
+/prime --verbose            # Load session + linked previous sessions
 ```
 
 ---
 
 ## Related Commands
 
-- `/capture-insight` — Manually capture an insight (usually auto-captured)
-- `/promote-pattern` — Promote an insight to a versioned pattern
+- `/capture-session` — Save session progress and decisions

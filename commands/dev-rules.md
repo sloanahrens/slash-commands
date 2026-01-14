@@ -221,18 +221,14 @@ pulumi up
 ## Knowledge System
 
 **Before starting work:**
-- `/prime <repo>` — Load patterns and notes for context
-
-**After encountering issues:**
-- `/capture-insight` — Save failure/solution for future sessions
+- `/prime <repo>` — Load most recent session note for context
 
 **After significant work:**
 - `/capture-session <repo>` — Track progress and next steps
 
-**Notes locations:**
-- `~/.claude/patterns/` — Proven patterns (git tracked)
-- `~/.claude/notes/insights/` — Insight captures (local, one file per repo)
-- `~/.claude/notes/sessions/` — Session summaries (local)
+**Repo .claude/ folder (gitignored):**
+- `<repo-path>/.claude/project-context.md` — External links, stakeholders, decisions
+- `<repo-path>/.claude/sessions/` — Session notes (one file per day)
 
 ---
 

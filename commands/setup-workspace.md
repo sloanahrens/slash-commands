@@ -15,19 +15,17 @@ Complete idempotent workspace initialization. This repo IS ~/.claude - no symlin
 ```bash
 CONFIG_OK=$( [ -f ~/.claude/config.yaml ] && echo "yes" || echo "no" )
 DEVBOT_OK=$( command -v devbot >/dev/null 2>&1 && echo "yes" || echo "no" )
-NOTES_OK=$( [ -d ~/.claude/notes ] && echo "yes" || echo "no" )
 
-echo "Config: $CONFIG_OK | devbot: $DEVBOT_OK | Notes: $NOTES_OK"
+echo "Config: $CONFIG_OK | devbot: $DEVBOT_OK"
 ```
 
-**If all three are "yes"**: Print summary and STOP.
+**If both are "yes"**: Print summary and STOP.
 
 ```
 ✓ Workspace already configured
 
   Config:  ~/.claude/config.yaml
   devbot:  $(which devbot)
-  Notes:   ~/.claude/notes/
 
 Nothing to do. Use --force to re-run setup.
 ```
@@ -65,14 +63,12 @@ fi
 
 ---
 
-## Step 3: Create Runtime Directories (if needed)
+## Step 3: Verify Workspace Structure
 
-```bash
-mkdir -p ~/.claude/notes
-mkdir -p ~/.claude/notes/insights
-mkdir -p ~/.claude/notes/sessions
+Session notes are stored in each repo's `.claude/sessions/` directory (gitignored), so no global directories are needed.
 
-echo "✓ Runtime directories ready"
+```
+✓ Workspace structure verified
 ```
 
 ---
@@ -93,8 +89,9 @@ Delegate to `/setup-plugins` command.
   Config:   ~/.claude/config.yaml
   devbot:   $(which devbot)
   Commands: $(ls ~/.claude/commands/*.md | wc -l) available
-  Notes:    ~/.claude/notes/
   Plugins:  Run /setup-plugins if needed
+
+Session notes are stored per-repo in .claude/sessions/ (gitignored).
 
 Quick start:
   /status              Show all repo status

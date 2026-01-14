@@ -127,18 +127,6 @@ Examples:
 
 - If a check fails, analyze the error output
 
-### Check for Known Patterns
-
-Before debugging, search for relevant patterns/insights:
-
-```bash
-# Check for patterns tagged with testing or this repo
-grep -l "tags:.*testing\|repos:.*<repo-name>" ~/.claude/patterns/*.md 2>/dev/null
-grep -l "tags:.*testing\|repos:.*<repo-name>" ~/.claude/notes/insights/*.md 2>/dev/null
-```
-
-If a matching pattern exists, apply its solution first.
-
 ### Debug Process
 
 - If `--fix` was passed, attempt auto-fix and re-run
@@ -149,14 +137,6 @@ If a matching pattern exists, apply its solution first.
 - Verify all fixes with a re-run
 - If unable to fix automatically, report the issue with diagnosis
 
-### Capture Learning
-
-After resolving a non-trivial test failure, suggest:
-
-```
-Tests passing. If this failure was tricky:
-  /capture-insight — Save this solution for future sessions
-```
 
 ---
 

@@ -15,12 +15,11 @@ cp config.yaml.example config.yaml
 
 # Install devbot CLI
 make -C devbot install
-
-# Create runtime directories
-mkdir -p notes/insights notes/sessions
 ```
 
 Or after cloning, run `/setup-workspace` in Claude Code.
+
+Note: Session notes are stored in each repo's `.claude/sessions/` directory (gitignored), not centrally.
 
 ## Migrating from Existing ~/.claude
 
@@ -61,10 +60,9 @@ make -C devbot install
 ├── commands/               # Slash commands
 ├── devbot/                 # CLI tool
 ├── hooks/                  # Session hooks
-├── patterns/               # Versioned patterns
 │
 │ # Runtime (gitignored):
-├── notes/                  # Local insights/session notes
+├── notes/                  # Session notes
 ├── history.jsonl
 ├── plugins/
 ├── cache/
@@ -79,13 +77,12 @@ make -C devbot install
 - `hookify.*.local.md` - Hookify rules
 - `commands/` - Slash commands
 - `devbot/` - CLI tool source
-- `patterns/` - Versioned patterns
 - `hooks/` - Session hooks
 - `config.yaml.example` - Config template
 
 **Gitignored (local/runtime):**
 - `config.yaml` - Your workspace paths
-- `notes/` - Local insights and session notes
+- `notes/` - Session notes
 - `history.jsonl` - Conversation history
 - `plugins/` - Downloaded plugins
 - `cache/`, `debug/`, `todos/`, etc. - Runtime files

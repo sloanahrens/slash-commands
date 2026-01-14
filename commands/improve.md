@@ -12,12 +12,11 @@ Spawn parallel subagents to explore a task, synthesize findings, and capture lea
 
 ## Process
 
-1. **Prime context** - Run `/prime <repo>` to load relevant patterns
+1. **Prime context** - Run `/prime <repo>` to load session context
 2. **Parse task** - Identify type: bug fix, feature, exploration, optimization
 3. **Spawn subagents** - Launch 2-3 Task agents in parallel for exploration
 4. **Synthesize findings** - Analyze combined results, recommend approach
 5. **Attempt fix** - If actionable, implement with user approval
-6. **Capture learnings** - Run `/capture-insight` to save what was learned
 
 ---
 
@@ -28,7 +27,6 @@ Launch agents in parallel based on task type:
 **Bug fixes:**
 - Code Explorer: Search relevant code, read context
 - History Analyzer: Check recent commits touching related files
-- Note Searcher: Search insights for similar issues
 
 **Features:**
 - Pattern Finder: Find similar patterns in codebase
@@ -75,6 +73,6 @@ If task not complete:
 
 ## Related Commands
 
-- `/prime` — Load context before improvement
-- `/capture-insight` — Save learnings from session
+- `/prime` — Load session context before improvement
 - `/find-tasks` — Discover tasks to improve
+- `/capture-session` — Save session progress

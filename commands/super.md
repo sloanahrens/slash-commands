@@ -51,23 +51,27 @@ devbot tree /path/to/repo     # Directory structure - takes literal PATH
 
 **NEVER use compound commands or construct paths manually.**
 
-### Step 3.5: Load Relevant Notes (Memory Priming)
+### Step 3.5: Load Context (Memory Priming)
 
-Search for patterns and insights that might inform this brainstorm:
+Load project context and most recent session note:
 
 ```bash
-# Patterns tagged for this repo or "all"
-grep -l "repos:.*<repo-name>\|repos:.*all" ~/.claude/patterns/*.md 2>/dev/null
+# Get repo path first
+devbot path <repo-name>
+# Output: /path/to/repo
 
-# Insights for this repo
-cat ~/.claude/notes/insights/<repo-name>.md 2>/dev/null
+# Check for project context (external links, stakeholders)
+ls /path/to/repo/.claude/project-context.md 2>/dev/null
+
+# Most recent session note for this repo
+ls -t /path/to/repo/.claude/sessions/*.md 2>/dev/null | head -1
 ```
 
-If matches found, briefly summarize relevant insights before brainstorming:
+If found, briefly summarize before brainstorming:
 ```
-📝 Loaded context from notes:
-   - Pattern: bash-execution.md (command execution in repos)
-   - Insights: 3 entries for <repo-name>
+📝 Loaded context:
+   - Project: External links, stakeholders (if project-context.md exists)
+   - Session: 2026-01-14.md (recent progress)
 ```
 
 This prevents repeating past mistakes during ideation.
@@ -117,7 +121,7 @@ Brainstorming complete. Next steps:
 | Task Type | Suggested Commands |
 |-----------|-------------------|
 | Feature implementation | `/capture-session`, `/run-tests`, `/yes-commit` |
-| Bug fix | `/capture-insight` (if tricky), `/find-tasks` |
+| Bug fix | `/capture-session`, `/find-tasks` |
 | Documentation | `/update-docs`, `/capture-session` |
 
 ---

@@ -137,21 +137,21 @@ Show key info from both (if they exist):
 - Key commands
 - Any warnings or gotchas
 
-### Step 5: Check for Notes
+### Step 5: Check for Session Notes
 
-Check for relevant notes/patterns for this repo:
+Check for session notes for this repo:
 
 ```bash
-# Count patterns for this repo
-grep -l "repos:.*<repo-name>\|repos:.*all" ~/.claude/patterns/*.md 2>/dev/null | wc -l
+# Get repo path
+devbot path <repo-name>
+# Output: /path/to/repo
 
-# Count insights file entries
-ls ~/.claude/notes/insights/*.md 2>/dev/null | wc -l
+ls /path/to/repo/.claude/sessions/*.md 2>/dev/null | wc -l
 ```
 
 If notes exist, show:
 ```
-📝 Notes available: 2 patterns, 1 insight file
+📝 Session notes available: 3 notes
    Run /prime <repo-name> to load context
 ```
 
@@ -163,7 +163,7 @@ Based on repo type, suggest relevant commands:
 |-----------|-------------------|
 | Package | `/prime`, `/run-tests`, `/yes-commit` |
 | Worktree | `/prime`, `/yes-commit`, `/push` |
-| Clone | Search patterns |
+| Clone | `/prime`, `/run-tests` |
 | Working Repo | `/prime`, `/find-tasks`, `/run-tests` |
 
 ---

@@ -21,8 +21,7 @@ Available Commands
 | Command | Description |
 |---------|-------------|
 | /add-repo | Add a new repository to the workspace |
-| /age-notes | Review and age old notes |
-| /capture-insight | Capture a failure or lesson learned |
+| /capture-session | Save session progress and decisions |
 ...
 ```
 

@@ -38,7 +38,7 @@ Check and update these files if they exist:
 |------|---------|-------|
 | `CLAUDE.md` | Claude Code reference | 100-200 lines |
 | `README.md` | Human quick start | Under 100 lines |
-| `docs/project-context.md` | External resources, stakeholders, decisions | As needed |
+| `.claude/project-context.md` | External resources, stakeholders, decisions | As needed |
 | `docs/architecture.md` | Technical architecture | As needed |
 | `docs/overview.md` | Project overview (if exists) | As needed |
 
