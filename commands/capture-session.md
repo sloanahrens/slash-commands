@@ -188,35 +188,6 @@ For truly separate sessions on the same day, add a suffix:
 
 ---
 
-## Output Format
-
-```
-Capturing session for: fractals-nextjs
-
----
-# Session: fractals-nextjs - 2026-01-11
-
-## Accomplished
-- Restructured ~/.claude directory
-- Fixed session hooks JSON schema
-- Updated all command paths
-
-## Key Decisions
-- Simplified notes system to just session notes
-- Merged SETUP.md into README.md
-
-## Next Steps
-- [ ] Test /prime command with new paths
-
-## Notes
-Session hooks use systemMessage for Stop events, not hookSpecificOutput.
----
-
-Save to <repo-path>/.claude/sessions/2026-01-11.md? [Y/n]
-```
-
----
-
 ## Examples
 
 ```bash
