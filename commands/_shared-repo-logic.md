@@ -55,9 +55,13 @@ devbot path fractals-nextjs
 2. Read `<repo-path>/CLAUDE.md` (repo-specific)
 3. Consider `/prime <repo>` for previous session context
 
-**Repo .claude/ folder (gitignored):**
+**Repo .claude/ folder (gitignored, local-only):**
 - `<repo-path>/.claude/project-context.md` → External links, stakeholders, decisions
 - `<repo-path>/.claude/sessions/` → Session notes (one file per day)
+
+**Repo docs/plans/ folder (committable):**
+- `<repo-path>/docs/plans/YYYY-MM-DD-<topic>-plan.md` → Implementation plans
+- `<repo-path>/docs/plans/YYYY-MM-DD-<topic>-design.md` → Design docs
 
 ---
 

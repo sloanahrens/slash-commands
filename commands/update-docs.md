@@ -48,7 +48,7 @@ Check and update these files if they exist:
 
 **project-context.md priorities:** External links (Linear, Notion, Drive), key decisions, stakeholders, open questions. Keep links current.
 
-**docs/ folder:** Active plans and reference docs only. Delete completed plans.
+**docs/plans/ folder:** Implementation plans and design docs. Delete completed plans.
 
 ---
 

@@ -14,12 +14,11 @@ Analyze a repository and suggest 3-5 high-priority tasks.
 
 1. **Resolve repo** per `_shared-repo-logic.md`
 2. **Check session notes** for unfinished "Next Steps" (highest priority)
-3. **Check insights** for blockers or known issues
-4. **Check implementation plans** in `<repo>/docs/`
-5. **Scan for TODOs** with `devbot todos <repo>`
-6. **Check complexity** with `devbot stats <path>`
-7. **Review recent commits** with `devbot log <repo>`
-8. **Present 3-5 prioritized tasks**
+3. **Check implementation plans** in `<repo>/docs/plans/`
+4. **Scan for TODOs** with `devbot todos <repo>`
+5. **Check complexity** with `devbot stats <path>`
+6. **Review recent commits** with `devbot log <repo>`
+7. **Present 3-5 prioritized tasks**
 
 ---
 
@@ -50,7 +49,7 @@ Session notes represent **explicit continuity** from prior work — prioritize t
 
 ### Implementation Plans (Second Priority)
 
-Check `<repo>/docs/*.md` for incomplete plans:
+Check `<repo>/docs/plans/*.md` for incomplete plans:
 - If plan complete → delete the file
 - If plan incomplete → extract remaining tasks as high priority
 

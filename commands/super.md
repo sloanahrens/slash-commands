@@ -95,15 +95,14 @@ Invoke `/superpowers:brainstorming` with:
 
 ## Documentation Location
 
-Place documentation in the relevant repository:
+Place plans and design docs in the repo's `docs/plans/` folder:
 
-| Type | Location |
-|------|----------|
-| Design docs | `<repo>/docs/YYYY-MM-DD-<topic>-design.md` |
-| Implementation plans | `<repo>/docs/YYYY-MM-DD-<topic>-plan.md` |
-| Technical reviews | `<repo>/docs/tech-review.md` |
+```
+<repo>/docs/plans/YYYY-MM-DD-<topic>-plan.md
+<repo>/docs/plans/YYYY-MM-DD-<topic>-design.md
+```
 
-**If unsure where docs belong, ASK the user.**
+**NOT in `.claude/`** — That folder is for local-only session notes (gitignored).
 
 ---
 
