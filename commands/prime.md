@@ -4,7 +4,7 @@ description: Load the most recent session note for a repo before starting work
 
 # Prime
 
-Load the most recent session note for a repo to get context from previous work.
+Load context from previous work before starting a session.
 
 **Arguments**: `$ARGUMENTS` - Repo name (exact match). See `_shared-repo-logic.md`.
 
@@ -14,7 +14,7 @@ Load the most recent session note for a repo to get context from previous work.
 
 ## Purpose
 
-Surface context from previous sessions so Claude doesn't operate from a blank slate. Session notes link to previous sessions, forming a chain of context.
+Surface context from previous sessions so Claude doesn't operate from a blank slate. Uses Beads for structured work tracking when available, with decisions log for narrative context.
 
 ---
 
@@ -24,9 +24,75 @@ Surface context from previous sessions so Claude doesn't operate from a blank sl
 
 Follow repo selection from `_shared-repo-logic.md`, then confirm: "Priming context for: <repo-name>"
 
-### Step 2: Confirm Global CLAUDE.md
+### Step 2: Get Repo Path
 
-Claude Code automatically loads `~/.claude/CLAUDE.md` at session start. Acknowledge this:
+```bash
+devbot path <repo-name>
+# Output: /path/to/repo
+```
+
+### Step 3: Check for Beads
+
+```bash
+ls /path/to/repo/.beads/ 2>/dev/null
+```
+
+**If `.beads/` exists → Use Beads workflow (Step 4A)**
+**If no `.beads/` → Use legacy session notes (Step 4B)**
+
+---
+
+### Step 4A: Beads Workflow (preferred)
+
+#### 4A.1: Run bd ready
+
+```bash
+cd /path/to/repo
+bd ready
+```
+
+This shows unblocked work ready to pick up.
+
+#### 4A.2: Show blocked issues (if any)
+
+```bash
+bd blocked 2>/dev/null | head -10
+```
+
+#### 4A.3: Load decisions log (if exists)
+
+```bash
+tail -30 /path/to/repo/.claude/decisions.md 2>/dev/null
+```
+
+Show recent decisions for context.
+
+#### 4A.4: Output format (Beads)
+
+```
+Priming context for: <repo-name>
+=====================================
+
+## Ready Work
+[output from bd ready]
+
+## Blocked (if any)
+[output from bd blocked]
+
+## Recent Decisions
+[tail of decisions.md if exists]
+
+---
+Ready to continue. Use `bd show <id>` for issue details.
+```
+
+---
+
+### Step 4B: Legacy Session Notes (fallback)
+
+Use this path if `.beads/` doesn't exist.
+
+#### 4B.1: Confirm Global CLAUDE.md
 
 ```
 📋 Global CLAUDE.md loaded
@@ -35,54 +101,29 @@ Claude Code automatically loads `~/.claude/CLAUDE.md` at session start. Acknowle
    - No Claude/Anthropic attribution in commits
 ```
 
-If `~/.claude/CLAUDE.md` doesn't exist, warn:
-```
-⚠️ No global CLAUDE.md found at ~/.claude/CLAUDE.md
-   Consider running /setup-workspace to initialize.
-```
-
-### Step 3: Load Project Context (if exists)
-
-Check for project context file:
+#### 4B.2: Load Project Context (if exists)
 
 ```bash
-# Get repo path
-devbot path <repo-name>
-# Output: /path/to/repo
-
-# Check for project context
 ls /path/to/repo/.claude/project-context.md 2>/dev/null
 ```
 
-If exists, read and summarize key info:
-- External links (Linear, Notion, etc.)
-- Key stakeholders
-- Important decisions
+If exists, read and summarize key info.
 
-### Step 4: Load Most Recent Session Note
-
-Find the most recent session note:
+#### 4B.3: Load Most Recent Session Note
 
 ```bash
-# Find most recent session note in repo
 ls -t /path/to/repo/.claude/sessions/*.md 2>/dev/null | head -1
 ```
 
-Read and display the full content. Session notes contain:
-- What was accomplished
-- Key decisions made
-- Action items and next steps
-- Links to previous related sessions
+Read and display the full content.
 
 If no session note exists:
 ```
 📝 No session notes found for <repo-name>
-   Session notes are created via /capture-session after working.
+   Consider initializing Beads: cd /path/to/repo && bd init
 ```
 
----
-
-## Output Format
+#### 4B.4: Output format (legacy)
 
 ```
 Priming context for: <repo-name>
@@ -102,13 +143,17 @@ Ready to continue where you left off.
 
 ---
 
-## Following the Chain
+## Beads Quick Reference
 
-Session notes include a "Related" section linking to previous sessions. If more context is needed:
+When working in a Beads-enabled repo:
 
-1. Check the "Related" links in the loaded session
-2. Read previous sessions as needed
-3. The chain provides full history without searching
+| Action | Command |
+|--------|---------|
+| See ready work | `bd ready` |
+| Issue details | `bd show <id>` |
+| Start working | `bd update <id> --status in_progress` |
+| Create issue | `bd create "Title" --type task` |
+| Complete work | `bd close <id>` |
 
 ---
 
@@ -116,7 +161,8 @@ Session notes include a "Related" section linking to previous sessions. If more 
 
 | Flag | Effect |
 |------|--------|
-| `--verbose` | Also load previous linked sessions |
+| `--verbose` | Show all open issues, not just ready |
+| `--full` | Also run `bd prime` for full workflow context |
 
 ---
 
@@ -125,11 +171,12 @@ Session notes include a "Related" section linking to previous sessions. If more 
 ```bash
 /prime fractals-nextjs      # Prime for fractals work
 /prime hanscom-plaid        # Prime for hanscom work
-/prime --verbose            # Load session + linked previous sessions
+/prime devops-pulumi-ts     # Prime with Beads workflow
 ```
 
 ---
 
 ## Related Commands
 
-- `/capture-session` — Save session progress and decisions
+- `/capture-session` — Save decisions and sync Beads
+- `/switch` — Switch context to another repo (calls /prime)

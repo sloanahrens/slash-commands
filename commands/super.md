@@ -53,13 +53,28 @@ devbot tree /path/to/repo     # Directory structure - takes literal PATH
 
 ### Step 3.5: Load Context (Memory Priming)
 
-Load project context and most recent session note:
+**Check for Beads first:**
 
 ```bash
-# Get repo path first
-devbot path <repo-name>
-# Output: /path/to/repo
+ls /path/to/repo/.beads/ 2>/dev/null
+```
 
+**If Beads exists:**
+```bash
+cd /path/to/repo
+bd ready
+bd list --status in_progress 2>/dev/null
+```
+
+Display:
+```
+📝 Loaded context:
+   - Beads: 3 ready, 1 in progress
+   - Decisions: [if decisions.md exists, note it]
+```
+
+**If no Beads (legacy):**
+```bash
 # Check for project context (external links, stakeholders)
 ls /path/to/repo/.claude/project-context.md 2>/dev/null
 
@@ -67,7 +82,7 @@ ls /path/to/repo/.claude/project-context.md 2>/dev/null
 ls -t /path/to/repo/.claude/sessions/*.md 2>/dev/null | head -1
 ```
 
-If found, briefly summarize before brainstorming:
+Display:
 ```
 📝 Loaded context:
    - Project: External links, stakeholders (if project-context.md exists)
@@ -102,26 +117,68 @@ Place plans and design docs in the repo's `docs/plans/` folder:
 <repo>/docs/plans/YYYY-MM-DD-<topic>-design.md
 ```
 
-**NOT in `.claude/`** — That folder is for local-only session notes (gitignored).
+**NOT in `.claude/`** — That folder is for local-only context (gitignored).
+
+---
+
+## Post-Brainstorming: Seed Beads Issues
+
+**If `.beads/` exists**, offer to create issues from the brainstorming output:
+
+```
+Brainstorming complete. Seed Beads issues from this design?
+
+Options:
+- Yes, create issues from action items
+- No, I'll create them manually
+```
+
+**If yes:**
+- Extract action items / next steps from the design
+- Create issues with appropriate types and priorities:
+
+```bash
+bd create "Implement X" --type feature --priority 2
+bd create "Add tests for X" --type task --priority 3
+bd dep add <tests-id> <feature-id>  # Tests depend on feature
+```
+
+- Show created issues:
+```
+✓ Created 3 Beads issues:
+  - proj-abc: Implement X [P2, feature]
+  - proj-def: Add tests for X [P3, task] (blocked by proj-abc)
+  - proj-ghi: Update docs [P3, task]
+```
 
 ---
 
 ## Post-Brainstorming Suggestions
 
-After brainstorming completes, suggest:
+After brainstorming completes:
 
+**With Beads:**
 ```
 Brainstorming complete. Next steps:
-- /capture-session <repo>  — Save decisions and progress for future sessions
-- /run-tests <repo>        — Validate implementation
-- /yes-commit <repo>       — Commit changes
+- bd ready                    — See what's ready to work on
+- bd show <id>                — Review issue details
+- /run-tests <repo>           — Validate implementation
+- /yes-commit <repo>          — Commit changes
+```
+
+**Without Beads:**
+```
+Brainstorming complete. Next steps:
+- /capture-session <repo>     — Save decisions and progress
+- /run-tests <repo>           — Validate implementation
+- /yes-commit <repo>          — Commit changes
 ```
 
 | Task Type | Suggested Commands |
 |-----------|-------------------|
-| Feature implementation | `/capture-session`, `/run-tests`, `/yes-commit` |
-| Bug fix | `/capture-session`, `/find-tasks` |
-| Documentation | `/update-docs`, `/capture-session` |
+| Feature implementation | `bd ready`, `/run-tests`, `/yes-commit` |
+| Bug fix | `bd ready`, `/run-tests` |
+| Documentation | `/update-docs`, `/yes-commit` |
 
 ---
 

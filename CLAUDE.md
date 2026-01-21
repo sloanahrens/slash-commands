@@ -141,6 +141,39 @@ This prevents destructive operations by showing existing infrastructure state.
 | `pulumi destroy` | Deletes all resources |
 | `pulumi stack rm` | Loses state permanently |
 
+## Beads Issue Tracking
+
+Beads (`bd`) is a git-backed issue tracker for AI agents. Use for structured work tracking.
+
+### Quick Reference
+
+```bash
+bd ready              # See unblocked work
+bd show <id>          # View issue details
+bd create "Title"     # Create issue (--type task|feature|bug)
+bd update <id> --status in_progress  # Start work
+bd close <id>         # Complete work
+bd sync               # Sync with git
+```
+
+### Two-Layer System
+
+| Layer | Purpose | Location |
+|-------|---------|----------|
+| Beads | Structured work tracking | `<repo>/.beads/` |
+| Decisions log | Narrative context | `<repo>/.claude/decisions.md` |
+
+**Beads** tracks: tasks, features, bugs, dependencies, status
+**Decisions log** tracks: why decisions were made, constraints, learnings
+
+### Initialize Beads in a Repo
+
+```bash
+cd /path/to/repo
+bd init
+# Add .beads/ to .gitignore
+```
+
 ## Key Skills
 
 | Skill | When |
@@ -151,11 +184,16 @@ This prevents destructive operations by showing existing infrastructure state.
 
 ## Repo Context Workflow
 
-Each repo has a `.claude/` folder (gitignored) containing:
-- `project-context.md` — External links, stakeholders, key decisions
-- `sessions/` — Daily session notes tracking progress
+Repos can use Beads (preferred) or legacy session notes. Check for `.beads/` to determine which.
 
-### Workflow
+### With Beads (preferred)
+
+1. **Start work** → `/prime <repo>` runs `bd ready` + shows recent decisions
+2. **Pick work** → `bd show <id>` for details, `bd update <id> --status in_progress`
+3. **Complete work** → `bd close <id>` when done
+4. **End session** → `/capture-session` syncs Beads + prompts for decisions
+
+### Without Beads (legacy)
 
 1. **Start work** → `/prime <repo>` loads project context + most recent session note
 2. **Do work** → Session notes link to previous sessions if more context needed
@@ -172,9 +210,10 @@ Each repo has a `.claude/` folder (gitignored) containing:
 | `~/.claude/commands/` | Slash commands |
 | `~/.claude/devbot/` | CLI tool source (Go) |
 | `~/.claude/hooks/` | Session start/end hooks |
+| `<repo>/.beads/` | Beads issue tracker (gitignored) |
 | `<repo>/.claude/` | Repo-local context (gitignored) |
-| `<repo>/.claude/project-context.md` | External links, stakeholders, decisions |
-| `<repo>/.claude/sessions/` | Session notes (one file per day) |
+| `<repo>/.claude/decisions.md` | Key decisions and rationale |
+| `<repo>/.claude/sessions/` | Legacy session notes (if no Beads) |
 | `<repo>/CLAUDE.md` | Repo-specific guidance |
 
 ## Local Model

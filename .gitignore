@@ -45,3 +45,6 @@ coverage.html
 .DS_Store
 
 .claude/
+
+# Beads issue tracker
+.beads/
