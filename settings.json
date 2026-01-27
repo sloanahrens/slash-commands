@@ -1,0 +1,206 @@
+{
+  "permissions": {
+    "allow": [
+      "Skill(superpowers:*)",
+      "Skill(mlx-hub:*)",
+      "Skill(super)",
+      "Skill(yes-proceed)",
+      "Skill(review-project)",
+      "Skill(prime)",
+      "Skill(capture-session)",
+      "Skill(plan-to-beads)",
+      "Skill(execute-plan)",
+      "WebSearch",
+      "WebFetch(domain:bitbucket.org)",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)",
+      "WebFetch(domain:claudecodemarketplace.com)",
+      "WebFetch(domain:skillsmp.com)",
+      "WebFetch(domain:www.pulumi.com)",
+      "mcp__plugin_episodic-memory_episodic-memory__*",
+      "mcp__plugin_superpowers-chrome_chrome__*",
+      "mcp__plugin_mlx-hub_mlx-hub__*",
+      "mcp__plugin_linear_linear__*",
+      "mcp__Notion__*",
+      "mcp__ide__*",
+      "Bash(devbot:*)",
+      "Bash(bd:*)",
+      "Bash(az:*)",
+      "Bash(atlas:*)",
+      "Bash(aws:*)",
+      "Bash(func:*)",
+      "Bash(gh:*)",
+      "Bash(psql:*)",
+      "Bash(ssh:*)",
+      "Bash(git add:*)",
+      "Bash(git bisect:*)",
+      "Bash(git blame:*)",
+      "Bash(git branch:*)",
+      "Bash(git check-ignore:*)",
+      "Bash(git checkout:*)",
+      "Bash(git cherry-pick:*)",
+      "Bash(git clean:*)",
+      "Bash(git clone:*)",
+      "Bash(git config:*)",
+      "Bash(git describe:*)",
+      "Bash(git diff:*)",
+      "Bash(git fetch:*)",
+      "Bash(git init:*)",
+      "Bash(git log:*)",
+      "Bash(git ls-files:*)",
+      "Bash(git ls-remote:*)",
+      "Bash(git merge:*)",
+      "Bash(git mv:*)",
+      "Bash(git pull:*)",
+      "Bash(git rebase:*)",
+      "Bash(git reflog:*)",
+      "Bash(git remote:*)",
+      "Bash(git reset:*)",
+      "Bash(git restore:*)",
+      "Bash(git rev-list:*)",
+      "Bash(git rev-parse:*)",
+      "Bash(git rm:*)",
+      "Bash(git shortlog:*)",
+      "Bash(git show:*)",
+      "Bash(git stash:*)",
+      "Bash(git status:*)",
+      "Bash(git submodule:*)",
+      "Bash(git switch:*)",
+      "Bash(git tag:*)",
+      "Bash(git worktree:*)",
+      "Bash(make:*)",
+      "Bash(go:*)",
+      "Bash(golangci-lint run:*)",
+      "Bash(node:*)",
+      "Bash(npm:*)",
+      "Bash(npx:*)",
+      "Bash(pnpm:*)",
+      "Bash(bun:*)",
+      "Bash(python3:*)",
+      "Bash(pip3:*)",
+      "Bash(docker:*)",
+      "Bash(gcloud:*)",
+      "Bash(gsutil:*)",
+      "Bash(pulumi:*)",
+      "Bash(cat:*)",
+      "Bash(cd:*)",
+      "Bash(chmod:*)",
+      "Bash(command -v:*)",
+      "Bash(curl:*)",
+      "Bash(du:*)",
+      "Bash(echo:*)",
+      "Bash(env)",
+      "Bash(export:*)",
+      "Bash(file:*)",
+      "Bash(find:*)",
+      "Bash(grep:*)",
+      "Bash(head:*)",
+      "Bash(kill:*)",
+      "Bash(ln:*)",
+      "Bash(ls:*)",
+      "Bash(lsof:*)",
+      "Bash(mkdir:*)",
+      "Bash(nc:*)",
+      "Bash(ping:*)",
+      "Bash(pkill:*)",
+      "Bash(printf:*)",
+      "Bash(ps:*)",
+      "Bash(pwd:*)",
+      "Bash(readlink:*)",
+      "Bash(rm:*)",
+      "Bash(sed:*)",
+      "Bash(source:*)",
+      "Bash(tail:*)",
+      "Bash(tar:*)",
+      "Bash(time:*)",
+      "Bash(timeout:*)",
+      "Bash(tree:*)",
+      "Bash(unzip:*)",
+      "Bash(wc:*)",
+      "Bash(which:*)",
+      "Bash(xargs:*)",
+      "Bash(yes:*)",
+      "Bash(zip:*)",
+      "Bash(brew:*)",
+      "Bash(claude:*)",
+      "Bash(fnm:*)",
+      "Bash(corepack:*)",
+      "Bash(./scripts/*)",
+      "Bash(./tests:*)",
+      "Bash(./config.sh:*)",
+      "Read(//Users/sloan/.claude/**)"
+    ],
+    "deny": []
+  },
+  "hooks": {
+    "PreCompact": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bd prime"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/session-start.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bd prime"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "~/.claude/hooks/session-end.sh"
+          }
+        ]
+      }
+    ]
+  },
+  "enabledPlugins": {
+    "agent-sdk-dev@claude-plugins-official": true,
+    "beads@beads-marketplace": true,
+    "code-review@claude-plugins-official": true,
+    "commit-commands@claude-plugins-official": true,
+    "double-shot-latte@superpowers-marketplace": false,
+    "elements-of-style@superpowers-marketplace": true,
+    "episodic-memory@superpowers-marketplace": true,
+    "explanatory-output-style@claude-plugins-official": true,
+    "feature-dev@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": true,
+    "gopls-lsp@claude-plugins-official": true,
+    "hookify@claude-plugins-official": true,
+    "learning-output-style@claude-plugins-official": true,
+    "linear@claude-plugins-official": true,
+    "mlx-hub@mlx-hub": true,
+    "plugin-dev@claude-plugins-official": true,
+    "pr-review-toolkit@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "rust-analyzer-lsp@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true,
+    "superpowers-chrome@superpowers-marketplace": true,
+    "superpowers-developing-for-claude-code@superpowers-marketplace": true,
+    "superpowers-lab@superpowers-marketplace": true,
+    "superpowers@superpowers-marketplace": true,
+    "typescript-lsp@claude-plugins-official": true
+  }
+}

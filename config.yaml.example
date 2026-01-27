@@ -1,0 +1,47 @@
+# Workspace Configuration
+# Copy this file to config.yaml and edit for your setup
+# config.yaml is gitignored and will not be committed
+
+# Workspace root - all repos live here
+workspace: ~/code/my-workspace
+
+# Working repositories
+# Added via /add-repo or /setup-workspace, or manually
+repos:
+  # Example: Next.js application
+  # - name: my-app
+  #   group: apps
+  #   language: typescript
+
+  # Example: Go API server
+  # - name: my-api
+  #   group: apps
+  #   language: go
+  #   work_dir: cmd/api  # Optional: subdirectory for nested projects
+
+  # Example: Python project
+  # - name: ml-service
+  #   group: services
+  #   language: python
+
+  # Example: Infrastructure
+  # - name: my-infra
+  #   group: devops
+  #   language: typescript
+
+  # Example: With Linear integration
+  # - name: my-project
+  #   group: apps
+  #   language: typescript
+  #   linear_projects:                    # Optional: Linear project names to track
+  #     - "My Project - Feature X"
+  #     - "My Project - Support"
+  #   plan_paths:                         # Optional: Where to find plan docs
+  #     - "docs/plans"                    # Relative to repo root
+  #     - "~/code/company-docs/plans"     # Absolute path
+
+# Optional: Git worktrees directory (relative to workspace)
+# worktrees_dir: .trees
+
+# Optional: Reference clones config (relative to workspace)
+# clones_config: clones/clone-config.json
