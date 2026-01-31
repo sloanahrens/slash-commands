@@ -1,0 +1,50 @@
+# User-specific configuration (root level only)
+/config.yaml
+
+# Project-specific command symlinks
+commands/debug-atap-automation.md
+
+# Claude Code runtime directories
+cache/
+debug/
+double-shot-latte/
+file-history/
+ide/
+notes/
+paste-cache/
+plans/
+plugins/
+projects/
+session-env/
+shell-snapshots/
+statsig/
+telemetry/
+todos/
+
+# Claude Code runtime files
+history.jsonl
+stats-cache.json
+security_warnings_state_*.json
+*.db
+*.db-journal
+
+# devbot build artifacts
+devbot/devbot
+*.exe
+coverage.out
+coverage.html
+*.out
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+
+.claude/
+image-cache/
+scripts/tasks/
+scripts/
